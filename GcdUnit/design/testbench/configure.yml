@@ -1,0 +1,13 @@
+# TODO: Set number of vectors parameter in python file and testbench from yml
+
+name: testbench
+
+outputs:
+  - testbench.sv
+  - test_vectors.txt
+  - design.args
+
+commands:
+  - cp GcdUnitTb.sv outputs/testbench.sv
+  - python3 generate_test_vectors.py
+  - cp test_vectors.txt outputs/test_vectors.txt
