@@ -17,7 +17,7 @@ The cell libraries are in submodules that need to be checked out independently:
 ```
 git submodule update --init libraries/sky130_fd_sc_hd/latest
 ```
-To create liberty files, go into top-level and do:
+To create liberty files, go into the `skywater-pdk` directory and do:
 ```
 make timing
 ```
