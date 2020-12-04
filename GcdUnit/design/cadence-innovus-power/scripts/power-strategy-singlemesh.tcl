@@ -51,7 +51,7 @@ set M1_route_pitchX [dbGet [dbGetLayerByZ 1].pitchX]
 # Bottom stripe params
 
 set pmesh_bot_str_width [expr  8 *  3 * $M1_min_width   ]
-set pmesh_bot_str_pitch [expr 10 * 10 * $M1_route_pitchX]
+set pmesh_bot_str_pitch [expr 4 * 10 * $M1_route_pitchX]
 
 set pmesh_bot_str_intraset_spacing [expr $pmesh_bot_str_pitch - $pmesh_bot_str_width]
 set pmesh_bot_str_interset_pitch   [expr 2*$pmesh_bot_str_pitch]
@@ -90,7 +90,7 @@ addStripe -nets {VSS VDD} -layer $pmesh_bot -direction vertical \
 # - pmesh_top_str_interset_pitch   : Pitch between same-signal stripes
 
 set pmesh_top_str_width [expr  8 *  3 * $M1_min_width   ]
-set pmesh_top_str_pitch [expr 10 * 10 * $M1_route_pitchX]
+set pmesh_top_str_pitch [expr 4 * 10 * $M1_route_pitchX]
 
 set pmesh_top_str_intraset_spacing [expr $pmesh_top_str_pitch - $pmesh_top_str_width]
 set pmesh_top_str_interset_pitch   [expr 2*$pmesh_top_str_pitch]

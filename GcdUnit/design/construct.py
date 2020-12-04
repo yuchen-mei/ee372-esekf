@@ -4,8 +4,8 @@
 #=========================================================================
 # Demo with 16-bit GcdUnit
 #
-# Author : Christopher Torng
-# Date   : June 2, 2019
+# Author : Priyanka Raina
+# Date   : December 4, 2020
 #
 
 import os
@@ -58,23 +58,20 @@ def construct():
   gl_sim        = vcs_sim.clone()
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name( 'gl-sim' )
-  #dc            = Step( this_dir + '/synopsys-dc-synthesis')
   pt_power_rtl  = Step( this_dir + '/synopsys-ptpx-rtl')
 
   # TODO: Use default instead
-  init         = Step( this_dir + '/cadence-innovus-init')
   power        = Step( this_dir + '/cadence-innovus-power')
-  cts          = Step( this_dir + '/cadence-innovus-cts')
   
   # Default steps
 
   info         = Step( 'info',                          default=True )
   dc           = Step( 'synopsys-dc-synthesis',         default=True )
   iflow        = Step( 'cadence-innovus-flowsetup',     default=True )
-  #init         = Step( 'cadence-innovus-init',          default=True )
+  init         = Step( 'cadence-innovus-init',          default=True )
   #power        = Step( 'cadence-innovus-power',         default=True )
   place        = Step( 'cadence-innovus-place',         default=True )
-  #cts          = Step( 'cadence-innovus-cts',           default=True )
+  cts          = Step( 'cadence-innovus-cts',           default=True )
   postcts_hold = Step( 'cadence-innovus-postcts_hold',  default=True )
   route        = Step( 'cadence-innovus-route',         default=True )
   postroute    = Step( 'cadence-innovus-postroute',     default=True )
@@ -215,4 +212,3 @@ def construct():
 if __name__ == '__main__':
   g = construct()
   g.plot()
-
