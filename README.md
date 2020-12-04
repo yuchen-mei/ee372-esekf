@@ -17,7 +17,7 @@ The cell libraries are in submodules that need to be checked out independently:
 ```
 git submodule update --init libraries/sky130_fd_sc_hd/latest
 ```
-To create liberty files, go into top-level and do:
+To create liberty files, go into the `skywater-pdk` directory and do:
 ```
 make timing
 ```
@@ -29,7 +29,7 @@ Follow the setup steps at https://github.com/mflowgen/mflowgen.
 
 # Using the Pipecleaners
 
-First, make sure you update various install paths the `setup.bashrc` file. Then source it.
+First, make sure you update various install paths in the `setup.bashrc` file. Then source it.
 
 Next, enter into the build directory of the pipecleaner you want to run, and run the following:
 
