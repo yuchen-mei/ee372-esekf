@@ -4,9 +4,9 @@ This repository runs the following pipecleaner designs through a digital physica
 *  SramWrapper - uses an OpenRAM generated SRAM (to be added soon)
 
 # Setup
-To run this flow, please install the following dependencies first:
+To run this flow, please install the following dependencies first in this order:
 
-* `skywater-pdk` 
+1. `skywater-pdk` 
 
 Get SkyWater PDK:
 ```
@@ -22,10 +22,10 @@ To create liberty files, go into the `skywater-pdk` directory and do:
 make timing
 ```
 
-* `mflowgen` - This is a tool to create ASIC design flows in a modular fashion.
+2. `mflowgen` - This is a tool to create ASIC design flows in a modular fashion.
 Follow the setup steps at https://github.com/mflowgen/mflowgen.
 
-* `skywater-130nm-adk` - This repo has some scripts that convert the SkyWater PDK into the format that mflowgen expects.
+3. `skywater-130nm-adk` - This repo has some scripts that convert the SkyWater PDK into the format that mflowgen expects. Follow the setup steps at https://code.stanford.edu/ee272/skywater-130nm-adk.
 
 # Using the Pipecleaners
 
