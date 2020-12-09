@@ -30,16 +30,25 @@ Follow the setup steps at https://github.com/mflowgen/mflowgen.
 # Using the Pipecleaners
 
 First, make sure you update various install paths in the `setup.bashrc` file. Then source it.
+```
+bash
+source setup.bashrc
+```
 
 Next, enter into the build directory of the pipecleaner you want to run, and run the following:
+```
+cd build
+$MFLOWGEN_HOME/configure --design ../design/
+```
 
-`$MFLOWGEN_HOME/configure --design ../design/`
+Now, if you do `make status` you will see all the status of all the steps in the flow. Use the following make targets to run and debug each step.
 
 # Helpful make Targets
 *  `make list` - list all the nodes in the graphs and their corresponding step number
 *  `make status` - list the build status of all the steps
 *  `make graph` - generates a PDF of the graph
 *  `make N` - runs step N
+*  `make debug-N` - pulls up GUI for the appropriate tool for debugging (at the output of step N)
 *  `make clean-N` - removes the folder for step N, and sets the status of steps [N,) to build
 *  `make clean-all` - removes folders for all the steps
 *  `make runtimes` - lists the runtime for each step
