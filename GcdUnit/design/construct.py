@@ -196,8 +196,10 @@ def construct():
   g.connect_by_name( gen_saif_gl,  pt_power_gl  ) # run.saif
 
   g.connect_by_name( adk,          gl_sim       )
-  g.connect_by_name( signoff,      gl_sim       ) # design.vcs.v
-  g.connect_by_name( pt_timing,    gl_sim       ) # design.sdf
+  g.connect( signoff.o( 'design.vcs.v' ), gl_sim.i( 'design.vcs.v' ) )
+  #g.connect_by_name( signoff,      gl_sim       ) # design.vcs.v
+  g.connect( pt_timing.o( 'design.sdf' ), gl_sim.i( 'design.sdf' ) )
+  #g.connect_by_name( pt_timing,    gl_sim       ) # design.sdf
   g.connect_by_name( testbench,    gl_sim       ) # testbench.sv
   g.connect_by_name( gl_sim,       gen_saif_gl  ) # run.vcd
  

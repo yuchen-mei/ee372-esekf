@@ -18,6 +18,7 @@ module load dc_shell
 module load innovus
 module load calibre
 module load pts
+module load prime
 #module load ic
 #module load spectre
 
