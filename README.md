@@ -23,7 +23,7 @@ make timing
 ```
 
 2. `mflowgen` - This is a tool to create ASIC design flows in a modular fashion.
-Follow the setup steps at https://github.com/mflowgen/mflowgen.
+Follow the setup steps at https://mflowgen.readthedocs.io/en/latest/quick-start.html.
 
 3. `skywater-130nm-adk` - This repo has some scripts that convert the SkyWater PDK into the format that mflowgen expects. Follow the setup steps at https://code.stanford.edu/ee272/skywater-130nm-adk. The files that are in `skywater-130nm-adk/view-standard` are the ones that mflowgen will use. (This is configured in `design/construct.py` file for each pipecleaner.)
 
