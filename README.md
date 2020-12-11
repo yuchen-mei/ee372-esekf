@@ -38,7 +38,7 @@ source setup.bashrc
 
 Next, enter into the build directory of the pipecleaner you want to run, and run the following:
 ```
-cd build
+cd GCDUnit/build
 $MFLOWGEN_HOME/configure --design ../design/
 ```
 
