@@ -45,8 +45,8 @@ addRing -nets {VDD VSS} -type core_rings -follow core   \
 
 # Get M1 min width and signal routing pitch as defined in the LEF
 
-set M1_min_width    [dbGet [dbGetLayerByZ 1].minWidth]
-set M1_route_pitchX [dbGet [dbGetLayerByZ 1].pitchX]
+set M1_min_width    [dbGet [dbGetLayerByZ 2].minWidth]
+set M1_route_pitchX [dbGet [dbGetLayerByZ 2].pitchX]
 
 # Bottom stripe params
 
@@ -61,7 +61,7 @@ setViaGenMode -viarule_preference default
 setViaGenMode -ignore_DRC false
 
 setAddStripeMode -reset
-setAddStripeMode -stacked_via_bottom_layer 1 \
+setAddStripeMode -stacked_via_bottom_layer 2 \
                  -stacked_via_top_layer    $pmesh_top
 
 # Add the stripes

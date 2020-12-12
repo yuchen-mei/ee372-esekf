@@ -58,16 +58,19 @@ def construct():
   gl_sim        = vcs_sim.clone()
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name( 'gl-sim' )
+
   pt_power_rtl  = Step( this_dir + '/synopsys-ptpx-rtl')
 
   # TODO: Use default instead
+  iflow        = Step( this_dir + '/cadence-innovus-flowsetup')
   power        = Step( this_dir + '/cadence-innovus-power')
-  
+  gdsmerge     = Step( this_dir + '/mentor-calibre-gdsmerge')
+ 
   # Default steps
 
   info         = Step( 'info',                          default=True )
   dc           = Step( 'synopsys-dc-synthesis',         default=True )
-  iflow        = Step( 'cadence-innovus-flowsetup',     default=True )
+  #iflow        = Step( 'cadence-innovus-flowsetup',     default=True )
   init         = Step( 'cadence-innovus-init',          default=True )
   #power        = Step( 'cadence-innovus-power',         default=True )
   place        = Step( 'cadence-innovus-place',         default=True )
@@ -77,7 +80,7 @@ def construct():
   postroute    = Step( 'cadence-innovus-postroute',     default=True )
   signoff      = Step( 'cadence-innovus-signoff',       default=True )
   genlibdb     = Step( 'synopsys-ptpx-genlibdb',        default=True )
-  gdsmerge     = Step( 'mentor-calibre-gdsmerge',       default=True )
+  #gdsmerge     = Step( 'mentor-calibre-gdsmerge',       default=True )
   pt_timing    = Step( 'synopsys-pt-timing-signoff',    default=True )
   drc          = Step( 'mentor-calibre-drc',            default=True )
   lvs          = Step( 'mentor-calibre-lvs',            default=True )
