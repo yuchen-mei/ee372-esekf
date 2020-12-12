@@ -20,6 +20,7 @@ module load innovus
 module load calibre
 module load pts
 module load prime
+module load magic/latest
 #module load ic
 #module load spectre
 

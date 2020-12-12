@@ -60,6 +60,7 @@ def construct():
   gl_sim.set_name( 'gl-sim' )
 
   pt_power_rtl  = Step( this_dir + '/synopsys-ptpx-rtl')
+  magic_drc     = Step( this_dir + '/magic-drc')
 
   # TODO: Use default instead
   iflow        = Step( this_dir + '/cadence-innovus-flowsetup')
@@ -124,6 +125,7 @@ def construct():
   g.add_step( gl_sim       )
   g.add_step( gen_saif_gl  )
   g.add_step( pt_power_gl  )
+  g.add_step( magic_drc    )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -150,6 +152,7 @@ def construct():
   g.connect_by_name( adk,          genlibdb     )
   g.connect_by_name( adk,          gdsmerge     )
   g.connect_by_name( adk,          drc          )
+  g.connect_by_name( adk,          magic_drc    )
   g.connect_by_name( adk,          lvs          )
   g.connect_by_name( adk,          pt_timing    )
   g.connect_by_name( adk,          pt_power_rtl )
@@ -190,6 +193,7 @@ def construct():
   g.connect_by_name( signoff,      gdsmerge     )
   g.connect_by_name( signoff,      drc          )
   g.connect_by_name( gdsmerge,     drc          )
+  g.connect_by_name( gdsmerge,     magic_drc    )
   g.connect_by_name( signoff,      lvs          )
   g.connect_by_name( gdsmerge,     lvs          )
   g.connect_by_name( signoff,      pt_timing    )
