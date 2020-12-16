@@ -5,6 +5,6 @@ load $::env(design_name)
 extract all
 ext2spice lvs
 ext2spice subcircuits off
-ext2spice -o outputs/design.extracted.spice
+ext2spice -o outputs/design_extracted.spice
 
 quit

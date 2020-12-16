@@ -12,7 +12,7 @@ name: netgen-lvs
 #-------------------------------------------------------------------------
 inputs:
   - adk # Needs netgen.tcl setup file from adk
-  - design.extracted.spice
+  - design_extracted.spice
   - design.lvs.v
 
 outputs:
