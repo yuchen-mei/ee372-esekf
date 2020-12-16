@@ -21,6 +21,7 @@ module load calibre
 module load pts
 module load prime
 module load magic/latest
+module load netgen/latest
 #module load ic
 #module load spectre
 

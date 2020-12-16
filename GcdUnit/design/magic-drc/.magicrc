@@ -1,8 +1,4 @@
-###
-###	Source file sky130.magicrc
-###	Process this file with the m4 processor
-###
-puts stdout "Sourcing design .magicrc for technology TECHNAME ..."
+puts stdout "Sourcing design .magicrc for technology EFS8A ..."
 
 # Put grid on 0.005 pitch.  This is important, as some commands don't
 # rescale the grid automatically (such as lef read?).
@@ -15,97 +11,91 @@ if {[lindex $scalefac 1] < 2} {
 # drc off
 drc euclidean on
 
-# Allow override of PDK path from environment variable PDKPATH
-#if {[catch {set PDKPATH $env(PDKPATH)}]} {
-#    set PDKPATH "STAGING_PATH/TECHNAME"
-#}
+#set PDKPATH "~/projects/efabless/tech/SkyWater/EFS8A"
 
 # loading technology
-#ifdef FULLTECH
-#tech load $PDKPATH/MAGIC_CURRENT/TECHNAME-F.tech
-#else
-#tech load $PDKPATH/MAGIC_CURRENT/TECHNAME.tech
-tech load inputs/adk/sky130.tech
-#endif
+#tech load $PDKPATH/libs.tech/magic/EFS8A.tech
+tech load inputs/adk/magic.tech
 
 # load device generator
-#source $PDKPATH/MAGIC_CURRENT/TECHNAME.tcl
+#source $PDKPATH/libs.tech/magic/EFS8A.tcl
 
 # load bind keys (optional)
-# source $PDKPATH/MAGIC_CURRENT/TECHNAME-BindKeys
+# source $PDKPATH/libs.tech/magic/EFS8A-BindKeys
 
 # set units to lambda grid 
-snap lambda
-
-# set sky130 standard power, ground, and substrate names
-set VDD VPWR
-set GND VGND
-set SUB VSUBS
-
-# Allow override of type of magic library views used, "mag" or "maglef",
-# from environment variable MAGTYPE
-
-#if {[catch {set MAGTYPE $env(MAGTYPE)}]} {
-#   set MAGTYPE mag
-#}
+snap internal
 
 # add path to reference cells
-#if {[file isdir ${PDKPATH}/libs.ref/${MAGTYPE}]} {
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_pr
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_io
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_hd
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_hdll
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_hs
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_hvl
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_lp
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_ls
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_fd_sc_ms
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_osu_sc
-#    addpath ${PDKPATH}/libs.ref/${MAGTYPE}/sky130_osu_sc_t18
-#} else {
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_pr/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_io/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_hd/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_hdll/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_hs/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_hvl/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_lp/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_ls/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_fd_sc_ms/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_osu_sc/${MAGTYPE}
-#    addpath ${PDKPATH}/libs.ref/sky130_osu_sc_t18/${MAGTYPE}
-#}
+#set MAGPATH "${PDKPATH}/libs.ref/mag"
+#addpath ${MAGPATH}/primdev
+#addpath ${MAGPATH}/s8fmlt
+#addpath ${MAGPATH}/s8iom0
+#addpath ${MAGPATH}/scs8hd
+#addpath ${MAGPATH}/scs8hdll
+#addpath ${MAGPATH}/scs8hvl
+#addpath ${MAGPATH}/scs8hs
+#addpath ${MAGPATH}/scs8ms
+#addpath ${MAGPATH}/scs8ls
+#addpath ${MAGPATH}/scs8lp
 
 # add path to GDS cells
-#ifdef FULLTECH
-#if {[file isdir ${PDKPATH}/libs.ref/gds]} {
-#    path cell ${PDKPATH}/libs.ref/gds/sky130_fd_pr
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_io
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_hd
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_hdll
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_hs
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_hvl
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_lp
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_ls
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_fd_sc_ms
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_osu130
-#    path cell +${PDKPATH}/libs.ref/gds/sky130_osu130_t18
-#} else {
-#    path cell ${PDKPATH}/libs.ref/sky130_fd_pr/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_io/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_hd/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_hdll/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_hs/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_hvl/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_lp/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_ls/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_fd_sc_ms/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_osu130/gds
-#    path cell +${PDKPATH}/libs.ref/sky130_osu130_t18/gds
-#}
-#endif (FULLTECH)
 
 # add path to IP from catalog.  This procedure defined in the PDK script.
-#catch {magic::query_mylib_ip}
+catch {magic::query_mylib_ip}
 # add path to local IP from user design space.  Defined in the PDK script.
-#catch {magic::query_my_projects}
+catch {magic::query_my_projects}
+
+macro Shift_G "grid 74"
+macro XK_Left "scroll l .1 w"
+macro Shift_XK_Left "scroll l 1 w"
+macro Control_XK_Left "box grow w 1"
+macro Control_Shift_XK_Left "box shrink e 1"
+macro XK_Right "scroll r .1 w"
+macro Shift_XK_Right "scroll r 1 w"
+macro Control_XK_Right "box grow e 1"
+macro Control_Shift_XK_Right "box shrink w 1"
+macro XK_Up "scroll u .1 w"
+macro Shift_XK_Up "scroll u 1 w"
+macro Control_XK_Up "box grow n 1"
+macro Control_Shift_XK_Up "box shrink s 1"
+macro XK_Down "scroll d .1 w"
+macro Shift_XK_Down "scroll d 1 w"
+macro Control_XK_Down "box grow s 1"
+macro Control_Shift_XK_Down "box shrink n 1"
+
+macro XK_Pointer_Button4 "scroll u .05 w"
+macro XK_Pointer_Button5 "scroll d .05 w"
+macro . "history redo -1"
+
+macro XK_L "select less area {ndif pdif nwell poly}"
+macro XK_K "select less area nwell"
+macro XK_J "select less area {m1 lic}"
+macro XK_H "select less area li1"
+macro Control_Shift_XK_X "rotate"
+macro Shift_XK_Pointer_Button4 "stretch N 74"
+macro Shift_XK_Pointer_Button5 "stretch S 74"
+macro Control_XK_Pointer_Button4 "stretch N 34"
+macro Control_XK_Pointer_Button5 "stretch S 34"
+macro Control_Shift_XK_Q "stretch W 88"
+macro Control_Shift_XK_R "stretch E 88"
+macro Control_Shift_XK_W "stretch N 28"
+macro Control_Shift_XK_E "stretch N 4"
+#macro Control_Shift_XK_W "stretch S 6"
+#macro Control_Shift_XK_E "stretch S 8"
+
+macro Control_Shift_XK_Pointer_Button4 "stretch N 17"
+macro Control_Shift_XK_Pointer_Button5 "stretch S 17"
+macro Control_Shift_XK_G "select area {m1 lic}"
+macro Control_Shift_XK_F "select area {poly polycont}"
+macro Control_Shift_XK_D "select area {ndc li1}"
+macro Control_Shift_XK_S "select area ntrans"
+
+macro Shift_D "select clear; move S 10; paint m1c"
+macro Shift_F "select clear; move N 10; paint m1c"
+
+
+macro Shift_B "box height 1.0um; move S 1.655um; select area; erase; select clear; move N 1um; select area; move S 1um; select clear; box height 0.26um; move S 4.35um;  select area; erase; select clear; move S 0.655um; box height 0.655um; select area; move N 0.26um; select clear; box height 20um; select area; move S 0.26um"
+
+
+macro Shift_N "box height 1.74um; move S 2.395um; select area; erase; select clear; move N 1.74um; select area; move S 1.74um; select clear; box height 0.48um; move S 3.61um;  select area; erase; select clear; move S 0.655um; box height 0.655um; select area; move N 0.48um; select clear; box height 20um; select area; move S 0.48um"

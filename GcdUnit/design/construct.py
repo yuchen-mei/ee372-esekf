@@ -59,8 +59,10 @@ def construct():
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name( 'gl-sim' )
 
-  pt_power_rtl  = Step( this_dir + '/synopsys-ptpx-rtl')
-  magic_drc     = Step( this_dir + '/magic-drc')
+  pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl')
+  magic_drc       = Step( this_dir + '/magic-drc')
+  magic_gds2spice = Step( this_dir + '/magic-gds2spice')
+  netgen_lvs      = Step( this_dir + '/netgen-lvs')
 
   # TODO: Use default instead
   iflow        = Step( this_dir + '/cadence-innovus-flowsetup')
@@ -126,6 +128,8 @@ def construct():
   g.add_step( gen_saif_gl  )
   g.add_step( pt_power_gl  )
   g.add_step( magic_drc    )
+  g.add_step( magic_gds2spice )
+  g.add_step( netgen_lvs   )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -153,6 +157,8 @@ def construct():
   g.connect_by_name( adk,          gdsmerge     )
   g.connect_by_name( adk,          drc          )
   g.connect_by_name( adk,          magic_drc    )
+  g.connect_by_name( adk,          magic_gds2spice)
+  g.connect_by_name( adk,          netgen_lvs   )
   g.connect_by_name( adk,          lvs          )
   g.connect_by_name( adk,          pt_timing    )
   g.connect_by_name( adk,          pt_power_rtl )
@@ -196,6 +202,9 @@ def construct():
   g.connect_by_name( gdsmerge,     magic_drc    )
   g.connect_by_name( signoff,      lvs          )
   g.connect_by_name( gdsmerge,     lvs          )
+  g.connect_by_name( gdsmerge,     magic_gds2spice)
+  g.connect_by_name( signoff,      netgen_lvs   )
+  g.connect_by_name( magic_gds2spice, netgen_lvs   )
   g.connect_by_name( signoff,      pt_timing    )
   g.connect_by_name( signoff,      pt_power_rtl )
   g.connect_by_name( gen_saif_rtl, pt_power_rtl ) # run.saif

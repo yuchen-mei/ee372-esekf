@@ -15,6 +15,7 @@ inputs:
   - design_merged.gds
 
 outputs:
+  - drc_results.log
 
 #-------------------------------------------------------------------------
 # Parameters
@@ -24,5 +25,5 @@ parameters:
   design_name: undefined
 
 commands: 
-#  - magic inputs/adk/stdcells.gds/sky130_fd_sc_hd__inv_1.gds
-  - magic inputs/design_merged.gds
+  - magic -noconsole -dnull run_drc.tcl | tee outputs/drc_results.log
+  - grep "error" outputs/drc_results.log
