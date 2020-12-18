@@ -10,12 +10,5 @@
 
 globalNetConnect VDD    -type pgpin -pin VPWR    -inst * -verbose
 globalNetConnect VSS    -type pgpin -pin VGND    -inst * -verbose
-
-# Connect VNW / VPW if any cells have these pins
-
-if { [ lindex [dbGet top.insts.cell.pgterms.name VNW] 0 ] != 0x0 } {
-  globalNetConnect VDD    -type pgpin -pin VNW    -inst * -verbose
-  globalNetConnect VSS    -type pgpin -pin VPW    -inst * -verbose
-}
-
-
+globalNetConnect VSS    -type pgpin -pin vnb    -inst * -verbose
+globalNetConnect VDD    -type pgpin -pin vpb    -inst * -verbose

@@ -1,4 +1,9 @@
-gds read inputs/design_merged.gds
+#gds read inputs/design_merged.gds
+
+lef read rtk-tech.lef
+lef read inputs/adk/stdcells.lef
+
+def read design.def
 load $::env(design_name)
 
 # Extract for LVS

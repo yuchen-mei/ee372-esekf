@@ -68,7 +68,8 @@ def construct():
   iflow        = Step( this_dir + '/cadence-innovus-flowsetup')
   power        = Step( this_dir + '/cadence-innovus-power')
   gdsmerge     = Step( this_dir + '/mentor-calibre-gdsmerge')
- 
+  signoff      = Step( this_dir + '/cadence-innovus-signoff')
+
   # Default steps
 
   info         = Step( 'info',                          default=True )
@@ -81,7 +82,7 @@ def construct():
   postcts_hold = Step( 'cadence-innovus-postcts_hold',  default=True )
   route        = Step( 'cadence-innovus-route',         default=True )
   postroute    = Step( 'cadence-innovus-postroute',     default=True )
-  signoff      = Step( 'cadence-innovus-signoff',       default=True )
+  #signoff      = Step( 'cadence-innovus-signoff',       default=True )
   genlibdb     = Step( 'synopsys-ptpx-genlibdb',        default=True )
   #gdsmerge     = Step( 'mentor-calibre-gdsmerge',       default=True )
   pt_timing    = Step( 'synopsys-pt-timing-signoff',    default=True )
@@ -203,6 +204,7 @@ def construct():
   g.connect_by_name( signoff,      lvs          )
   g.connect_by_name( gdsmerge,     lvs          )
   g.connect_by_name( gdsmerge,     magic_gds2spice)
+  g.connect_by_name( signoff,      magic_gds2spice)
   g.connect_by_name( signoff,      netgen_lvs   )
   g.connect_by_name( magic_gds2spice, netgen_lvs   )
   g.connect_by_name( signoff,      pt_timing    )
