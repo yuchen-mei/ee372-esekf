@@ -18,7 +18,7 @@ The cell libraries are in submodules that need to be checked out independently:
 git submodule update --init libraries/sky130_fd_sc_hd/latest
 git submodule update --init libraries/sky130_fd_pr/latest
 ```
-To create the .lib timing files, go into the `skywater-pdk` directory and do:
+To create the .lib timing files:
 ```
 make timing
 cd ..
