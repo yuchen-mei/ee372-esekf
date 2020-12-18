@@ -29,7 +29,7 @@ cd ..
 ```
 git clone https://github.com/RTimothyEdwards/open_pdks.git
 cd open_pdks
-./configure --with-sky130-source=`realpath ../skywater-pdk` --with-sky130-local-path=`realpath ../PDKS`
+./configure --with-sky130-source=`realpath ../skywater-pdk/libraries` --with-sky130-local-path=`realpath ../PDKS`
 make
 make install
 cd .. 
