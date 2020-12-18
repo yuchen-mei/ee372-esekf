@@ -54,7 +54,10 @@ cd GcdUnit/build
 $MFLOWGEN_HOME/configure --design ../design/
 ```
 
-Now, if you do `make status` you will see all the status of all the steps in the flow. Use the following make targets to run and debug each step.
+Now, if you do `make status` you will see the status of all the steps in the flow. Use the following make targets to run and debug each step. For example to run step number N do:
+```
+make N
+```
 
 # Helpful make Targets
 *  `make list` - list all the nodes in the graphs and their corresponding step number
