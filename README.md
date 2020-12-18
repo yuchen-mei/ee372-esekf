@@ -18,7 +18,7 @@ The cell libraries are in submodules that need to be checked out independently:
 git submodule update --init libraries/sky130_fd_sc_hd/latest
 git submodule update --init libraries/sky130_fd_pr/latest
 ```
-To create the .lib timing files, go into the `skywater-pdk` directory and do:
+To create the .lib timing files:
 ```
 make timing
 cd ..
@@ -29,7 +29,7 @@ cd ..
 ```
 git clone https://github.com/RTimothyEdwards/open_pdks.git
 cd open_pdks
-./configure --with-sky130-source=`realpath ../skywater-pdk` --with-sky130-local-path=`realpath ../PDKS`
+./configure --with-sky130-source=`realpath ../skywater-pdk/libraries` --with-sky130-local-path=`realpath ../PDKS`
 make
 make install
 cd .. 
@@ -54,7 +54,10 @@ cd GcdUnit/build
 $MFLOWGEN_HOME/configure --design ../design/
 ```
 
-Now, if you do `make status` you will see all the status of all the steps in the flow. Use the following make targets to run and debug each step.
+Now, if you do `make status` you will see the status of all the steps in the flow. Use the following make targets to run and debug each step. For example to run step number N do:
+```
+make N
+```
 
 # Helpful make Targets
 *  `make list` - list all the nodes in the graphs and their corresponding step number
