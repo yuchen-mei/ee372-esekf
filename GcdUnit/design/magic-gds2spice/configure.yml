@@ -27,5 +27,6 @@ parameters:
 
 commands: 
   - cp -L inputs/design.def.gz design.def.gz 
-  - gunzip design.def.gz  
+  - gunzip design.def.gz 
+  - sed -i 's/\//____/g' design.def
   - magic -noconsole -dnull extract.tcl | tee gds2spice.log

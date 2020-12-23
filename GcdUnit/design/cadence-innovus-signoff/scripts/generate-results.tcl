@@ -73,6 +73,6 @@ write_lef_abstract                                                       \
 
 # Save DEF for use in running DC again
 
-defOut $vars(results_dir)/$vars(design).def.gz
+defOut -routing $vars(results_dir)/$vars(design).def.gz
 
 

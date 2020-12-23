@@ -1,15 +1,15 @@
-export MFLOWGEN_HOME=/home/praina/ee272/mflowgen
-export MFLOWGEN_PATH=/home/praina/ee272/
+export MFLOWGEN_HOME=/afs/ir.stanford.edu/class/ee272/mflowgen
+export MFLOWGEN_PATH=/afs/ir.stanford.edu/class/ee272/
 
-export OPENRAM_HOME=/home/praina/ee272/OpenRAM/compiler
-export OPENRAM_TECH=/home/praina/ee272/OpenRAM/technology
+export OPENRAM_HOME=/afs/ir.stanford.edu/class/ee272/OpenRAM/compiler
+export OPENRAM_TECH=/afs/ir.stanford.edu/class/ee272/OpenRAM/technology
 export PYTHONPATH=$PYTHONPATH:$OPENRAM_HOME
 
 export FREEPDK45=/cad/freepdk/FreePDK45
 
-export PDKPATH=/home/praina/ee272/PDKS/sky130A
+export PDKPATH=/afs/ir.stanford.edu/class/ee272/PDKS/sky130A
 
-export PATH=/home/praina/.local/bin:$PATH
+export PATH=/home/users/praina/.local/bin:$PATH
 export PATH=/cad/mentor/2019.11/Catapult_Synthesis_10.4b-841621/Mgc_home/bin:$PATH
 export MGLS_LICENSE_FILE=1717@cadlic0.stanford.edu
 
