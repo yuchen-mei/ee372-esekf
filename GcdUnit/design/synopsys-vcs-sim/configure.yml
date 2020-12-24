@@ -56,7 +56,7 @@ commands:
 
 parameters:
   clock_period: 1.0
-  testbench_name: tb
+  testbench_name: GcdUnitTb
   waveform: True
 
 debug: 
