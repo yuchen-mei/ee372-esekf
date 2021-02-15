@@ -1,0 +1,32 @@
+#=========================================================================
+# Extract spice from gds using magic
+#=========================================================================
+# Author : Priyanka Raina
+# Date   : Dec 12, 2020
+#
+
+name: magic-gds2spice
+
+#-------------------------------------------------------------------------
+# Inputs and Outputs
+#-------------------------------------------------------------------------
+inputs:
+  - adk
+  - design_merged.gds
+  - design.def.gz
+
+outputs:
+  - design_extracted.spice
+
+#-------------------------------------------------------------------------
+# Parameters
+#-------------------------------------------------------------------------
+
+parameters:
+  design_name: undefined
+
+commands: 
+  - cp -L inputs/design.def.gz design.def.gz 
+  - gunzip design.def.gz 
+  - sed -i 's/\//____/g' design.def
+  - magic -noconsole -dnull extract.tcl | tee gds2spice.log

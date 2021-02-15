@@ -1,0 +1,7 @@
+name: rtl
+
+outputs:
+  - design.v
+
+commands:
+  - cat SramWrapper.v > outputs/design.v 
