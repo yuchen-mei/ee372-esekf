@@ -28,7 +28,7 @@ def construct():
   parameters = {
     'construct_path' : __file__,
     'design_name'    : 'SramWrapper',
-    'clock_period'   : 2.0,
+    'clock_period'   : 25.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
     'topographical'  : True,
@@ -50,14 +50,14 @@ def construct():
   sram          = Step( this_dir + '/sram'              )
   rtl           = Step( this_dir + '/rtl'           )
   constraints   = Step( this_dir + '/constraints'   )
-  testbench     = Step( this_dir + '/testbench'     )
-  vcs_sim       = Step( this_dir + '/synopsys-vcs-sim')
-  rtl_sim       = vcs_sim.clone()
-  gl_sim        = vcs_sim.clone()
-  rtl_sim.set_name( 'rtl-sim' )
-  gl_sim.set_name( 'gl-sim' )
+  # testbench     = Step( this_dir + '/testbench'     )
+  # vcs_sim       = Step( this_dir + '/synopsys-vcs-sim')
+  # rtl_sim       = vcs_sim.clone()
+  # gl_sim        = vcs_sim.clone()
+  # rtl_sim.set_name( 'rtl-sim' )
+  # gl_sim.set_name( 'gl-sim' )
 
-  pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl')
+  # pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl')
   magic_drc       = Step( this_dir + '/magic-drc')
   magic_gds2spice = Step( this_dir + '/magic-gds2spice')
   netgen_lvs      = Step( this_dir + '/netgen-lvs')
@@ -86,13 +86,13 @@ def construct():
   pt_timing    = Step( 'synopsys-pt-timing-signoff',    default=True )
   drc          = Step( 'mentor-calibre-drc',            default=True )
   lvs          = Step( 'mentor-calibre-lvs',            default=True )
-  gen_saif     = Step( 'synopsys-vcd2saif-convert',     default=True )
-  gen_saif_rtl = gen_saif.clone()
-  gen_saif_gl  = gen_saif.clone()
-  gen_saif_rtl.set_name( 'gen-saif-rtl' )
-  gen_saif_gl.set_name( 'gen-saif-gl' )
+  # gen_saif     = Step( 'synopsys-vcd2saif-convert',     default=True )
+  # gen_saif_rtl = gen_saif.clone()
+  # gen_saif_gl  = gen_saif.clone()
+  # gen_saif_rtl.set_name( 'gen-saif-rtl' )
+  # gen_saif_gl.set_name( 'gen-saif-gl' )
   #pt_power_rtl = Step( 'synopsys-ptpx-rtl',             default=True ) 
-  pt_power_gl  = Step( 'synopsys-ptpx-gl',              default=True )
+  # pt_power_gl  = Step( 'synopsys-ptpx-gl',              default=True )
   
   # To open DRC and LVS results in calibre viewer do:
   # make debug-[DRC_STEP] or make debug-[LVS_STEP]
@@ -104,8 +104,8 @@ def construct():
   g.add_step( info         )
   g.add_step( sram         )
   g.add_step( rtl          )
-  g.add_step( testbench    )
-  g.add_step( rtl_sim      )
+  # g.add_step( testbench    )
+  # g.add_step( rtl_sim      )
   g.add_step( constraints  )
   g.add_step( dc           )
   g.add_step( iflow        )
@@ -122,11 +122,11 @@ def construct():
   g.add_step( drc          )
   g.add_step( lvs          )
   g.add_step( pt_timing    )
-  g.add_step( gen_saif_rtl )
-  g.add_step( pt_power_rtl )
-  g.add_step( gl_sim       )
-  g.add_step( gen_saif_gl  )
-  g.add_step( pt_power_gl  )
+  # g.add_step( gen_saif_rtl )
+  # g.add_step( pt_power_rtl )
+  # g.add_step( gl_sim       )
+  # g.add_step( gen_saif_gl  )
+  # g.add_step( pt_power_gl  )
   g.add_step( magic_drc    )
   g.add_step( magic_gds2spice )
   g.add_step( netgen_lvs   )
@@ -137,9 +137,9 @@ def construct():
   
   # Dynamically add edges
 
-  rtl_sim.extend_inputs(['design.v'])
-  rtl_sim.extend_inputs(['test_vectors.txt'])
-  gl_sim.extend_inputs(['test_vectors.txt'])
+  # rtl_sim.extend_inputs(['design.v'])
+  # rtl_sim.extend_inputs(['test_vectors.txt'])
+  # gl_sim.extend_inputs(['test_vectors.txt'])
   dc.extend_inputs(['sram_tt_1p1V_25C.db'])
   pt_timing.extend_inputs(['sram_tt_1p1V_25C.db'])
   genlibdb.extend_inputs(['sram_tt_1p1V_25C.db'])
@@ -169,12 +169,12 @@ def construct():
   g.connect_by_name( adk,          netgen_lvs   )
   g.connect_by_name( adk,          lvs          )
   g.connect_by_name( adk,          pt_timing    )
-  g.connect_by_name( adk,          pt_power_rtl )
-  g.connect_by_name( adk,          pt_power_gl  )
+  # g.connect_by_name( adk,          pt_power_rtl )
+  # g.connect_by_name( adk,          pt_power_gl  )
 
-  g.connect_by_name( rtl,          rtl_sim      ) # design.v
-  g.connect_by_name( testbench,    rtl_sim      ) # testbench.sv
-  g.connect_by_name( rtl_sim,      gen_saif_rtl ) # run.vcd
+  # g.connect_by_name( rtl,          rtl_sim      ) # design.v
+  # g.connect_by_name( testbench,    rtl_sim      ) # testbench.sv
+  # g.connect_by_name( rtl_sim,      gen_saif_rtl ) # run.vcd
 
   g.connect_by_name( sram,        dc        )
   g.connect_by_name( sram,        iflow     )
@@ -193,14 +193,14 @@ def construct():
 
   g.connect_by_name( rtl,          dc           )
   g.connect_by_name( constraints,  dc           )
-  g.connect_by_name( gen_saif_rtl, dc           ) # run.saif
+  # g.connect_by_name( gen_saif_rtl, dc           ) # run.saif
   
   g.connect_by_name( dc,           iflow        )
   g.connect_by_name( dc,           init         )
   g.connect_by_name( dc,           power        )
   g.connect_by_name( dc,           place        )
   g.connect_by_name( dc,           cts          )
-  g.connect_by_name( dc,           pt_power_rtl ) # design.namemap
+  # g.connect_by_name( dc,           pt_power_rtl ) # design.namemap
 
   g.connect_by_name( iflow,        init         )
   g.connect_by_name( iflow,        power        )
@@ -230,18 +230,18 @@ def construct():
   g.connect_by_name( signoff,      netgen_lvs   )
   g.connect_by_name( magic_gds2spice, netgen_lvs   )
   g.connect_by_name( signoff,      pt_timing    )
-  g.connect_by_name( signoff,      pt_power_rtl )
-  g.connect_by_name( gen_saif_rtl, pt_power_rtl ) # run.saif
-  g.connect_by_name( signoff,      pt_power_gl  )
-  g.connect_by_name( gen_saif_gl,  pt_power_gl  ) # run.saif
+  # g.connect_by_name( signoff,      pt_power_rtl )
+  # g.connect_by_name( gen_saif_rtl, pt_power_rtl ) # run.saif
+  # g.connect_by_name( signoff,      pt_power_gl  )
+  # g.connect_by_name( gen_saif_gl,  pt_power_gl  ) # run.saif
 
-  g.connect_by_name( adk,          gl_sim       )
-  g.connect( signoff.o( 'design.vcs.v' ), gl_sim.i( 'design.vcs.v' ) )
-  #g.connect_by_name( signoff,      gl_sim       ) # design.vcs.v
-  g.connect( pt_timing.o( 'design.sdf' ), gl_sim.i( 'design.sdf' ) )
-  #g.connect_by_name( pt_timing,    gl_sim       ) # design.sdf
-  g.connect_by_name( testbench,    gl_sim       ) # testbench.sv
-  g.connect_by_name( gl_sim,       gen_saif_gl  ) # run.vcd
+  # g.connect_by_name( adk,          gl_sim       )
+  # g.connect( signoff.o( 'design.vcs.v' ), gl_sim.i( 'design.vcs.v' ) )
+  # #g.connect_by_name( signoff,      gl_sim       ) # design.vcs.v
+  # g.connect( pt_timing.o( 'design.sdf' ), gl_sim.i( 'design.sdf' ) )
+  # #g.connect_by_name( pt_timing,    gl_sim       ) # design.sdf
+  # g.connect_by_name( testbench,    gl_sim       ) # testbench.sv
+  # g.connect_by_name( gl_sim,       gen_saif_gl  ) # run.vcd
  
   #-----------------------------------------------------------------------
   # Parameterize
