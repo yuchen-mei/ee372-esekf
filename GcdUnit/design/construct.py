@@ -22,7 +22,6 @@ def construct():
   #-----------------------------------------------------------------------
   
   adk_name = 'skywater-130nm-adk'
-  #adk_name = 'freepdk-45nm'
   adk_view = 'view-standard'
 
   parameters = {
