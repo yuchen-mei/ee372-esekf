@@ -19,7 +19,7 @@ outputs:
 #-------------------------------------------------------------------------
 
 parameters:
-  clock_period: 1.0
+  clock_period: 20.0
   design_name: undefined
 
 commands: 

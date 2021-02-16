@@ -2,10 +2,10 @@
 #=========================================================================
 # construct.py
 #=========================================================================
-# Demo with 16-bit GcdUnit
+# Demo with a simple SRAM macro
 #
 # Author : Priyanka Raina
-# Date   : December 4, 2020
+# Date   : February 15, 2021
 #
 
 import os
@@ -22,12 +22,11 @@ def construct():
   #-----------------------------------------------------------------------
   
   adk_name = 'skywater-130nm-adk'
-  #adk_name = 'freepdk-45nm'
   adk_view = 'view-standard'
 
   parameters = {
     'construct_path' : __file__,
-    'design_name'    : 'SramWrapper',
+    'design_name'    : 'SramUnit',
     'clock_period'   : 25.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
@@ -140,15 +139,16 @@ def construct():
   # rtl_sim.extend_inputs(['design.v'])
   # rtl_sim.extend_inputs(['test_vectors.txt'])
   # gl_sim.extend_inputs(['test_vectors.txt'])
-  dc.extend_inputs(['sram_tt_1p1V_25C.db'])
-  pt_timing.extend_inputs(['sram_tt_1p1V_25C.db'])
-  genlibdb.extend_inputs(['sram_tt_1p1V_25C.db'])
+  dc.extend_inputs(['sram_tt_1p8V_25C.db'])
+  pt_timing.extend_inputs(['sram_tt_1p8V_25C.db'])
+  genlibdb.extend_inputs(['sram_tt_1p8V_25C.db'])
 
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
-    step.extend_inputs(['sram_tt_1p1V_25C.lib', 'sram.lef'])
+    step.extend_inputs(['sram_tt_1p8V_25C.lib', 'sram.lef'])
 
   gdsmerge.extend_inputs(['sram.gds'])
   lvs.extend_inputs(['sram.sp'])
+  
   # Connect by name
 
   g.connect_by_name( adk,          dc           )

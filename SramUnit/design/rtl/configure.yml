@@ -4,4 +4,4 @@ outputs:
   - design.v
 
 commands:
-  - cat SramWrapper.v > outputs/design.v 
+  - cat SramUnit.v > outputs/design.v 
