@@ -1,7 +1,7 @@
 # Overview
 This repository runs the following pipecleaner designs through a digital physical design flow using Design Compiler and Innovus with the SkyWater open source 130nm PDK.
 *  GcdUnit - computes the greatest common divisor function, consists of 100-200 gates
-*  SramWrapper - uses an OpenRAM generated SRAM (to be added soon)
+*  SramUnit - uses an OpenRAM generated SRAM, plus a simple counter that supplies addresses to it
 
 # Setup
 To run this flow, please install the following dependencies first in this order:
