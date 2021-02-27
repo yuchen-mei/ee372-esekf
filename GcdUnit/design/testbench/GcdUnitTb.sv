@@ -1,4 +1,4 @@
-`define CLK_PERIOD 25
+`define CLK_PERIOD 20
 `define ASSIGNMENT_DELAY 5
 `define FINISH_TIME 2000000
 `define NUM_TEST_VECTORS 100
@@ -32,7 +32,7 @@ module GcdUnitTb;
   );
 
   initial begin
-    $readmemh("test_vectors.txt", test_vectors);
+    $readmemh("inputs/test_vectors.txt", test_vectors);
     clk <= 0;
     reset <= 1;
     a_b_addr_r <= 0;

@@ -51,7 +51,7 @@ source setup.bashrc
 Next, enter into the build directory of the pipecleaner you want to run, and run the following:
 ```
 cd GcdUnit/build
-$MFLOWGEN_HOME/configure --design ../design/
+mflowgen run --design ../design/
 ```
 
 Now, if you do `make status` you will see the status of all the steps in the flow. Use the following make targets to run and debug each step. For example to run step number N do:

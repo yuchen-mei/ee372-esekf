@@ -16,15 +16,20 @@ inputs:
   - run.saif
   - design.namemap
 
+outputs:
+  - design.pwr.rpt
+  - design.pwr.hier.rpt
+  - design.sw.rpt
+
 #-------------------------------------------------------------------------
 # Commands
 #-------------------------------------------------------------------------
 
 commands:
   - pt_shell -file pt_px.tcl
-
-
-outputs:
+  - cp reports/*.pwr.rpt outputs/design.pwr.rpt
+  - cp reports/*.pwr.hier.rpt outputs/design.pwr.hier.rpt
+  - cp reports/*.sw.rpt outputs/design.sw.rpt
 
 #-------------------------------------------------------------------------
 # Parameters

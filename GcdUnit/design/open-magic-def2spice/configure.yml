@@ -1,18 +1,17 @@
 #=========================================================================
-# Extract spice from gds using magic
+# Extract spice from def using magic
 #=========================================================================
 # Author : Priyanka Raina
 # Date   : Dec 12, 2020
 #
 
-name: magic-gds2spice
+name: open-magic-def2spice
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design_merged.gds
   - design.def.gz
 
 outputs:
@@ -25,8 +24,13 @@ outputs:
 parameters:
   design_name: undefined
 
-commands: 
+commands:
+  - cp inputs/adk/sky130A.magicrc .magicrc
+  - cp inputs/adk/sky130A.tech sky130A.tech
+  - cp inputs/adk/sky130A.tcl sky130A.tcl
+  - cp inputs/adk/rtk-tech.lef rtk-tech-nolicon.lef
+  - sed -i '/LAYER licon/,/END licon/d' rtk-tech-nolicon.lef
   - cp -L inputs/design.def.gz design.def.gz 
   - gunzip design.def.gz 
-  - sed -i 's/\//____/g' design.def
-  - magic -noconsole -dnull extract.tcl | tee gds2spice.log
+  - sed -i 's/\//____/g' design.def # FIXME: Fix generated names properly in layout 
+  - magic -noconsole -dnull extract.tcl | tee def2spice.log

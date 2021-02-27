@@ -1,25 +1,31 @@
 #=========================================================================
-# run-debug.tcl
+# LVS using netgen
 #=========================================================================
-# Opens an Innovus session with GUI enabled and loads the finished
-# checkpoint for this step.
-#
-# Author : Christopher Torng
-# Date   : January 10, 2020
+# Author : Priyanka Raina
+# Date   : Dec 12, 2020
 #
 
-#-------------------------------------------------------------------------
-# Setup
-#-------------------------------------------------------------------------
-# Restore from the finished checkpoint for this step and set up variables
-
-source checkpoints/design.checkpoint/save.enc
-source innovus-foundation-flow/custom-scripts/setup-session.tcl
+name: open-netgen-lvs
 
 #-------------------------------------------------------------------------
-# Open the Innovus GUI
+# Inputs and Outputs
+#-------------------------------------------------------------------------
+inputs:
+  - adk
+  - design_extracted.spice
+  - design.lvs.v
+
+outputs:
+  - lvs_results.log
+
+#-------------------------------------------------------------------------
+# Parameters
 #-------------------------------------------------------------------------
 
-win
+parameters:
+  design_name: undefined
 
+commands: 
+  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -v inputs/design.lvs.v -o design_lvs.spice
+  - sh run_lvs.sh
 
