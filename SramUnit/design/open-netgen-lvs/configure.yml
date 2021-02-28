@@ -26,6 +26,6 @@ parameters:
   design_name: undefined
 
 commands: 
-  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -v inputs/design.lvs.v -o design_lvs.spice
+  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.lvs.v -o design_lvs.spice
   - sh run_lvs.sh
 

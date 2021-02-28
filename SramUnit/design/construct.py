@@ -155,6 +155,8 @@ def construct():
   dc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
   dc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
   pt_timing.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
+  pt_power_rtl.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
+  pt_power_gl.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.gds'])
   netgen_lvs.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.sp'])
   
@@ -201,7 +203,10 @@ def construct():
   g.connect_by_name( sram,            signoff         )
   g.connect_by_name( sram,            gdsmerge        )
   g.connect_by_name( sram,            pt_timing       )
+  g.connect_by_name( sram,            pt_power_rtl    )
+  g.connect_by_name( sram,            pt_power_gl     )
   g.connect_by_name( sram,            magic_def2spice )
+  g.connect_by_name( sram,            netgen_lvs      )
 
   g.connect_by_name( rtl,             dc              )
   g.connect_by_name( constraints,     dc              )
