@@ -10,6 +10,7 @@ module load vcs
 module load lc
 module load dc_shell
 module load xcelium
+module load genus
 module load innovus
 module load calibre
 module load pts

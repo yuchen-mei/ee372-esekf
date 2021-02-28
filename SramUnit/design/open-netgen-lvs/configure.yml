@@ -1,22 +1,22 @@
 #=========================================================================
-# Extract spice from gds using magic
+# LVS using netgen
 #=========================================================================
 # Author : Priyanka Raina
 # Date   : Dec 12, 2020
 #
 
-name: magic-gds2spice
+name: open-netgen-lvs
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design_merged.gds
-  - design.def.gz
+  - design_extracted.spice
+  - design.lvs.v
 
 outputs:
-  - design_extracted.spice
+  - lvs_results.log
 
 #-------------------------------------------------------------------------
 # Parameters
@@ -26,7 +26,6 @@ parameters:
   design_name: undefined
 
 commands: 
-  - cp -L inputs/design.def.gz design.def.gz 
-  - gunzip design.def.gz 
-  - sed -i 's/\//____/g' design.def
-  - magic -noconsole -dnull extract.tcl | tee gds2spice.log
+  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -v inputs/design.lvs.v -o design_lvs.spice
+  - sh run_lvs.sh
+
