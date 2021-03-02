@@ -120,10 +120,9 @@ addStripe -nets {VSS VDD} -layer $pmesh_top -direction horizontal \
     -start [expr $pmesh_top_str_pitch]
 
 
-# macro power
+# Route power to power pins on the macro
+
 deselectAll
 selectInst sram
 
-addRing -nets {VDD VSS} -type block_rings -around selected -layer {top met5 bottom met5 left met4 right met4} -width 4.0f -spacing 1.6 -offset 1.6
-
-sroute -connect {blockPin padRing} -layerChangeRange {met1 met5} -blockPinTarget { nearestTarget } -nets {VDD VSS} -allowLayerChange 1 -blockPin useLef -inst sram
+sroute -connect {blockPin} -layerChangeRange {met1 met5} -blockPinTarget { nearestTarget } -nets {VDD VSS} -allowLayerChange 1 -blockPin useLef -inst sram
