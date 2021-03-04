@@ -59,13 +59,10 @@ set pt_uut $::env(strip_path)
 set pt_clk_period $::env(clock_period)
 
 file mkdir ${pt_reports}
-link_design > ${pt_reports}/${ptpx_design_name}.link.rpt
 create_clock ${pt_clk} -name ideal_clock1 -period ${pt_clk_period}
 source inputs/design.namemap > ${pt_reports}/${ptpx_design_name}.map.rpt
 
 read_saif inputs/run.saif -strip_path ${pt_uut}
-read_parasitics -format spef inputs/design.spef.gz
-read_sdc inputs/design.pt.sdc > ${pt_reports}/${ptpx_design_name}.sdc.rpt
 
 update_power > ${pt_reports}/${ptpx_design_name}.update.rpt
 report_switching_activity > ${pt_reports}/${ptpx_design_name}.sw.rpt 
