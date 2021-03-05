@@ -2,6 +2,9 @@
 
 name: testbench
 
+inputs:
+  - adk
+
 outputs:
   - testbench.sv
   - test_vectors.txt
@@ -11,3 +14,4 @@ commands:
   - cp GcdUnitTb.sv outputs/testbench.sv
   - python3 generate_test_vectors.py
   - cp test_vectors.txt outputs/test_vectors.txt
+  - cat design.args inputs/adk/vcs_incdir.txt > outputs/design.args
