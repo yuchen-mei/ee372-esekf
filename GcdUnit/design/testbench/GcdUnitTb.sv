@@ -14,6 +14,8 @@ module GcdUnitTb;
   wire a_b_rdy_w;
   wire [15 : 0] c_w;
   wire c_rdy_w;
+  supply0 VSS;
+  supply1 VDD;
 
   reg [16 + 16 + 16 - 1 : 0] test_vectors [`NUM_TEST_VECTORS - 1 : 0];
 
@@ -31,8 +33,8 @@ module GcdUnitTb;
     .resp_val(c_rdy_w)
     `ifdef USE_POWER_PINS
     ,
-    .VSS(0),
-    .VDD(1)
+    .VSS(VSS),
+    .VDD(VDD)
     `endif
   );
 
