@@ -29,6 +29,11 @@ module GcdUnitTb;
     .resp_msg(c_w),
     .resp_rdy(1'b1),
     .resp_val(c_rdy_w)
+    `ifdef USE_POWER_PINS
+    ,
+    .VSS(0),
+    .VDD(1)
+    `endif
   );
 
   initial begin

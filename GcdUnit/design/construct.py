@@ -217,9 +217,12 @@ def construct():
 
   # Gate level simulation
   g.connect_by_name( adk,             gl_sim          )
-  g.connect( signoff.o( 'design.vcs.v' ), gl_sim.i( 'design.vcs.v' ) )
-  g.connect( pt_timing.o( 'design.sdf' ), gl_sim.i( 'design.sdf' ) )
-  g.connect_by_name( testbench,       gl_sim          ) # testbench.sv
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
+  g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
+  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
+  g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
+  g.connect( testbench.o( 'test_vectors.txt' ), gl_sim.i( 'test_vectors.txt' ) )
+
   g.connect( gl_sim.o( 'design.vpd' ), gen_saif_gl.i( 'run.vcd' ) ) 
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
