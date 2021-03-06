@@ -17,6 +17,9 @@ module SramUnitTb;
   reg [`DATA_WIDTH-1:0] din0;
   wire [`DATA_WIDTH-1:0] dout0;
   wire [`DATA_WIDTH-1:0] dout1;
+  supply0 VSS;
+  supply1 VDD;
+
 
   always #(`CLK_PERIOD/2) clk =~clk;
  
@@ -35,6 +38,11 @@ module SramUnitTb;
     .din0(din0),
     .dout0(dout0),
     .dout1(dout1)
+    `ifdef USE_POWER_PINS
+    ,
+    .VSS(VSS),
+    .VDD(VDD)
+    `endif
   );
 
   initial begin

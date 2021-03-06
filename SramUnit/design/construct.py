@@ -152,6 +152,7 @@ def construct():
   # Dynamically add edges
 
   rtl_sim.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.v'])
+  gl_sim.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.v'])
   dc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
   dc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
   pt_timing.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
@@ -167,6 +168,7 @@ def construct():
 
   # Connect by name
 
+  g.connect_by_name( adk,             testbench       )
   g.connect_by_name( adk,             dc              )
   g.connect_by_name( adk,             iflow           )
   g.connect_by_name( adk,             init            )
@@ -191,6 +193,7 @@ def construct():
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
   g.connect_by_name( sram,            rtl_sim         )
+  g.connect_by_name( sram,            gl_sim         )
   g.connect_by_name( sram,            dc              )
   g.connect_by_name( sram,            iflow           )
   g.connect_by_name( sram,            init            )
@@ -253,10 +256,12 @@ def construct():
 
   # Gate level simulation
   g.connect_by_name( adk,             gl_sim          )
-  g.connect( signoff.o( 'design.vcs.v' ), gl_sim.i( 'design.vcs.v' ) )
-  g.connect( pt_timing.o( 'design.sdf' ), gl_sim.i( 'design.sdf' ) )
-  g.connect_by_name( testbench,       gl_sim          ) # testbench.sv
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
+  g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
+  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
+  g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
   g.connect( gl_sim.o( 'design.vpd' ), gen_saif_gl.i( 'run.vcd' ) ) 
+
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
 
