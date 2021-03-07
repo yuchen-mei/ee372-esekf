@@ -37,6 +37,7 @@ foreach x $ADK_LVS_EXCLUDE_CELL_LIST {
 
 saveNetlist -excludeLeafCell                   \
             -phys                              \
+            -flattenBus                        \
             $vars(results_dir)/$vars(design).lvs.v
 
 # Write netlist for Virtuoso simulation

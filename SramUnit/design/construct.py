@@ -57,6 +57,7 @@ def construct():
   sram            = Step( this_dir + '/sram'                            )
   pin_placement   = Step( this_dir + '/pin-placement'                   )
   floorplan       = Step( this_dir + '/floorplan'                       )
+  syn_compile     = Step( this_dir + '/synopsys-dc-compile'             )
 
   # Power node is custom because power and gnd pins are named differently in
   # the standard cells compared to the default node, and the layer numbering is
@@ -122,6 +123,7 @@ def construct():
   g.add_step( testbench       )
   g.add_step( rtl_sim         )
   g.add_step( constraints     )
+  g.add_step( syn_compile     )
   g.add_step( dc              )
   g.add_step( iflow           )
   g.add_step( pin_placement   )
@@ -165,6 +167,7 @@ def construct():
     step.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.lib', 'sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
 
   init.extend_inputs(['floorplan.tcl', 'pin-assignments.tcl'])
+  dc.extend_inputs(['compile.tcl'])
 
   # Connect by name
 
@@ -212,6 +215,7 @@ def construct():
   g.connect_by_name( sram,            netgen_lvs      )
 
   g.connect_by_name( rtl,             dc              )
+  g.connect_by_name( syn_compile,     dc              )
   g.connect_by_name( constraints,     dc              )
   g.connect_by_name( gen_saif_rtl,    dc              ) # run.saif
   
