@@ -27,7 +27,7 @@ def construct():
   parameters = {
     'construct_path' : __file__,
     'design_name'    : 'GcdUnit',
-    'clock_period'   : 6.0,
+    'clock_period'   : 8.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
     'topographical'  : True,
