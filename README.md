@@ -17,6 +17,7 @@ The cell libraries are in submodules that need to be checked out independently:
 ```
 git submodule update --init libraries/sky130_fd_sc_hd/latest
 git submodule update --init libraries/sky130_fd_pr/latest
+git submodule update --init libraries/sky130_fd_io/latest
 ```
 To create the .lib timing files:
 ```
