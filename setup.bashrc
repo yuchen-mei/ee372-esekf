@@ -6,16 +6,14 @@ export MGLS_LICENSE_FILE=1717@cadlic0.stanford.edu
 
 export PATH=/cad/openlane/build/bin:$PATH
 
-source /cad/modules/tcl/init/sh
 module load base
 module load vcs
 module load lc
-module load dc_shell
+module load syn
 module load xcelium
 module load genus
 module load innovus
-module load calibre
-module load pts
+module load calibre/2019.1
 module load prime
 module load magic/latest
 module load netgen/latest
