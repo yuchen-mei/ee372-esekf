@@ -17,6 +17,7 @@ The cell libraries are in submodules that need to be checked out independently:
 ```
 git submodule update --init libraries/sky130_fd_sc_hd/latest
 git submodule update --init libraries/sky130_fd_pr/latest
+git submodule update --init libraries/sky130_fd_io/latest
 ```
 To create the .lib timing files:
 ```
@@ -29,7 +30,7 @@ cd ..
 ```
 git clone https://github.com/RTimothyEdwards/open_pdks.git
 cd open_pdks
-./configure --with-sky130-source=`realpath ../skywater-pdk/libraries` --with-sky130-local-path=`realpath ../PDKS`
+./configure --enable-sky130-pdk=`realpath ../skywater-pdk/libraries` --with-sky130-local-path=`realpath ../PDKS`
 make
 make install
 cd .. 
