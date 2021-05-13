@@ -54,18 +54,24 @@ module GcdUnitTb;
 
     if (c_rdy_w) begin
       $display("got c = %d, expected c = %d", c_w, test_vectors[c_addr_r][48 - 1 : 32]);
-      assert(c_w == test_vectors[c_addr_r][48 - 1 : 32]);
+      // FIXME: current version of Icarus does not support assertions
+      // assert(c_w == test_vectors[c_addr_r][48 - 1 : 32]);
       c_addr_r <= c_addr_r + 1;
       if (c_addr_r == `NUM_TEST_VECTORS - 1) $finish;
     end
   end
 
   initial begin
-    $vcdplusfile("dump.vcd");
-    $vcdplusmemon();
-    $vcdpluson(0, GcdUnitTb);
+    $dumpfile("run.vcd");
+    $dumpvars(0, GcdUnitTb);
     #(`FINISH_TIME);
     $finish(2);
   end
+
+  `ifdef GL
+  initial begin
+    $sdf_annotate("inputs/design.sdf", GcdUnit_inst);
+  end
+  `endif
 
 endmodule 
