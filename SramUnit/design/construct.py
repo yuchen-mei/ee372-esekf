@@ -78,7 +78,6 @@ def construct():
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   netgen_lvs      = Step( this_dir + '/open-netgen-lvs'                 )
 
-
   # Default steps
 
   info            = Step( 'info',                          default=True )
@@ -162,6 +161,7 @@ def construct():
   pt_power_gl.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.gds'])
   netgen_lvs.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.sp'])
+  magic_drc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
   
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
     step.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.lib', 'sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
@@ -213,6 +213,7 @@ def construct():
   g.connect_by_name( sram,            pt_power_gl     )
   g.connect_by_name( sram,            magic_def2spice )
   g.connect_by_name( sram,            netgen_lvs      )
+  g.connect_by_name( sram,            magic_drc       )
 
   g.connect_by_name( rtl,             dc              )
   g.connect_by_name( syn_compile,     dc              )
