@@ -87,12 +87,9 @@ def construct():
   # in your graph but configure it differently, for example, RTL simulation and
   # gate-level simulation use the same VCS node
   
-  vcs_sim         = Step( 'synopsys-vcs-sim',              default=True )
-  rtl_sim         = vcs_sim.clone()
-  gl_sim          = vcs_sim.clone()
-  rtl_sim.set_name( 'rtl-sim' )
-  gl_sim.set_name( 'gl-sim' )
-  
+  rtl_sim         = Step( 'synopsys-vcs-sim',              default=True )
+  gl_sim          = Step( this_dir + '/open-icarus-simulation'          )
+
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
   place           = Step( 'cadence-innovus-place',         default=True )
@@ -196,7 +193,7 @@ def construct():
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
   g.connect_by_name( sram,            rtl_sim         )
-  g.connect_by_name( sram,            gl_sim         )
+  g.connect_by_name( sram,            gl_sim          )
   g.connect_by_name( sram,            dc              )
   g.connect_by_name( sram,            iflow           )
   g.connect_by_name( sram,            init            )
@@ -261,11 +258,11 @@ def construct():
 
   # Gate level simulation
   g.connect_by_name( adk,             gl_sim          )
-  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
   g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
-  g.connect( gl_sim.o( 'design.vpd' ), gen_saif_gl.i( 'run.vcd' ) ) 
+  g.connect( gl_sim.o( 'run.vcd' ), gen_saif_gl.i( 'run.vcd' ) ) 
 
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
