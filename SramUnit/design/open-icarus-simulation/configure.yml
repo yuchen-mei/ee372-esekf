@@ -1,31 +1,37 @@
 #=========================================================================
-# DRC using magic
+# Simulation using Icarus Verilog
 #=========================================================================
-# Author : Priyanka Raina
-# Date   : Dec 12, 2020
+# Author : Kartik Prabhu
+# Date   : May 13, 2021
 #
 
-name: open-magic-drc
+name: open-icarus-simulation
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design_merged.gds
+  - design.v
+  - testbench.sv
+  - design.sdf
+  - design.args
 
 outputs:
-  - drc_results.log
+  - run.vcd
+
+#-------------------------------------------------------------------------
+# Commands
+#-------------------------------------------------------------------------
+
+commands:
+  - bash run.sh
 
 #-------------------------------------------------------------------------
 # Parameters
 #-------------------------------------------------------------------------
 
 parameters:
-  design_name: undefined
-
-commands:
-  - cp inputs/adk/magicrc .magicrc
-  - cp inputs/*.lef .
-  - magic -noconsole -dnull run_drc.tcl | tee outputs/drc_results.log
-  - grep "error" outputs/drc_results.log
+  testbench_name: tb
+  dut_name: dut
+  waveform: True

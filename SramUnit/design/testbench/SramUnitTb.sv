@@ -66,15 +66,21 @@ module SramUnitTb;
     #(1*`CLK_PERIOD) //csb1 <= 1;
     csb0 <= 1;
     #(`CLK_PERIOD/2) $display("dout0 = %h", dout0);
-    assert(dout0 == 32'haaaaaaaa);
+    // FIXME: current version of Icarus (that we use for GLS) does not support assertions
+    //assert(dout0 == 32'haaaaaaaa);
   end
 
   initial begin
-    $vcdplusfile("dump.vcd");
-    $vcdplusmemon();
-    $vcdpluson(0, SramUnitTb);
+    $dumpfile("run.vcd");
+    $dumpvars(0, SramUnitTb);
     #(`FINISH_TIME);
     $finish(2);
   end
+
+  `ifdef GL
+  initial begin
+    $sdf_annotate("inputs/design.sdf", SramUnit_inst);
+  end
+  `endif
 
 endmodule 

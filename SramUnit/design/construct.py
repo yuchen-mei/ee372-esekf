@@ -78,7 +78,6 @@ def construct():
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   netgen_lvs      = Step( this_dir + '/open-netgen-lvs'                 )
 
-
   # Default steps
 
   info            = Step( 'info',                          default=True )
@@ -88,12 +87,9 @@ def construct():
   # in your graph but configure it differently, for example, RTL simulation and
   # gate-level simulation use the same VCS node
   
-  vcs_sim         = Step( 'synopsys-vcs-sim',              default=True )
-  rtl_sim         = vcs_sim.clone()
-  gl_sim          = vcs_sim.clone()
-  rtl_sim.set_name( 'rtl-sim' )
-  gl_sim.set_name( 'gl-sim' )
-  
+  rtl_sim         = Step( 'synopsys-vcs-sim',              default=True )
+  gl_sim          = Step( this_dir + '/open-icarus-simulation'          )
+
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
   place           = Step( 'cadence-innovus-place',         default=True )
@@ -162,6 +158,7 @@ def construct():
   pt_power_gl.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.gds'])
   netgen_lvs.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.sp'])
+  magic_drc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
   
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
     step.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.lib', 'sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
@@ -196,7 +193,7 @@ def construct():
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
   g.connect_by_name( sram,            rtl_sim         )
-  g.connect_by_name( sram,            gl_sim         )
+  g.connect_by_name( sram,            gl_sim          )
   g.connect_by_name( sram,            dc              )
   g.connect_by_name( sram,            iflow           )
   g.connect_by_name( sram,            init            )
@@ -213,6 +210,7 @@ def construct():
   g.connect_by_name( sram,            pt_power_gl     )
   g.connect_by_name( sram,            magic_def2spice )
   g.connect_by_name( sram,            netgen_lvs      )
+  g.connect_by_name( sram,            magic_drc       )
 
   g.connect_by_name( rtl,             dc              )
   g.connect_by_name( syn_compile,     dc              )
@@ -260,11 +258,11 @@ def construct():
 
   # Gate level simulation
   g.connect_by_name( adk,             gl_sim          )
-  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
   g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
-  g.connect( gl_sim.o( 'design.vpd' ), gen_saif_gl.i( 'run.vcd' ) ) 
+  g.connect( gl_sim.o( 'run.vcd' ), gen_saif_gl.i( 'run.vcd' ) ) 
 
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
