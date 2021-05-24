@@ -72,6 +72,7 @@ def construct():
 
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
+  magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
   netgen_lvs      = Step( this_dir + '/open-netgen-lvs'                 )
 
 
@@ -106,6 +107,11 @@ def construct():
   gen_saif_rtl.set_name( 'gen-saif-rtl' )
   gen_saif_gl.set_name( 'gen-saif-gl' )
   
+  netgen_lvs_def  = netgen_lvs.clone()
+  netgen_lvs_def.set_name('netgen-lvs-def')
+  netgen_lvs_gds  = netgen_lvs.clone()
+  netgen_lvs_gds.set_name('netgen-lvs-gds')
+
   pt_power_gl     = Step( 'synopsys-ptpx-gl',              default=True )
   
 
@@ -137,7 +143,9 @@ def construct():
   g.add_step( pt_power_gl     )
   g.add_step( magic_drc       )
   g.add_step( magic_def2spice )
-  g.add_step( netgen_lvs      )
+  g.add_step( netgen_lvs_def  )
+  g.add_step( magic_gds2spice )
+  g.add_step( netgen_lvs_gds  )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -165,7 +173,9 @@ def construct():
   g.connect_by_name( adk,             gdsmerge        )
   g.connect_by_name( adk,             magic_drc       )
   g.connect_by_name( adk,             magic_def2spice )
-  g.connect_by_name( adk,             netgen_lvs      )
+  g.connect_by_name( adk,             magic_gds2spice )
+  g.connect_by_name( adk,             netgen_lvs_def  )
+  g.connect_by_name( adk,             netgen_lvs_gds  )
   g.connect_by_name( adk,             pt_timing       )
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
@@ -206,9 +216,17 @@ def construct():
   
   # DRC, LVS, timing signoff and power signoff
   g.connect_by_name( gdsmerge,        magic_drc       )
+
+  # LVS using DEF
   g.connect_by_name( signoff,         magic_def2spice )
-  g.connect_by_name( signoff,         netgen_lvs      )
-  g.connect_by_name( magic_def2spice, netgen_lvs      )
+  g.connect_by_name( signoff,         netgen_lvs_def  )
+  g.connect_by_name( magic_def2spice, netgen_lvs_def  )
+
+  # LVS using GDS
+  g.connect_by_name( signoff,         magic_gds2spice )
+  g.connect_by_name( signoff,         netgen_lvs_gds  )
+  g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
+
   g.connect_by_name( signoff,         pt_timing       )
   g.connect_by_name( signoff,         pt_power_rtl    )
   g.connect_by_name( gen_saif_rtl,    pt_power_rtl    ) # run.saif

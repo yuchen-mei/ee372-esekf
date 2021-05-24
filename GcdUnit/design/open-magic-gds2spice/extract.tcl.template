@@ -1,0 +1,13 @@
+lef read ./inputs/adk/stdcells.lef;
+cif istyle sky130(vendor);
+gds flatten true;
+gds read ./design.gds;
+load ${design_name};
+select top cell;
+extract no all;
+extract do local;
+extract unique;
+extract;
+ext2spice lvs;
+ext2spice ${design_name}.ext;
+exit;
