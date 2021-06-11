@@ -1,22 +1,21 @@
 #=========================================================================
-# LVS using netgen
+# Run antenna check
 #=========================================================================
-# Author : Priyanka Raina
-# Date   : Dec 12, 2020
+# Author : Kartik Prabhu
+# Date   : May 25, 2021
 #
 
-name: open-netgen-lvs
+name: open-magic-antenna
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design_extracted.spice
-  - design.lvs.v
+  - design.def.gz
 
 outputs:
-  - lvs_results.log
+  - antenna_check.log
 
 #-------------------------------------------------------------------------
 # Parameters
@@ -25,6 +24,10 @@ outputs:
 parameters:
   design_name: undefined
 
-commands: 
-  - sh run_lvs.sh
-
+commands:
+  - cp inputs/adk/magicrc .magicrc
+  - cp inputs/adk/rtk-tech.lef rtk-tech-nolicon.lef
+  - sed -i '/LAYER licon/,/END licon/d' rtk-tech-nolicon.lef
+  - cp -L inputs/design.def.gz design.def.gz 
+  - gunzip design.def.gz 
+  - magic -noconsole -dnull run_antenna.tcl | tee outputs/antenna_check.log
