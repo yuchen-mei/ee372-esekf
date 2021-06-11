@@ -149,19 +149,19 @@ def construct():
   
   # Dynamically add edges
 
-  rtl_sim.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.v'])
-  gl_sim.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.v'])
-  dc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
-  dc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
-  pt_timing.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
-  pt_power_rtl.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
-  pt_power_gl.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.db'])
-  gdsmerge.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.gds'])
-  netgen_lvs.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.sp'])
-  magic_drc.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
+  rtl_sim.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.v'])
+  gl_sim.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.v'])
+  dc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
+  dc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
+  pt_timing.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
+  pt_power_rtl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
+  pt_power_gl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
+  gdsmerge.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.gds'])
+  netgen_lvs.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  magic_drc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
   
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
-    step.extend_inputs(['sky130_sram_4kbyte_1rw1r_32x1024_8_TT_1p8V_25C.lib', 'sky130_sram_4kbyte_1rw1r_32x1024_8.lef'])
+    step.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib', 'sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
 
   init.extend_inputs(['floorplan.tcl', 'pin-assignments.tcl'])
   dc.extend_inputs(['compile.tcl'])

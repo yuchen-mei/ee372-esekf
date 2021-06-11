@@ -30,14 +30,15 @@ foreach x $ADK_LVS_EXCLUDE_CELL_LIST {
   append lvs_exclude_list [dbGet -u -e top.insts.cell.name $x] " "
 }
 
+saveNetlist -excludeLeafCell                   \
+            -flat                              \
+            -phys                              \
+            -excludeCellInst $lvs_exclude_list \
+            $vars(results_dir)/$vars(design).lvs.v
+
 #saveNetlist -excludeLeafCell                   \
 #            -phys                              \
-#            -excludeCellInst $lvs_exclude_list \
 #            $vars(results_dir)/$vars(design).lvs.v
-
-saveNetlist -excludeLeafCell                   \
-            -phys                              \
-            $vars(results_dir)/$vars(design).lvs.v
 
 # Write netlist for Virtuoso simulation
 #

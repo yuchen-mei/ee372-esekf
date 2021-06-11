@@ -5,7 +5,7 @@
 module SramUnit #(
   parameter NUM_WMASKS = 4,
   parameter DATA_WIDTH = 32,
-  parameter ADDR_WIDTH = 10
+  parameter ADDR_WIDTH = 8
 )(
   input clk, // clock
   input rst_n,
@@ -21,7 +21,7 @@ module SramUnit #(
 
   reg [ADDR_WIDTH-1:0]  addr1;
 
-  sky130_sram_4kbyte_1rw1r_32x1024_8 sram(
+  sky130_sram_1kbyte_1rw1r_32x256_8 sram(
     .clk0(clk),
     .csb0(csb0),
     .web0(web0),

@@ -3,7 +3,7 @@
 `define FINISH_TIME 200
 `define NUM_WMASKS 4
 `define DATA_WIDTH 32
-`define ADDR_WIDTH 10
+`define ADDR_WIDTH 8
 
 module SramUnitTb;
   

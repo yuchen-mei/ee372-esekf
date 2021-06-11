@@ -226,6 +226,8 @@ def construct():
   # LVS using GDS
   g.connect_by_name( signoff,         magic_gds2spice )
   g.connect_by_name( signoff,         netgen_lvs_gds  )
+  #g.connect_by_name( gdsmerge,        magic_gds2spice )
+  #g.connect_by_name( signoff,        netgen_lvs_gds  )
   g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
 
   g.connect_by_name( signoff,         pt_timing       )

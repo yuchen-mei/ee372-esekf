@@ -1,6 +1,6 @@
 lef read rtk-tech-nolicon.lef
 lef read inputs/adk/stdcells.lef
-lef read inputs/sky130_sram_4kbyte_1rw1r_32x1024_8.lef
+lef read inputs/sky130_sram_1kbyte_1rw1r_32x256_8.lef
 
 def read design.def
 
