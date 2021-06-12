@@ -5,7 +5,7 @@
 # Date   : Dec 12, 2020
 #
 
-name: open-netgen-lvs
+name: open-netgen-lvs-def-spice
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
@@ -13,7 +13,6 @@ name: open-netgen-lvs
 inputs:
   - adk
   - design_extracted.spice
-  - design.lvs.v
   - design.flatbuslvs.v
 
 outputs:
@@ -29,6 +28,5 @@ parameters:
 commands: 
   - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.flatbuslvs.v -o design_lvs.spice
   - cat inputs/adk/netgen-setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
-  #- cat inputs/adk/netgen-setup.tcl > netgen_blackbox_setup.tcl
   - sh run_lvs.sh
 

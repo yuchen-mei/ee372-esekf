@@ -76,7 +76,12 @@ def construct():
 
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
-  netgen_lvs      = Step( this_dir + '/open-netgen-lvs'                 )
+  magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
+  netgen_lvs_def  = Step( this_dir + '/open-netgen-lvs-def-spice'       )
+  netgen_lvs_def.set_name('netgen-lvs-def')
+  
+  netgen_lvs_gds  = Step( this_dir + '/open-netgen-lvs'                 )
+  netgen_lvs_gds.set_name('netgen-lvs-gds')
 
   # Default steps
 
@@ -141,7 +146,9 @@ def construct():
   g.add_step( pt_power_gl     )
   g.add_step( magic_drc       )
   g.add_step( magic_def2spice )
-  g.add_step( netgen_lvs      )
+  g.add_step( netgen_lvs_def  )
+  g.add_step( magic_gds2spice )
+  g.add_step( netgen_lvs_gds  )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -157,7 +164,8 @@ def construct():
   pt_power_rtl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   pt_power_gl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.gds'])
-  netgen_lvs.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  netgen_lvs_gds.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   magic_drc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
   
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
@@ -182,7 +190,9 @@ def construct():
   g.connect_by_name( adk,             gdsmerge        )
   g.connect_by_name( adk,             magic_drc       )
   g.connect_by_name( adk,             magic_def2spice )
-  g.connect_by_name( adk,             netgen_lvs      )
+  g.connect_by_name( adk,             magic_gds2spice )
+  g.connect_by_name( adk,             netgen_lvs_def  )
+  g.connect_by_name( adk,             netgen_lvs_gds  )
   g.connect_by_name( adk,             pt_timing       )
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
@@ -209,7 +219,9 @@ def construct():
   g.connect_by_name( sram,            pt_power_rtl    )
   g.connect_by_name( sram,            pt_power_gl     )
   g.connect_by_name( sram,            magic_def2spice )
-  g.connect_by_name( sram,            netgen_lvs      )
+  g.connect_by_name( sram,            magic_gds2spice )
+  g.connect_by_name( sram,            netgen_lvs_def  )
+  g.connect_by_name( sram,            netgen_lvs_gds  )
   g.connect_by_name( sram,            magic_drc       )
 
   g.connect_by_name( rtl,             dc              )
@@ -247,9 +259,17 @@ def construct():
   
   # DRC, LVS, timing signoff and power signoff
   g.connect_by_name( gdsmerge,        magic_drc       )
+
+  # LVS using DEF
   g.connect_by_name( signoff,         magic_def2spice )
-  g.connect_by_name( signoff,         netgen_lvs      )
-  g.connect_by_name( magic_def2spice, netgen_lvs      )
+  g.connect_by_name( signoff,         netgen_lvs_def  )
+  g.connect_by_name( magic_def2spice, netgen_lvs_def  )
+
+  # LVS using GDS
+  g.connect_by_name( gdsmerge,        magic_gds2spice )
+  g.connect_by_name( signoff,         netgen_lvs_gds  )
+  g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
+
   g.connect_by_name( signoff,         pt_timing       )
   g.connect_by_name( signoff,         pt_power_rtl    )
   g.connect_by_name( gen_saif_rtl,    pt_power_rtl    ) # run.saif
