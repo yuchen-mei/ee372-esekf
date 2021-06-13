@@ -30,10 +30,11 @@ foreach x $ADK_LVS_EXCLUDE_CELL_LIST {
   append lvs_exclude_list [dbGet -u -e top.insts.cell.name $x] " "
 }
 
+# Typically we would exclude cells, but we are not in this case,
+# since Magic creates abstract views for all cells (incl. filler)
 saveNetlist -excludeLeafCell                   \
             -flat                             \
            -phys                              \
-           -excludeCellInst $lvs_exclude_list \
            $vars(results_dir)/$vars(design).lvs.v
 
 # saveNetlist -excludeLeafCell                   \

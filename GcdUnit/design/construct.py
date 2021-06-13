@@ -75,6 +75,7 @@ def construct():
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
   netgen_lvs      = Step( this_dir + '/open-netgen-lvs'                 )
   magic_antenna   = Step( this_dir + '/open-magic-antenna'              )
+  calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
 
 
   # Default steps
@@ -148,6 +149,7 @@ def construct():
   g.add_step( netgen_lvs_def  )
   g.add_step( magic_gds2spice )
   g.add_step( netgen_lvs_gds  )
+  g.add_step( calibre_lvs     )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -179,6 +181,7 @@ def construct():
   g.connect_by_name( adk,             magic_gds2spice )
   g.connect_by_name( adk,             netgen_lvs_def  )
   g.connect_by_name( adk,             netgen_lvs_gds  )
+  g.connect_by_name( adk,             calibre_lvs     )
   g.connect_by_name( adk,             pt_timing       )
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
@@ -231,6 +234,10 @@ def construct():
   g.connect_by_name( gdsmerge,        magic_gds2spice )
   g.connect_by_name( signoff,         netgen_lvs_gds  )
   g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
+
+  # LVS comparision using Calibre
+  g.connect_by_name( signoff,         calibre_lvs     )
+  g.connect_by_name( magic_gds2spice, calibre_lvs     )
 
   g.connect_by_name( signoff,         pt_timing       )
   g.connect_by_name( signoff,         pt_power_rtl    )
