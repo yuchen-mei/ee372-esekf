@@ -1,22 +1,22 @@
 #=========================================================================
-# Extract spice from def using magic
+# LVS using netgen
 #=========================================================================
 # Author : Priyanka Raina
 # Date   : Dec 12, 2020
 #
 
-name: open-magic-def2spice
+name: open-netgen-lvs-def-spice
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design.def.gz
-  - sky130_sram_1kbyte_1rw1r_32x256_8.lef
+  - design_extracted.spice
+  - design.flatbuslvs.v
 
 outputs:
-  - design_extracted.spice
+  - lvs_results.log
 
 #-------------------------------------------------------------------------
 # Parameters
@@ -25,11 +25,8 @@ outputs:
 parameters:
   design_name: undefined
 
-commands:
-  - cp inputs/adk/magicrc .magicrc
-  - cp inputs/adk/rtk-tech.lef rtk-tech-nolicon.lef
-  - sed -i '/LAYER licon/,/END licon/d' rtk-tech-nolicon.lef
-  - cp -L inputs/design.def.gz design.def.gz 
-  - gunzip design.def.gz 
-  - sed -i 's/\//____/g' design.def # FIXME: Fix generated names properly in layout 
-  - magic -noconsole -dnull extract.tcl | tee def2spice.log
+commands: 
+  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.flatbuslvs.v -o design_lvs.spice
+  - cat inputs/adk/netgen-setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
+  - sh run_lvs.sh
+

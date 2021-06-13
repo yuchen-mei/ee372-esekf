@@ -34,6 +34,10 @@ addRing -nets {VDD VSS} -type core_rings -follow core   \
         -offset $savedvars(p_ring_spacing)              \
         -extend_corner {tl tr bl br lt lb rt rb}
 
+selectInst sram
+setAddRingMode -ring_target default -extend_over_row 0 -ignore_rows 0 -avoid_short 0 -skip_crossing_trunks none -stacked_via_top_layer met5 -stacked_via_bottom_layer met4 -via_using_exact_crossover_size 1 -orthogonal_only true -skip_via_on_pin {  standardcell } -skip_via_on_wire_shape {  noshape }
+addRing -nets {VDD VSS} -type block_rings -around selected -layer {top met5 bottom met5 left met4 right met4} -width {top 1.8 bottom 1.8 left 1.8 right 1.8} -spacing {top 1.8 bottom 1.8 left 1.8 right 1.8} -offset {top 1.8 bottom 1.8 left 1.8 right 1.8} -center 0 -threshold 0 -jog_distance 0 -snap_wire_center_to_grid None
+
 #-------------------------------------------------------------------------
 # Power mesh bottom settings (vertical)
 #-------------------------------------------------------------------------
@@ -61,9 +65,9 @@ setViaGenMode -viarule_preference default
 setViaGenMode -ignore_DRC false
 
 setAddStripeMode -reset
-setAddStripeMode -stacked_via_bottom_layer 2 \
-                 -stacked_via_top_layer    $pmesh_top
-
+setAddStripeMode -stacked_via_bottom_layer met1 \
+                 -stacked_via_top_layer    $pmesh_top\
+                 -break_at {  block_ring  } 
 # Add the stripes
 #
 # Use -start to offset the stripes slightly away from the core edge.
@@ -101,8 +105,8 @@ setViaGenMode -ignore_DRC false
 
 setAddStripeMode -reset
 setAddStripeMode -stacked_via_bottom_layer $pmesh_bot \
-                 -stacked_via_top_layer    $pmesh_top
-
+                 -stacked_via_top_layer    $pmesh_top \
+                 -break_at {  block_ring  } 
 # Add the stripes
 #
 # Use -start to offset the stripes slightly away from the core edge.
@@ -117,6 +121,7 @@ addStripe -nets {VSS VDD} -layer $pmesh_top -direction horizontal \
     -max_same_layer_jog_length $pmesh_top_str_pitch               \
     -padcore_ring_bottom_layer_limit $pmesh_bot                   \
     -padcore_ring_top_layer_limit $pmesh_top                      \
+    -block_ring_bottom_layer_limit met4                           \
     -start [expr $pmesh_top_str_pitch]
 
 

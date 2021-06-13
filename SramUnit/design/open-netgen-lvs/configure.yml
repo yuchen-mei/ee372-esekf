@@ -14,6 +14,7 @@ inputs:
   - adk
   - design_extracted.spice
   - design.lvs.v
+  - design.flatbuslvs.v
 
 outputs:
   - lvs_results.log
@@ -26,8 +27,8 @@ parameters:
   design_name: undefined
 
 commands: 
-  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.lvs.v -o design_lvs.spice
-  #- cat inputs/adk/netgen-setup.tcl > netgen_blackbox_setup.tcl
+  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.flatbuslvs.v -o design_lvs.spice
   - cat inputs/adk/netgen-setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
+  #- cat inputs/adk/netgen-setup.tcl > netgen_blackbox_setup.tcl
   - sh run_lvs.sh
 
