@@ -33,14 +33,12 @@ foreach x $ADK_LVS_EXCLUDE_CELL_LIST {
 saveNetlist -excludeLeafCell                   \
             -flat                              \
             -phys                              \
-            -excludeCellInst $lvs_exclude_list \
             $vars(results_dir)/$vars(design).lvs.v
 
 saveNetlist -excludeLeafCell                   \
             -flat                              \
             -flattenBus                        \
             -phys                              \
-            -excludeCellInst $lvs_exclude_list \
             $vars(results_dir)/$vars(design).flatbuslvs.v
 
 

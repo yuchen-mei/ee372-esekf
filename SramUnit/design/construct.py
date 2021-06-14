@@ -83,6 +83,8 @@ def construct():
   netgen_lvs_gds  = Step( this_dir + '/open-netgen-lvs'                 )
   netgen_lvs_gds.set_name('netgen-lvs-gds')
 
+  calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
+
   # Default steps
 
   info            = Step( 'info',                          default=True )
@@ -149,6 +151,7 @@ def construct():
   g.add_step( netgen_lvs_def  )
   g.add_step( magic_gds2spice )
   g.add_step( netgen_lvs_gds  )
+  g.add_step( calibre_lvs     )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -166,6 +169,7 @@ def construct():
   gdsmerge.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.gds'])
   netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   netgen_lvs_gds.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  calibre_lvs.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   magic_drc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
   
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
@@ -193,6 +197,7 @@ def construct():
   g.connect_by_name( adk,             magic_gds2spice )
   g.connect_by_name( adk,             netgen_lvs_def  )
   g.connect_by_name( adk,             netgen_lvs_gds  )
+  g.connect_by_name( adk,             calibre_lvs     )
   g.connect_by_name( adk,             pt_timing       )
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
@@ -222,6 +227,7 @@ def construct():
   g.connect_by_name( sram,            magic_gds2spice )
   g.connect_by_name( sram,            netgen_lvs_def  )
   g.connect_by_name( sram,            netgen_lvs_gds  )
+  g.connect_by_name( sram,            calibre_lvs     )
   g.connect_by_name( sram,            magic_drc       )
 
   g.connect_by_name( rtl,             dc              )
@@ -269,6 +275,10 @@ def construct():
   g.connect_by_name( gdsmerge,        magic_gds2spice )
   g.connect_by_name( signoff,         netgen_lvs_gds  )
   g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
+
+  # LVS comparision using Calibre
+  g.connect_by_name( signoff,         calibre_lvs     )
+  g.connect_by_name( magic_gds2spice, calibre_lvs     )
 
   g.connect_by_name( signoff,         pt_timing       )
   g.connect_by_name( signoff,         pt_power_rtl    )
