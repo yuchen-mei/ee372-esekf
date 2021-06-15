@@ -12,7 +12,7 @@ name: open-magic-antenna
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design.def.gz
+  - design_merged.gds
 
 outputs:
   - antenna_check.log
@@ -26,8 +26,4 @@ parameters:
 
 commands:
   - cp inputs/adk/magicrc .magicrc
-  - cp inputs/adk/rtk-tech.lef rtk-tech-nolicon.lef
-  - sed -i '/LAYER licon/,/END licon/d' rtk-tech-nolicon.lef
-  - cp -L inputs/design.def.gz design.def.gz 
-  - gunzip design.def.gz 
   - magic -noconsole -dnull run_antenna.tcl | tee outputs/antenna_check.log
