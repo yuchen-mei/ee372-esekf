@@ -223,7 +223,7 @@ def construct():
   
   # DRC, LVS, timing signoff and power signoff
   g.connect_by_name( gdsmerge,        magic_drc       )
-  g.connect_by_name( signoff,         magic_antenna   )
+  g.connect_by_name( gdsmerge,        magic_antenna   )
 
   # LVS using DEF
   g.connect_by_name( signoff,         magic_def2spice )

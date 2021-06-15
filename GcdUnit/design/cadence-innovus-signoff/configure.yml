@@ -61,6 +61,7 @@ commands:
 
 parameters:
   order:
+    - fill-decap.tcl
     - main.tcl
     - generate-results.tcl
     - reporting.tcl

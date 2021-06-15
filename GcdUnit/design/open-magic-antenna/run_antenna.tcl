@@ -1,11 +1,10 @@
-lef read rtk-tech-nolicon.lef
-lef read inputs/adk/stdcells.lef
+# Copied from https://github.com/efabless/caravel/blob/master/gds/antenna_on_gds.tcl
 
-def read design.def
+gds read inputs/design_merged.gds
 
 load $::env(design_name)
 
-# Extract for LVS
+select top cell
 extract do local
 extract no capacitance
 extract no coupling
@@ -13,6 +12,8 @@ extract no resisitance
 extract no adjust
 extract unique
 extract
+
+feedback save ./outputs/antenna.feedback.txt
 
 antennacheck debug
 antennacheck
