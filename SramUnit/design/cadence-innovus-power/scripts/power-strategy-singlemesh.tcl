@@ -58,7 +58,7 @@ set pmesh_bot_str_width [expr  8 *  3 * $M1_min_width   ]
 set pmesh_bot_str_pitch [expr 4 * 10 * $M1_route_pitchX]
 
 set pmesh_bot_str_intraset_spacing [expr $pmesh_bot_str_pitch - $pmesh_bot_str_width]
-set pmesh_bot_str_interset_pitch   [expr 2*$pmesh_bot_str_pitch]
+set pmesh_bot_str_interset_pitch   [expr 4*$pmesh_bot_str_pitch]
 
 setViaGenMode -reset
 setViaGenMode -viarule_preference default
@@ -82,7 +82,7 @@ addStripe -nets {VSS VDD} -layer $pmesh_bot -direction vertical \
     -max_same_layer_jog_length $pmesh_bot_str_pitch             \
     -padcore_ring_bottom_layer_limit $pmesh_bot                 \
     -padcore_ring_top_layer_limit $pmesh_top                    \
-    -start [expr $pmesh_bot_str_pitch]
+    -start [expr 2*$pmesh_bot_str_pitch]
 
 #-------------------------------------------------------------------------
 # Power mesh top settings (horizontal)
@@ -97,7 +97,7 @@ set pmesh_top_str_width [expr  8 *  3 * $M1_min_width   ]
 set pmesh_top_str_pitch [expr 4 * 10 * $M1_route_pitchX]
 
 set pmesh_top_str_intraset_spacing [expr $pmesh_top_str_pitch - $pmesh_top_str_width]
-set pmesh_top_str_interset_pitch   [expr 2*$pmesh_top_str_pitch]
+set pmesh_top_str_interset_pitch   [expr 4*$pmesh_top_str_pitch]
 
 setViaGenMode -reset
 setViaGenMode -viarule_preference default
