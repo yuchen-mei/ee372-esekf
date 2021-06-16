@@ -77,6 +77,7 @@ def construct():
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
+  magic_gds2spice_nobbox = Step( this_dir + '/open-magic-gds2spice-nobbox'            )
   netgen_lvs_def  = Step( this_dir + '/open-netgen-lvs-def-spice'       )
   netgen_lvs_def.set_name('netgen-lvs-def')
   
@@ -84,6 +85,7 @@ def construct():
   netgen_lvs_gds.set_name('netgen-lvs-gds')
 
   calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
+  calibre_lvs_nobbox     = Step( this_dir + '/mentor-calibre-comparison-nobbox'       )
 
   # Default steps
 
@@ -150,8 +152,10 @@ def construct():
   g.add_step( magic_def2spice )
   g.add_step( netgen_lvs_def  )
   g.add_step( magic_gds2spice )
+  g.add_step( magic_gds2spice_nobbox )
   g.add_step( netgen_lvs_gds  )
   g.add_step( calibre_lvs     )
+  g.add_step( calibre_lvs_nobbox     )
 
   #-----------------------------------------------------------------------
   # Graph -- Add edges
@@ -170,6 +174,7 @@ def construct():
   netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   netgen_lvs_gds.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   calibre_lvs.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  calibre_lvs_nobbox.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   magic_drc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
   
   for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
@@ -195,9 +200,11 @@ def construct():
   g.connect_by_name( adk,             magic_drc       )
   g.connect_by_name( adk,             magic_def2spice )
   g.connect_by_name( adk,             magic_gds2spice )
+  g.connect_by_name( adk,             magic_gds2spice_nobbox )
   g.connect_by_name( adk,             netgen_lvs_def  )
   g.connect_by_name( adk,             netgen_lvs_gds  )
   g.connect_by_name( adk,             calibre_lvs     )
+  g.connect_by_name( adk,             calibre_lvs_nobbox     )
   g.connect_by_name( adk,             pt_timing       )
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
@@ -228,6 +235,7 @@ def construct():
   g.connect_by_name( sram,            netgen_lvs_def  )
   g.connect_by_name( sram,            netgen_lvs_gds  )
   g.connect_by_name( sram,            calibre_lvs     )
+  g.connect_by_name( sram,            calibre_lvs_nobbox     )
   g.connect_by_name( sram,            magic_drc       )
 
   g.connect_by_name( rtl,             dc              )
@@ -276,9 +284,14 @@ def construct():
   g.connect_by_name( signoff,         netgen_lvs_gds  )
   g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
 
-  # LVS comparision using Calibre
+  # LVS comparision using Calibre with standard cells blackboxed
   g.connect_by_name( signoff,         calibre_lvs     )
   g.connect_by_name( magic_gds2spice, calibre_lvs     )
+
+  # LVS comparision using Calibre without standard cells blackboxed
+  g.connect_by_name( gdsmerge,        magic_gds2spice_nobbox )
+  g.connect_by_name( signoff,         calibre_lvs_nobbox     )
+  g.connect_by_name( magic_gds2spice_nobbox, calibre_lvs_nobbox     )
 
   g.connect_by_name( signoff,         pt_timing       )
   g.connect_by_name( signoff,         pt_power_rtl    )
