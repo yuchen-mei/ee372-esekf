@@ -89,8 +89,8 @@ def construct():
   # gate-level simulation use the same VCS node
   
   icarus_sim         = Step( this_dir + '/open-icarus-simulation' )
-  rtl_sim         = vcs_sim.clone()
-  gl_sim          = vcs_sim.clone()
+  rtl_sim         = icarus_sim.clone()
+  gl_sim          = icarus_sim.clone()
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name( 'gl-sim' )
   
@@ -160,7 +160,6 @@ def construct():
 
   rtl_sim.extend_inputs(['design.v'])
   rtl_sim.extend_inputs(['test_vectors.txt'])
-  gl_sim.extend_inputs(['design.v'])
   gl_sim.extend_inputs(['test_vectors.txt'])
 
   # Connect by name
