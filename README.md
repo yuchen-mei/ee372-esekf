@@ -43,10 +43,9 @@ Follow the setup steps at https://mflowgen.readthedocs.io/en/latest/quick-start.
 
 # Using the Pipecleaners
 
-First, make sure you update various install paths in the `setup.bashrc` file. Then source it.
+First, make sure you update various install paths in the `setup.csh` file. Then source it.
 ```
-bash
-source setup.bashrc
+source setup.csh
 ```
 
 Next, enter into the build directory of the pipecleaner you want to run, and run the following:
