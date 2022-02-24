@@ -16,12 +16,13 @@ from mflowgen.components import Graph, Step
 def construct():
 
   g = Graph()
+  g.sys_path.append( '/farmshare/classes/ee/272' )
 
   #-----------------------------------------------------------------------
   # Parameters
   #-----------------------------------------------------------------------
   
-  adk_name = 'skywater-130nm-adk'
+  adk_name = 'skywater-130nm-adk.v2021'
   adk_view = 'view-standard'
 
   parameters = {
@@ -82,7 +83,7 @@ def construct():
 
   info            = Step( 'info',                          default=True )
   dc              = Step( 'synopsys-dc-synthesis',         default=True )
-  
+  vcs_sim         = Step( 'synopsys-vcs-sim',              default=True )
   # Need to use clone if you want to instantiate the same node more than once
   # in your graph but configure it differently, for example, RTL simulation and
   # gate-level simulation use the same VCS node

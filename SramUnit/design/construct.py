@@ -16,12 +16,13 @@ from mflowgen.components import Graph, Step
 def construct():
 
   g = Graph()
+  g.sys_path.append( '/farmshare/classes/ee/272' )
 
   #-----------------------------------------------------------------------
   # Parameters
   #-----------------------------------------------------------------------
   
-  adk_name = 'skywater-130nm-adk'
+  adk_name = 'skywater-130nm-adk.v2021'
   adk_view = 'view-standard'
 
   parameters = {
@@ -211,7 +212,7 @@ def construct():
 
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
-  g.connect( rtl_sim.o( 'design.vpd' ), gen_saif_rtl.i( 'run.vcd' ) ) 
+  g.connect( rtl_sim.o( 'run.vcd' ), gen_saif_rtl.i( 'run.vcd' ) ) 
   # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
   g.connect_by_name( sram,            rtl_sim         )

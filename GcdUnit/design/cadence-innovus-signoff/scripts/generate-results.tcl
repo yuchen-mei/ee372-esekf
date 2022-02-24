@@ -33,9 +33,10 @@ foreach x $ADK_LVS_EXCLUDE_CELL_LIST {
 # Typically we would exclude cells, but we are not in this case,
 # since Magic creates abstract views for all cells (incl. filler)
 saveNetlist -excludeLeafCell                   \
-            -flat                             \
-           -phys                              \
-           $vars(results_dir)/$vars(design).lvs.v
+            -flat                              \
+            -phys                              \
+            -excludeCellInst $lvs_exclude_list \
+            $vars(results_dir)/$vars(design).lvs.v
 
 # saveNetlist -excludeLeafCell                   \
 #             -phys                              \
