@@ -39,6 +39,9 @@ LVS GROUND NAME "VSS" "VGND"
 LVS SPICE OVERRIDE GLOBALS             YES
 LVS GLOBALS ARE PORTS                  NO
 
+// filering out fills and taps in source
+LVS FILTER "sky130_fd_sc_*__fill_*" SOURCE OPEN
+LVS FILTER "sky130_fd_sc_*__tapvpwrvgnd_*" SOURCE OPEN
 
 VIRTUAL CONNECT COLON YES
 VIRTUAL CONNECT REPORT NO
