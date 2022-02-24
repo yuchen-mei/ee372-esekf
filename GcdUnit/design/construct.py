@@ -74,7 +74,8 @@ def construct():
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
-  netgen_lvs      = Step( this_dir + '/open-netgen-lvs'                 )
+  netgen_lvs_gds  = Step( this_dir + '/netgen-lvs-gds'                 )
+  netgen_lvs_def  = Step( this_dir + '/netgen-lvs-def'                 )
   magic_antenna   = Step( this_dir + '/open-magic-antenna'              )
   calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
 
@@ -110,11 +111,6 @@ def construct():
   gen_saif_rtl.set_name( 'gen-saif-rtl' )
   gen_saif_gl.set_name( 'gen-saif-gl' )
   
-  netgen_lvs_def  = netgen_lvs.clone()
-  netgen_lvs_def.set_name('netgen-lvs-def')
-  netgen_lvs_gds  = netgen_lvs.clone()
-  netgen_lvs_gds.set_name('netgen-lvs-gds')
-
   pt_power_gl     = Step( 'synopsys-ptpx-gl',              default=True )
   
 
