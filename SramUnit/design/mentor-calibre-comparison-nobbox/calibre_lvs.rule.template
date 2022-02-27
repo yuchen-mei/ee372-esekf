@@ -22,6 +22,10 @@ SOURCE CASE YES
 LVS BOX "sky130_sram*"
 LVS BOX "sky130_fd_pr*"
 
+// filering out fills and taps in source
+LVS FILTER "sky130_fd_sc_*__fill_*" SOURCE OPEN
+LVS FILTER "sky130_fd_sc_*__tapvpwrvgnd_*" SOURCE OPEN
+
 LVS DEVICE TYPE NMOS sky130_fd_pr__nfet_01v8
 LVS DEVICE TYPE NMOS sky130_fd_pr__nfet_01v8_hvt
 LVS DEVICE TYPE PMOS sky130_fd_pr__pfet_01v8 

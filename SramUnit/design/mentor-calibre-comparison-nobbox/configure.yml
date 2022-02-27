@@ -13,7 +13,8 @@ name: mentor-calibre-comparison-nobbox
 inputs:
   - adk
   - design_extracted.spice
-  - design.nofillerflatbuslvs.v
+  # - design.nofillerflatbuslvs.v
+  - design.flatbuslvs.v
 
 outputs:
   - lvs.report
