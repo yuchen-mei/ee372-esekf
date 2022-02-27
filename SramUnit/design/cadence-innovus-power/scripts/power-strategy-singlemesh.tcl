@@ -13,7 +13,7 @@
 #-------------------------------------------------------------------------
 # Generate horizontal stdcell preroutes
 
-sroute -nets {VDD VSS}
+sroute -nets {VDD VSS} -connect {corePin}
 
 #-------------------------------------------------------------------------
 # Shorter names from the ADK
@@ -34,9 +34,8 @@ addRing -nets {VDD VSS} -type core_rings -follow core   \
         -offset $savedvars(p_ring_spacing)              \
         -extend_corner {tl tr bl br lt lb rt rb}
 
-selectInst sram
 setAddRingMode -ring_target default -extend_over_row 0 -ignore_rows 0 -avoid_short 0 -skip_crossing_trunks none -stacked_via_top_layer met5 -stacked_via_bottom_layer met4 -via_using_exact_crossover_size 1 -orthogonal_only true -skip_via_on_pin {  standardcell } -skip_via_on_wire_shape {  noshape }
-addRing -nets {VDD VSS} -type block_rings -around selected -layer {top met5 bottom met5 left met4 right met4} -width {top 1.8 bottom 1.8 left 1.8 right 1.8} -spacing {top 1.8 bottom 1.8 left 1.8 right 1.8} -offset {top 1.8 bottom 1.8 left 1.8 right 1.8} -center 0 -threshold 0 -jog_distance 0 -snap_wire_center_to_grid None
+addRing -nets {VDD VSS} -type block_rings -around each_block -layer {top met5 bottom met5 left met4 right met4} -width {top 1.8 bottom 1.8 left 1.8 right 1.8} -spacing {top 1.8 bottom 1.8 left 1.8 right 1.8} -offset {top 1.8 bottom 1.8 left 1.8 right 1.8} -center 0 -threshold 0 -jog_distance 0 -snap_wire_center_to_grid None
 
 #-------------------------------------------------------------------------
 # Power mesh bottom settings (vertical)
@@ -58,7 +57,7 @@ set pmesh_bot_str_width [expr  8 *  3 * $M1_min_width   ]
 set pmesh_bot_str_pitch [expr 4 * 10 * $M1_route_pitchX]
 
 set pmesh_bot_str_intraset_spacing [expr $pmesh_bot_str_pitch - $pmesh_bot_str_width]
-set pmesh_bot_str_interset_pitch   [expr 4*$pmesh_bot_str_pitch]
+set pmesh_bot_str_interset_pitch   [expr 2*$pmesh_bot_str_pitch]
 
 setViaGenMode -reset
 setViaGenMode -viarule_preference default
@@ -66,7 +65,8 @@ setViaGenMode -ignore_DRC false
 
 setAddStripeMode -reset
 setAddStripeMode -stacked_via_bottom_layer met1 \
-                 -stacked_via_top_layer    $pmesh_top\
+                 -stacked_via_top_layer    $pmesh_top \
+                 -trim_antenna_back_to_shape stripe \
                  -break_at {  block_ring  } 
 # Add the stripes
 #
@@ -97,7 +97,7 @@ set pmesh_top_str_width [expr  8 *  3 * $M1_min_width   ]
 set pmesh_top_str_pitch [expr 4 * 10 * $M1_route_pitchX]
 
 set pmesh_top_str_intraset_spacing [expr $pmesh_top_str_pitch - $pmesh_top_str_width]
-set pmesh_top_str_interset_pitch   [expr 4*$pmesh_top_str_pitch]
+set pmesh_top_str_interset_pitch   [expr 2*$pmesh_top_str_pitch]
 
 setViaGenMode -reset
 setViaGenMode -viarule_preference default
@@ -106,7 +106,7 @@ setViaGenMode -ignore_DRC false
 setAddStripeMode -reset
 setAddStripeMode -stacked_via_bottom_layer $pmesh_bot \
                  -stacked_via_top_layer    $pmesh_top \
-                 -break_at {  block_ring  } 
+                 -trim_antenna_back_to_shape stripe
 # Add the stripes
 #
 # Use -start to offset the stripes slightly away from the core edge.
@@ -124,10 +124,12 @@ addStripe -nets {VSS VDD} -layer $pmesh_top -direction horizontal \
     -block_ring_bottom_layer_limit met4                           \
     -start [expr $pmesh_top_str_pitch]
 
+# trim the dangling stripes
+editTrim -nets {VDD VSS} 
+
+# Change PG to cover so they don't get removed in post-route
+editChangeStatus -nets {VDD VSS} -to COVER
 
 # Route power to power pins on the macro
-
-deselectAll
-selectInst sram
-
-sroute -connect {blockPin} -layerChangeRange {met1 met5} -blockPinTarget { nearestTarget } -nets {VDD VSS} -allowLayerChange 1 -blockPin useLef -inst sram
+# This command only creates 2 vias, because only one port is defined for each PG pin in the SRAM LEF.
+# sroute -connect {blockPin} -layerChangeRange {met1 met5} -blockPinTarget { blockring } -nets {VDD VSS} -allowLayerChange 1 -blockPin useLef -inst sram
