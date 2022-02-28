@@ -79,11 +79,9 @@ def construct():
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
   magic_gds2spice_nobbox = Step( this_dir + '/open-magic-gds2spice-nobbox'            )
-  netgen_lvs_def  = Step( this_dir + '/open-netgen-lvs-def-spice'       )
-  netgen_lvs_def.set_name('netgen-lvs-def')
+  netgen_lvs_def  = Step( this_dir + '/netgen-lvs-def'       )
   
-  netgen_lvs_gds  = Step( this_dir + '/open-netgen-lvs'                 )
-  netgen_lvs_gds.set_name('netgen-lvs-gds')
+  netgen_lvs_gds  = Step( this_dir + '/netgen-lvs-gds'                 )
 
   calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
   calibre_lvs_nobbox     = Step( this_dir + '/mentor-calibre-comparison-nobbox'       )
@@ -283,7 +281,7 @@ def construct():
   # LVS using GDS
   g.connect_by_name( gdsmerge,        magic_gds2spice )
   g.connect_by_name( signoff,         netgen_lvs_gds  )
-  g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
+  g.connect_by_name( magic_gds2spice_nobbox, netgen_lvs_gds  )
 
   # LVS comparision using Calibre with standard cells blackboxed
   g.connect_by_name( signoff,         calibre_lvs     )

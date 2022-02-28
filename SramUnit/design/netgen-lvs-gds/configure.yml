@@ -5,7 +5,7 @@
 # Date   : Dec 12, 2020
 #
 
-name: open-netgen-lvs
+name: netgen-lvs-gds
 
 #-------------------------------------------------------------------------
 # Inputs and Outputs
@@ -27,7 +27,6 @@ parameters:
   design_name: undefined
 
 commands: 
-  - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.flatbuslvs.v -o design_lvs.spice
   - cat inputs/adk/netgen_setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
   #- cat inputs/adk/netgen_setup.tcl > netgen_blackbox_setup.tcl
   - sh run_lvs.sh
