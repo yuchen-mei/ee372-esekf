@@ -54,7 +54,7 @@ placeInstance sram 55.4 65.4
 
 addHaloToBlock 3 3 3 3 sram
 
-# Create a routing blockage on li1 layer over the entire chip area, so that 
-# Innovus does not use this layer for routing
+# Somehow when li1 blockage is over the entire chip area, no cell can be placed
+# Have to open block the sram area.
 
-createRouteBlk -box {0 0 614 614} -layer {li1}
+createRouteBlk -layer {li1} -inst sram -cover
