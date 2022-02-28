@@ -5,10 +5,12 @@ inputs:
 
 outputs:
   - testbench.sv
+  - testbench.gls.sv
   - design.args
   - design.args.gls
 
 commands:
   - cp SramUnitTb.sv outputs/testbench.sv
+  - cp SramUnitTb.gls.sv outputs/testbench.gls.sv
   - cp design.args outputs/design.args
   - cp design.args.gls outputs/design.args.gls

@@ -302,11 +302,10 @@ def construct():
   g.connect_by_name( adk,             gl_sim          )
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
-  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
+  g.connect( testbench.o( 'testbench.gls.sv'     ), gl_sim.i( 'testbench.sv'     ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
   g.connect( gl_sim.o( 'run.vcd' ), gen_saif_gl.i( 'run.vcd' ) ) 
 
-  # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
 
   #-----------------------------------------------------------------------
