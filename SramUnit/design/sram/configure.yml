@@ -32,12 +32,12 @@ outputs:
 
 commands:
 # The SRAM macros are cloned from https://github.com/efabless/sky130_sram_macros  
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.sp              outputs/sky130_sram_1kbyte_1rw1r_32x256_8.sp
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lvs.sp          outputs/sky130_sram_1kbyte_1rw1r_32x256_8.lvs.sp
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v               outputs/sky130_sram_1kbyte_1rw1r_32x256_8.v
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lef             outputs/sky130_sram_1kbyte_1rw1r_32x256_8.lef
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib outputs/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.gds             outputs/sky130_sram_1kbyte_1rw1r_32x256_8.gds
-  - cp /farmshare/classes/ee/272/sky130_sram_macros/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db  outputs/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.sp              outputs/sky130_sram_1kbyte_1rw1r_32x256_8.sp
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lvs.sp          outputs/sky130_sram_1kbyte_1rw1r_32x256_8.lvs.sp
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.v               outputs/sky130_sram_1kbyte_1rw1r_32x256_8.v
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.lef             outputs/sky130_sram_1kbyte_1rw1r_32x256_8.lef
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib outputs/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8.gds             outputs/sky130_sram_1kbyte_1rw1r_32x256_8.gds
+  - cp $SRAM_PATH/sky130_sram_1kbyte_1rw1r_32x256_8/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db  outputs/sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db
 
   - sed -i '/SHAPE ABUTMENT/d' outputs/sky130_sram_1kbyte_1rw1r_32x256_8.lef

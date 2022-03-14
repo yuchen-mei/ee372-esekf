@@ -16,13 +16,12 @@ from mflowgen.components import Graph, Step
 def construct():
 
   g = Graph()
-  g.sys_path.append( '/farmshare/classes/ee/272' )
 
   #-----------------------------------------------------------------------
   # Parameters
   #-----------------------------------------------------------------------
   
-  adk_name = 'skywater-130nm-adk.v2021'
+  adk_name = 'skywater-130nm-adk-open_pdks'
   adk_view = 'view-standard'
 
   parameters = {
@@ -75,6 +74,8 @@ def construct():
   
   pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl'               )
 
+  gl_sim          = Step( this_dir + '/open-icarus-simulation'          )
+
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
@@ -96,7 +97,6 @@ def construct():
   # gate-level simulation use the same VCS node
   
   rtl_sim         = Step( 'synopsys-vcs-sim',              default=True )
-  gl_sim          = Step( this_dir + '/open-icarus-simulation'          )
 
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
@@ -211,7 +211,6 @@ def construct():
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
   g.connect( rtl_sim.o( 'run.vcd' ), gen_saif_rtl.i( 'run.vcd' ) ) 
-  # FIXME: VCS sim node generates a VCD file but gives it a VPD extension
 
   g.connect_by_name( sram,            rtl_sim         )
   g.connect_by_name( sram,            gl_sim          )
@@ -279,11 +278,11 @@ def construct():
   g.connect_by_name( magic_def2spice, netgen_lvs_def  )
 
   # LVS using GDS
-  g.connect_by_name( gdsmerge,        magic_gds2spice )
   g.connect_by_name( signoff,         netgen_lvs_gds  )
   g.connect_by_name( magic_gds2spice_nobbox, netgen_lvs_gds  )
 
   # LVS comparision using Calibre with standard cells blackboxed
+  g.connect_by_name( gdsmerge,        magic_gds2spice )
   g.connect_by_name( signoff,         calibre_lvs     )
   g.connect_by_name( magic_gds2spice, calibre_lvs     )
 

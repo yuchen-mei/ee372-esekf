@@ -16,13 +16,12 @@ from mflowgen.components import Graph, Step
 def construct():
 
   g = Graph()
-  g.sys_path.append( '/farmshare/classes/ee/272' )
 
   #-----------------------------------------------------------------------
   # Parameters
   #-----------------------------------------------------------------------
   
-  adk_name = 'skywater-130nm-adk.v2021'
+  adk_name = 'skywater-130nm-adk-open_pdks'
   adk_view = 'view-standard'
 
   parameters = {
