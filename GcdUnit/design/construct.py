@@ -33,7 +33,8 @@ def construct():
     'topographical'  : True,
     'testbench_name' : 'GcdUnitTb',
     'strip_path'     : 'GcdUnitTb/GcdUnit_inst',
-    'saif_instance'  : 'GcdUnitTb/GcdUnit_inst'
+    'saif_instance'  : 'GcdUnitTb/GcdUnit_inst',
+    'dut_name'       : 'GcdUnit_inst'
   }
 
   #-----------------------------------------------------------------------
