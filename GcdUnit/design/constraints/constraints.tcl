@@ -30,12 +30,12 @@ set_load -pin_load $ADK_TYPICAL_ON_CHIP_LOAD [all_outputs]
 # your inputs.
 
 set_driving_cell -no_design_rule \
-  -lib_cell $ADK_DRIVING_CELL [all_inputs]
+    -lib_cell $ADK_DRIVING_CELL [remove_from_collection [all_inputs] [get_ports $clock_net]]
 
 # set_input_delay constraints for input ports
 # Make this non-zero to avoid hold buffers on input-registered designs
 
-set_input_delay -clock ${clock_name} [expr ${dc_clock_period}/2.0] [all_inputs]
+set_input_delay -clock ${clock_name} [expr ${dc_clock_period}/2.0] [remove_from_collection [all_inputs] [get_ports $clock_net]]
 
 # set_output_delay constraints for output ports
 
