@@ -2,6 +2,8 @@ name: rtl
 
 outputs:
   - design.v
+  - design.vcs.v
 
 commands:
   - cat GcdUnit-demo.v > outputs/design.v 
+  - cat GcdUnit-demo.v > outputs/design.vcs.v 

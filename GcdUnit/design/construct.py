@@ -4,9 +4,10 @@
 #=========================================================================
 # Demo with 16-bit GcdUnit
 #
-# Author : Priyanka Raina
-# Date   : December 4, 2020
-#
+# Author      : Priyanka Raina
+# Date        : December 4, 2020
+# Modified by : Allen Pan
+# Date        : March 15, 2022
 
 import os
 import sys
@@ -68,7 +69,9 @@ def construct():
   # from layout for LVS
   
   signoff         = Step( this_dir + '/cadence-innovus-signoff'         ) 
-  
+
+  pt_timing       = Step( this_dir + '/synopsys-pt-timing-signoff'      )
+
   pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl'               )
 
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
@@ -79,23 +82,23 @@ def construct():
   magic_antenna   = Step( this_dir + '/open-magic-antenna'              )
   calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
 
-
-  # Default steps
-
-  info            = Step( 'info',                          default=True )
-  dc              = Step( 'synopsys-dc-synthesis',         default=True )
   # Need to use clone if you want to instantiate the same node more than once
   # in your graph but configure it differently, for example, RTL simulation and
   # gate-level simulation use the same VCS node
 
-  vcs_sim         = Step( this_dir + '/synopsys-vcs-sim' )
+  vcs_sim         = Step( 'synopsys-vcs-sim',            default=True )
   rtl_sim         = vcs_sim.clone()
   gl_sim          = vcs_sim.clone()
-  # icarus_sim      = Step( this_dir + '/open-icarus-simulation' )
+  # icarus_sim          = Step( this_dir + '/open-icarus-simulation'          )
   # rtl_sim         = icarus_sim.clone()
   # gl_sim          = icarus_sim.clone()
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name(  'gl-sim'  )
+  
+  # Default steps
+
+  info            = Step( 'info',                          default=True )
+  dc              = Step( 'synopsys-dc-synthesis',         default=True )
   
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
@@ -105,7 +108,6 @@ def construct():
   route           = Step( 'cadence-innovus-route',         default=True )
   postroute       = Step( 'cadence-innovus-postroute',     default=True )
   gdsmerge        = Step( 'mentor-calibre-gdsmerge',       default=True )
-  pt_timing       = Step( 'synopsys-pt-timing-signoff',    default=True )
   
   gen_saif        = Step( 'synopsys-vcd2saif-convert',     default=True )
   gen_saif_rtl    = gen_saif.clone()
@@ -245,7 +247,7 @@ def construct():
 
   # Gate level simulation
   g.connect_by_name( gl_sim,                    gen_saif_gl) # run.vcd
-  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.v'     ) )
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
   g.connect( testbench.o( 'test_vectors.txt' ), gl_sim.i( 'test_vectors.txt' ) )
