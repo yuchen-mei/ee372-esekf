@@ -12,7 +12,7 @@ name: open-icarus-simulation
 #-------------------------------------------------------------------------
 inputs:
   - adk
-  - design.v
+  - design.vcs.v
   - testbench.sv
   - design.sdf
   - design.args

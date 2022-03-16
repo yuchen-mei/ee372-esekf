@@ -12,5 +12,7 @@ outputs:
 commands:
   - cp SramUnitTb.sv outputs/testbench.sv
   - cp SramUnitTb.gls.sv outputs/testbench.gls.sv
-  - cp design.args outputs/design.args
-  - cp design.args.gls outputs/design.args.gls
+  - cp design.vcs.args outputs/design.args
+  - cp design.vcs.args.gls outputs/design.args.gls
+  # - cp design.icarus.args outputs/design.args
+  # - cp design.icarus.args.gls outputs/design.args.gls

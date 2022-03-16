@@ -1,6 +1,12 @@
 ARGS=`cat inputs/design.args`
 
 # Grab all design/testbench files
+
+for f in inputs/adk/*.v; do
+    [ -e "$f" ] || continue
+    ARGS="$ARGS $f"
+done
+
 for f in inputs/*.v; do
     [ -e "$f" ] || continue
     ARGS="$ARGS $f"

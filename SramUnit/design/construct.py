@@ -4,9 +4,10 @@
 #=========================================================================
 # Demo with a simple SRAM macro
 #
-# Author : Priyanka Raina
-# Date   : February 15, 2021
-#
+# Author      : Priyanka Raina
+# Date        : February 15, 2021
+# Modified by : Allen Pan
+# Date        : March 15, 2022
 
 import os
 import sys
@@ -33,7 +34,8 @@ def construct():
     'topographical'  : True,
     'testbench_name' : 'SramUnitTb',
     'strip_path'     : 'SramUnitTb/SramUnit_inst',
-    'saif_instance'  : 'SramUnitTb/SramUnit_inst'
+    'saif_instance'  : 'SramUnitTb/SramUnit_inst',
+    'dut_name'       : 'SramUnit_inst'
   }
 
   #-----------------------------------------------------------------------
@@ -71,10 +73,8 @@ def construct():
   # from layout for LVS
   
   signoff         = Step( this_dir + '/cadence-innovus-signoff'         ) 
-  
-  pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl'               )
 
-  gl_sim          = Step( this_dir + '/open-icarus-simulation'          )
+  pt_timing       = Step( this_dir + '/synopsys-pt-timing-signoff'      )
 
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
@@ -87,16 +87,25 @@ def construct():
   calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
   calibre_lvs_nobbox     = Step( this_dir + '/mentor-calibre-comparison-nobbox'       )
 
+  # Need to use clone if you want to instantiate the same node more than once
+  # in your graph but configure it differently, for example, RTL simulation and
+  # gate-level simulation use the same VCS node
+
+  vcs_sim         = Step( 'synopsys-vcs-sim',            default=True )
+  rtl_sim         = vcs_sim.clone()
+  gl_sim          = vcs_sim.clone()
+  # icarus_sim          = Step( this_dir + '/open-icarus-simulation'          )
+  # rtl_sim         = icarus_sim.clone()
+  # gl_sim          = icarus_sim.clone()
+  rtl_sim.set_name( 'rtl-sim' )
+  gl_sim.set_name(  'gl-sim'  )
+
   # Default steps
 
   info            = Step( 'info',                          default=True )
   dc              = Step( 'synopsys-dc-synthesis',         default=True )
   
-  # Need to use clone if you want to instantiate the same node more than once
-  # in your graph but configure it differently, for example, RTL simulation and
-  # gate-level simulation use the same VCS node
   
-  rtl_sim         = Step( 'synopsys-vcs-sim',              default=True )
 
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
@@ -106,7 +115,6 @@ def construct():
   route           = Step( 'cadence-innovus-route',         default=True )
   postroute       = Step( 'cadence-innovus-postroute',     default=True )
   gdsmerge        = Step( 'mentor-calibre-gdsmerge',       default=True )
-  pt_timing       = Step( 'synopsys-pt-timing-signoff',    default=True )
   
   gen_saif        = Step( 'synopsys-vcd2saif-convert',     default=True )
   gen_saif_rtl    = gen_saif.clone()
@@ -114,7 +122,7 @@ def construct():
   gen_saif_rtl.set_name( 'gen-saif-rtl' )
   gen_saif_gl.set_name( 'gen-saif-gl' )
   
-  pt_power_gl     = Step( 'synopsys-ptpx-gl',              default=True )
+  pt_power_gl     = Step( this_dir + '/synopsys-ptpx-gl')
   
 
   #-----------------------------------------------------------------------
@@ -126,6 +134,7 @@ def construct():
   g.add_step( rtl             )
   g.add_step( testbench       )
   g.add_step( rtl_sim         )
+  g.add_step( gl_sim          )
   g.add_step( constraints     )
   g.add_step( syn_compile     )
   g.add_step( dc              )
@@ -143,8 +152,6 @@ def construct():
   g.add_step( gdsmerge        )
   g.add_step( pt_timing       )
   g.add_step( gen_saif_rtl    )
-  g.add_step( pt_power_rtl    )
-  g.add_step( gl_sim          )
   g.add_step( gen_saif_gl     )
   g.add_step( pt_power_gl     )
   g.add_step( magic_drc       )
@@ -167,7 +174,6 @@ def construct():
   dc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   dc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
   pt_timing.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
-  pt_power_rtl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   pt_power_gl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.gds'])
   netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
@@ -181,7 +187,6 @@ def construct():
 
   init.extend_inputs(['floorplan.tcl', 'pin-assignments.tcl'])
   dc.extend_inputs(['compile.tcl'])
-
   # Connect by name
 
   g.connect_by_name( adk,             testbench       )
@@ -205,12 +210,12 @@ def construct():
   g.connect_by_name( adk,             calibre_lvs     )
   g.connect_by_name( adk,             calibre_lvs_nobbox     )
   g.connect_by_name( adk,             pt_timing       )
-  g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
+  g.connect_by_name( adk,             gl_sim          )
 
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
-  g.connect( rtl_sim.o( 'run.vcd' ), gen_saif_rtl.i( 'run.vcd' ) ) 
+  g.connect_by_name( rtl_sim,         gen_saif_rtl    ) # run.vcd
 
   g.connect_by_name( sram,            rtl_sim         )
   g.connect_by_name( sram,            gl_sim          )
@@ -226,7 +231,6 @@ def construct():
   g.connect_by_name( sram,            signoff         )
   g.connect_by_name( sram,            gdsmerge        )
   g.connect_by_name( sram,            pt_timing       )
-  g.connect_by_name( sram,            pt_power_rtl    )
   g.connect_by_name( sram,            pt_power_gl     )
   g.connect_by_name( sram,            magic_def2spice )
   g.connect_by_name( sram,            magic_gds2spice )
@@ -246,7 +250,6 @@ def construct():
   g.connect_by_name( dc,              power           )
   g.connect_by_name( dc,              place           )
   g.connect_by_name( dc,              cts             )
-  g.connect_by_name( dc,              pt_power_rtl    ) # design.namemap
 
   g.connect_by_name( iflow,           init            )
   g.connect_by_name( iflow,           power           )
@@ -291,20 +294,24 @@ def construct():
   g.connect_by_name( signoff,         calibre_lvs_nobbox     )
   g.connect_by_name( magic_gds2spice_nobbox, calibre_lvs_nobbox     )
 
-  g.connect_by_name( signoff,         pt_timing       )
-  g.connect_by_name( signoff,         pt_power_rtl    )
-  g.connect_by_name( gen_saif_rtl,    pt_power_rtl    ) # run.saif
-  g.connect_by_name( signoff,         pt_power_gl     )
-  g.connect_by_name( gen_saif_gl,     pt_power_gl     ) # run.saif
+  # Timing signoff
+  g.connect( signoff.o('design.spef.gz'),   pt_timing.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_timing.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
 
   # Gate level simulation
-  g.connect_by_name( adk,             gl_sim          )
-  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.v'     ) )
-  g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
-  g.connect( testbench.o( 'testbench.gls.sv'     ), gl_sim.i( 'testbench.sv'     ) )
-  g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
-  g.connect( gl_sim.o( 'run.vcd' ), gen_saif_gl.i( 'run.vcd' ) ) 
+  g.connect( gl_sim.o(    'run.vcd'          ), gen_saif_gl.i( 'run.vcd'      ) ) 
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i(      'design.vcs.v'     ) )
+  g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i(      'design.sdf'   ) )
+  g.connect( testbench.o( 'testbench.gls.sv' ), gl_sim.i(      'testbench.sv' ) )
+  g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i(      'design.args'  ) )
 
+  # and power signoff
+  g.connect( signoff.o('design.spef.gz'),   pt_power_gl.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_power_gl.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_power_gl.i('design.pt.sdc'  ) )
+  # g.connect( dc.o(     'design.namemap'),   pt_power_gl.i('design.namemap' ) )
+  g.connect_by_name( gen_saif_gl,           pt_power_gl    ) # run.saif
 
 
   #-----------------------------------------------------------------------
