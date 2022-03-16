@@ -27,7 +27,7 @@ def construct():
   parameters = {
     'construct_path' : __file__,
     'design_name'    : 'GcdUnit',
-    'clock_period'   : 6.0,
+    'clock_period'   : 10.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
     'topographical'  : True,
@@ -83,16 +83,18 @@ def construct():
 
   info            = Step( 'info',                          default=True )
   dc              = Step( 'synopsys-dc-synthesis',         default=True )
-  vcs_sim         = Step( 'synopsys-vcs-sim',              default=True )
   # Need to use clone if you want to instantiate the same node more than once
   # in your graph but configure it differently, for example, RTL simulation and
   # gate-level simulation use the same VCS node
-  
-  icarus_sim         = Step( this_dir + '/open-icarus-simulation' )
-  rtl_sim         = icarus_sim.clone()
-  gl_sim          = icarus_sim.clone()
+
+  vcs_sim         = Step( this_dir + '/synopsys-vcs-sim' )
+  rtl_sim         = vcs_sim.clone()
+  gl_sim          = vcs_sim.clone()
+  # icarus_sim      = Step( this_dir + '/open-icarus-simulation' )
+  # rtl_sim         = icarus_sim.clone()
+  # gl_sim          = icarus_sim.clone()
   rtl_sim.set_name( 'rtl-sim' )
-  gl_sim.set_name( 'gl-sim' )
+  gl_sim.set_name(  'gl-sim'  )
   
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
@@ -153,7 +155,6 @@ def construct():
   
   # Dynamically add edges
 
-  rtl_sim.extend_inputs(['design.v'])
   rtl_sim.extend_inputs(['test_vectors.txt'])
   gl_sim.extend_inputs(['test_vectors.txt'])
 
@@ -181,11 +182,11 @@ def construct():
   g.connect_by_name( adk,             pt_timing       )
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
+  g.connect_by_name( adk,             gl_sim          )
 
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
   g.connect_by_name( rtl_sim,         gen_saif_rtl    ) # run.vcd
-  g.connect_by_name( gl_sim,          gen_saif_gl     ) # run.vcd
   
   g.connect_by_name( rtl,             dc              )
   g.connect_by_name( constraints,     dc              )
@@ -242,12 +243,12 @@ def construct():
   g.connect_by_name( gen_saif_gl,     pt_power_gl     ) # run.saif
 
   # Gate level simulation
-  g.connect_by_name( adk,             gl_sim          )
+  g.connect_by_name( gl_sim,                    gen_saif_gl) # run.vcd
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
-  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
   g.connect( testbench.o( 'test_vectors.txt' ), gl_sim.i( 'test_vectors.txt' ) )
+  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
 
 
   #-----------------------------------------------------------------------
