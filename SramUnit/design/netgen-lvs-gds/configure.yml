@@ -28,6 +28,6 @@ parameters:
 
 commands: 
   - cat inputs/adk/netgen_setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
-  #- cat inputs/adk/netgen_setup.tcl > netgen_blackbox_setup.tcl
+  # - cat inputs/design.lvs.v inputs/adk/stdcells.v > design.lvs.v
   - sh run_lvs.sh
 

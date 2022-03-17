@@ -13,6 +13,7 @@ name: netgen-lvs-def
 inputs:
   - adk
   - design_extracted.spice
+  - design.lvs.v
   - design.flatbuslvs.v
 
 outputs:
@@ -27,6 +28,7 @@ parameters:
 
 commands: 
   # - v2lvs -i -lsp inputs/adk/stdcells.spi -s inputs/adk/stdcells.spi -lsp inputs/*.sp -s inputs/*.sp -v inputs/design.flatbuslvs.v -o design_lvs.spice
+  # - cat inputs/adk/stdcells.v inputs/design.lvs.v > design.lvs.v  # EXPERIMENT
   - cat inputs/adk/netgen_setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
   - sh run_lvs.sh
 

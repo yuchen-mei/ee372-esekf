@@ -180,8 +180,8 @@ def construct():
   pt_power_rtl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   pt_power_gl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.gds'])
-  netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
-  netgen_lvs_gds.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  # netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
+  # netgen_lvs_gds.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   calibre_lvs.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   calibre_lvs_nobbox.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   magic_drc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
@@ -306,11 +306,11 @@ def construct():
   g.connect( dc.o(     'design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
 
   # Gate level simulation
-  g.connect( gl_sim.o(    'run.vcd'          ), gen_saif_gl.i( 'run.vcd'      ) ) 
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i(      'design.vcs.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i(      'design.sdf'   ) )
   g.connect( testbench.o( 'testbench.gls.sv' ), gl_sim.i(      'testbench.sv' ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i(      'design.args'  ) )
+  g.connect_by_name( gl_sim,                    gen_saif_gl    ) # run.vcd
 
   # and power signoff
   g.connect( signoff.o('design.spef.gz'),   pt_power_rtl.i('design.spef.gz' ) )
