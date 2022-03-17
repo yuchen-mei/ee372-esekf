@@ -243,11 +243,10 @@ def construct():
   g.connect_by_name( magic_gds2spice, calibre_lvs     )
 
   # Timing signoff
-  g.connect_by_name( signoff,         pt_timing       )
   g.connect( signoff.o('design.spef.gz'),   pt_timing.i('design.spef.gz' ) )
   g.connect( signoff.o('design.vcs.v'  ),   pt_timing.i('design.vcs.v'   ) )
   g.connect( dc.o(     'design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
-  
+
   # Gate level simulation
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
