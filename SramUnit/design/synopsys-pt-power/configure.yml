@@ -47,7 +47,7 @@ debug:
 parameters:
   design_name: undefined
   #The strip path/saif_instance must be defined, without any quotations!
-  saif_instance: th/dut
+  saif_instance: tb/dut
   # analysis mode either "averaged" or "time_based"
   analysis_mode: averaged
   # If VCD activity files is the result of a zero-delay simulation, it needs

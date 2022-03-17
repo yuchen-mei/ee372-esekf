@@ -51,15 +51,15 @@ set ptpx_gl_netlist         inputs/design.vcs.v
 set ptpx_sdc                inputs/design.pt.sdc
 set ptpx_spef               inputs/design.spef.gz
 set ptpx_saif               inputs/run.saif
-set ptpx_vcd				inputs/run.vcd
-set ptpx_namemap			inputs/design.namemap
+set ptpx_vcd				        inputs/run.vcd
+set ptpx_namemap			      inputs/design.namemap
 
 #-------------------------------------------------------------------------
 # Directories
 #-------------------------------------------------------------------------
 
 set ptpx_reports_dir	   	reports
-set ptpx_logs_dir	   		logs
-set ptpx_outputs_dir		outputs
+set ptpx_logs_dir	   	  	logs
+set ptpx_outputs_dir	  	outputs
 
 

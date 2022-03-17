@@ -52,6 +52,10 @@ if {$ptpx_analysis_mode == "time_based" || $ptpx_averaged_use_activity == "vcd"}
 
 read_sdc -echo $ptpx_sdc > ${ptpx_logs_dir}/${ptpx_design_name}.read_sdc.rpt
 
+# Set clock to propagated
+
+set_propagated_clock [all_clocks]
+
 # Read parsitics file
 
 read_parasitics -format spef $ptpx_spef

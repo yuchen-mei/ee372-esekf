@@ -38,7 +38,7 @@ if {[file exists $ptpx_namemap] == 1} {
 
 if {$ptpx_analysis_mode == "time_based"} {
 	if {[file exists $ptpx_vcd] == 0} {
-		echo "Error: Did not find a value change dumb file for time-based power analysis!"
+		echo "Error: Did not find a value change dump file for time-based power analysis!"
     	exit 1
 	} 
 } elseif {$ptpx_analysis_mode == "averaged"} {
