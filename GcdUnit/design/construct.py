@@ -33,7 +33,6 @@ def construct():
     'adk_view'       : adk_view,
     'topographical'  : True,
     'testbench_name' : 'GcdUnitTb',
-    'strip_path'     : 'GcdUnitTb/GcdUnit_inst',
     'saif_instance'  : 'GcdUnitTb/GcdUnit_inst',
     'dut_name'       : 'GcdUnit_inst'
   }
@@ -72,7 +71,6 @@ def construct():
 
   pt_timing       = Step( this_dir + '/synopsys-pt-timing-signoff'      )
 
-  pt_power_rtl    = Step( this_dir + '/synopsys-ptpx-rtl'               )
 
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
@@ -95,6 +93,12 @@ def construct():
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name(  'gl-sim'  )
   
+  pt_power       = Step( this_dir + '/synopsys-pt-power')
+  pt_power_rtl   = pt_power.clone()
+  pt_power_gl    = pt_power.clone()
+  pt_power_rtl.set_name( 'ptpx-rtl')
+  pt_power_gl.set_name( 'ptpx-gl')
+
   # Default steps
 
   info            = Step( 'info',                          default=True )
@@ -200,7 +204,6 @@ def construct():
   g.connect_by_name( dc,              power           )
   g.connect_by_name( dc,              place           )
   g.connect_by_name( dc,              cts             )
-  g.connect_by_name( dc,              pt_power_rtl    ) # design.namemap
 
   g.connect_by_name( iflow,           init            )
   g.connect_by_name( iflow,           power           )
@@ -239,20 +242,31 @@ def construct():
   g.connect_by_name( signoff,         calibre_lvs     )
   g.connect_by_name( magic_gds2spice, calibre_lvs     )
 
+  # Timing signoff
   g.connect_by_name( signoff,         pt_timing       )
-  g.connect_by_name( signoff,         pt_power_rtl    )
-  g.connect_by_name( gen_saif_rtl,    pt_power_rtl    ) # run.saif
-  g.connect_by_name( signoff,         pt_power_gl     )
-  g.connect_by_name( gen_saif_gl,     pt_power_gl     ) # run.saif
-
+  g.connect( signoff.o('design.spef.gz'),   pt_timing.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_timing.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
+  
   # Gate level simulation
-  g.connect_by_name( gl_sim,                    gen_saif_gl) # run.vcd
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i( 'design.vcs.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i( 'design.sdf'       ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i( 'design.args'      ) )
   g.connect( testbench.o( 'test_vectors.txt' ), gl_sim.i( 'test_vectors.txt' ) )
   g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i( 'testbench.sv'     ) )
+  g.connect_by_name( gl_sim,                    gen_saif_gl    ) # run.vcd
 
+  g.connect( signoff.o('design.spef.gz'),   pt_power_rtl.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_power_rtl.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_power_rtl.i('design.pt.sdc'  ) )
+  g.connect( dc.o(     'design.namemap'),   pt_power_rtl.i('design.namemap' ) )
+  g.connect_by_name( gen_saif_rtl,          pt_power_rtl    ) # run.saif
+  # g.connect_by_name( rtl_sim,               pt_power_rtl    ) # run.vcd
+  g.connect( signoff.o('design.spef.gz'),   pt_power_gl.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_power_gl.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_power_gl.i('design.pt.sdc'  ) )
+  g.connect_by_name( gen_saif_gl,           pt_power_gl    ) # run.saif
+  # g.connect_by_name( gl_sim,               pt_power_gl    ) # run.vcd
 
   #-----------------------------------------------------------------------
   # Parameterize

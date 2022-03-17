@@ -33,7 +33,6 @@ def construct():
     'adk_view'       : adk_view,
     'topographical'  : True,
     'testbench_name' : 'SramUnitTb',
-    'strip_path'     : 'SramUnitTb/SramUnit_inst',
     'saif_instance'  : 'SramUnitTb/SramUnit_inst',
     'dut_name'       : 'SramUnit_inst'
   }
@@ -100,12 +99,16 @@ def construct():
   rtl_sim.set_name( 'rtl-sim' )
   gl_sim.set_name(  'gl-sim'  )
 
+  pt_power       = Step( this_dir + '/synopsys-pt-power')
+  pt_power_rtl   = pt_power.clone()
+  pt_power_gl    = pt_power.clone()
+  pt_power_rtl.set_name( 'ptpx-rtl')
+  pt_power_gl.set_name( 'ptpx-gl')
+
   # Default steps
 
   info            = Step( 'info',                          default=True )
-  dc              = Step( 'synopsys-dc-synthesis',         default=True )
-  
-  
+  dc              = Step( 'synopsys-dc-synthesis',         default=True )  
 
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
@@ -121,8 +124,7 @@ def construct():
   gen_saif_gl     = gen_saif.clone()
   gen_saif_rtl.set_name( 'gen-saif-rtl' )
   gen_saif_gl.set_name( 'gen-saif-gl' )
-  
-  pt_power_gl     = Step( this_dir + '/synopsys-ptpx-gl')
+
   
 
   #-----------------------------------------------------------------------
@@ -153,6 +155,7 @@ def construct():
   g.add_step( pt_timing       )
   g.add_step( gen_saif_rtl    )
   g.add_step( gen_saif_gl     )
+  g.add_step( pt_power_rtl     )
   g.add_step( pt_power_gl     )
   g.add_step( magic_drc       )
   g.add_step( magic_def2spice )
@@ -174,6 +177,7 @@ def construct():
   dc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   dc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
   pt_timing.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
+  pt_power_rtl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   pt_power_gl.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   gdsmerge.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.gds'])
   netgen_lvs_def.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
@@ -210,6 +214,7 @@ def construct():
   g.connect_by_name( adk,             calibre_lvs     )
   g.connect_by_name( adk,             calibre_lvs_nobbox     )
   g.connect_by_name( adk,             pt_timing       )
+  g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
   g.connect_by_name( adk,             gl_sim          )
 
@@ -231,6 +236,7 @@ def construct():
   g.connect_by_name( sram,            signoff         )
   g.connect_by_name( sram,            gdsmerge        )
   g.connect_by_name( sram,            pt_timing       )
+  g.connect_by_name( sram,            pt_power_rtl    )
   g.connect_by_name( sram,            pt_power_gl     )
   g.connect_by_name( sram,            magic_def2spice )
   g.connect_by_name( sram,            magic_gds2spice )
@@ -307,12 +313,17 @@ def construct():
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i(      'design.args'  ) )
 
   # and power signoff
+  g.connect( signoff.o('design.spef.gz'),   pt_power_rtl.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_power_rtl.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_power_rtl.i('design.pt.sdc'  ) )
+  g.connect( dc.o(     'design.namemap'),   pt_power_rtl.i('design.namemap' ) )
+  g.connect_by_name( gen_saif_rtl,          pt_power_rtl    ) # run.saif
+  # g.connect_by_name( rtl_sim,               pt_power_rtl    ) # run.vcd
   g.connect( signoff.o('design.spef.gz'),   pt_power_gl.i('design.spef.gz' ) )
   g.connect( signoff.o('design.vcs.v'  ),   pt_power_gl.i('design.vcs.v'   ) )
   g.connect( dc.o(     'design.sdc'    ),   pt_power_gl.i('design.pt.sdc'  ) )
-  # g.connect( dc.o(     'design.namemap'),   pt_power_gl.i('design.namemap' ) )
   g.connect_by_name( gen_saif_gl,           pt_power_gl    ) # run.saif
-
+  # g.connect_by_name( gl_sim,               pt_power_gl    ) # run.vcd
 
   #-----------------------------------------------------------------------
   # Parameterize
