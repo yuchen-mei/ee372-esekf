@@ -119,8 +119,6 @@ def construct():
   gen_saif_rtl.set_name( 'gen-saif-rtl' )
   gen_saif_gl.set_name( 'gen-saif-gl' )
   
-  pt_power_gl     = Step( 'synopsys-ptpx-gl',              default=True )
-  
 
   #-----------------------------------------------------------------------
   # Graph -- Add nodes
