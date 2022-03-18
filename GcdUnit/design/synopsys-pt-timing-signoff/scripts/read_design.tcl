@@ -13,7 +13,7 @@ source -echo -verbose designer_interface.tcl
 # Set up paths and libraries
 
 set_app_var search_path      ". $pt_additional_search_path $search_path"
-set_app_var target_library   $ptpx_target_libraries
+set_app_var target_library   $pt_target_libraries
 set_app_var link_library     "* $pt_target_libraries $pt_extra_link_libraries"
 
 #-------------------------------------------------------------------------
