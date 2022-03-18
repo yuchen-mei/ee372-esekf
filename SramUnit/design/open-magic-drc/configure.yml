@@ -26,5 +26,4 @@ parameters:
 
 commands:
   - cp inputs/adk/magicrc .magicrc
-  - cp inputs/*.lef .
   - magic -noconsole -dnull run_drc.tcl | tee outputs/drc_results.log

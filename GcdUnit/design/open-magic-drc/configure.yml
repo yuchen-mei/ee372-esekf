@@ -27,4 +27,3 @@ parameters:
 commands:
   - cp inputs/adk/magicrc .magicrc
   - magic -noconsole -dnull run_drc.tcl | tee outputs/drc_results.log
-  - grep "error" outputs/drc_results.log
