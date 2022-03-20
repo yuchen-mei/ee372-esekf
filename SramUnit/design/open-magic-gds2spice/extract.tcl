@@ -1,7 +1,8 @@
 cif istyle sky130(vendor)
 lef read inputs/adk/stdcells.lef
-lef read inputs/sky130_sram_1kbyte_1rw1r_32x256_8.lef
-
+foreach f [glob -directory inputs *.lef] {
+    lef read $f
+}
 gds noduplicates true
 gds order true
 

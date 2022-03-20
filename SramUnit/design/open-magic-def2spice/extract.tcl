@@ -1,7 +1,8 @@
-lef read rtk-tech-nolicon.lef
+lef read inputs/adk/rtk-tech.lef
 lef read inputs/adk/stdcells.lef
-lef read inputs/sky130_sram_1kbyte_1rw1r_32x256_8.lef
-
+foreach f [glob -directory inputs *.lef] {
+    lef read $f
+}
 def read design.def
 
 load $::env(design_name)

@@ -1,4 +1,4 @@
-lef read rtk-tech-nolicon.lef
+lef read rtk-tech.lef
 lef read inputs/adk/stdcells.lef
 
 def read design.def

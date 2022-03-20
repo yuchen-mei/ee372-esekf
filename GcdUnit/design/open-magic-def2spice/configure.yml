@@ -26,8 +26,8 @@ parameters:
 
 commands:
   - cp inputs/adk/magicrc .magicrc
-  - cp inputs/adk/rtk-tech.lef rtk-tech-nolicon.lef
-  - sed -i '/LAYER licon/,/END licon/d' rtk-tech-nolicon.lef
+  # - cp inputs/adk/rtk-tech.lef rtk-tech-nolicon.lef
+  # - sed -i '/LAYER licon/,/END licon/d' rtk-tech-nolicon.lef
   - cp -L inputs/design.def.gz design.def.gz 
   - gunzip design.def.gz 
   - sed -i 's/\//____/g' design.def # FIXME: Fix generated names properly in layout 
