@@ -308,7 +308,7 @@ def construct():
   # Gate level simulation
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i(      'design.vcs.v'     ) )
   g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i(      'design.sdf'   ) )
-  g.connect( testbench.o( 'testbench.gls.sv' ), gl_sim.i(      'testbench.sv' ) )
+  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i(      'testbench.sv' ) )
   g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i(      'design.args'  ) )
   g.connect_by_name( gl_sim,                    gen_saif_gl    ) # run.vcd
 
