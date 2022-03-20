@@ -62,8 +62,7 @@ module SramUnitTb;
     #(1*`CLK_PERIOD) //csb1 <= 1;
     csb0 <= 1;
     #(`CLK_PERIOD/2) $display("dout0 = %h", dout0);
-    // FIXME: current version of Icarus (that we use for GLS) does not support assertions
-    //assert(dout0 == 32'haaaaaaaa);
+    assert(dout0 == 32'haaaaaaaa);
   end
 
   initial begin
