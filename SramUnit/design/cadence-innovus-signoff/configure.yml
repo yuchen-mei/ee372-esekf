@@ -22,13 +22,11 @@ outputs:
   - design-merged.gds
   - design.lvs.v
   - design.flatbuslvs.v
-  - design.nofillerlvs.v
-  - design.nofillerflatbuslvs.v
   - design.vcs.v
   - design.vcs.pg.v
   - design.lef
   - design.def.gz
-  - design.pt.sdc
+  - design.sdc
   - design.sdf
   - design.virtuoso.v
   - design.spef.gz
@@ -51,13 +49,11 @@ commands:
   - ln -sf ../results/*-merged.gds        design-merged.gds
   - ln -sf ../results/*.lvs.v             design.lvs.v
   - ln -sf ../results/*.flatbuslvs.v      design.flatbuslvs.v
-  - ln -sf ../results/*.nofillerlvs.v     design.nofillerlvs.v
-  - ln -sf ../results/*.nofillerflatbuslvs.v      design.nofillerflatbuslvs.v
   - ln -sf ../results/*.vcs.v             design.vcs.v
   - ln -sf ../results/*.vcs.pg.v          design.vcs.pg.v
   - ln -sf ../results/*.lef               design.lef
   - ln -sf ../results/*.def.gz            design.def.gz
-  - ln -sf ../results/*.pt.sdc            design.pt.sdc
+  - ln -sf ../results/*.sdc               design.sdc
   - ln -sf ../results/*.sdf               design.sdf
   - ln -sf ../results/*.virtuoso.v        design.virtuoso.v
 

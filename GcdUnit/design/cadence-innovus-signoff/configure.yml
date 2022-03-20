@@ -25,7 +25,7 @@ outputs:
   - design.vcs.pg.v
   - design.lef
   - design.def.gz
-  - design.pt.sdc
+  - design.sdc
   - design.sdf
   - design.virtuoso.v
   - design.spef.gz
@@ -51,7 +51,7 @@ commands:
   - ln -sf ../results/*.vcs.pg.v          design.vcs.pg.v
   - ln -sf ../results/*.lef               design.lef
   - ln -sf ../results/*.def.gz            design.def.gz
-  - ln -sf ../results/*.pt.sdc            design.pt.sdc
+  - ln -sf ../results/*.sdc               design.sdc
   - ln -sf ../results/*.sdf               design.sdf
   - ln -sf ../results/*.virtuoso.v        design.virtuoso.v
 

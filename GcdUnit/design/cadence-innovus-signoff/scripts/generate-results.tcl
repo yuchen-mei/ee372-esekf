@@ -10,12 +10,12 @@ write_sdf $vars(results_dir)/$vars(design).sdf
 
 # Write out updated SDC for timing signoff
 
-writeTimingCon $vars(results_dir)/$vars(design).pt.sdc
+writeTimingCon $vars(results_dir)/$vars(design).sdc
 
 # Remove Synopsys-incompatible SDC commands
 
-sed -i "s/^current_design/\#current_design/" $vars(results_dir)/$vars(design).pt.sdc
-sed -i "s/get_design.*$/current_design\]/" $vars(results_dir)/$vars(design).pt.sdc
+sed -i "s/^current_design/\#current_design/" $vars(results_dir)/$vars(design).sdc
+sed -i "s/get_design.*$/current_design\]/" $vars(results_dir)/$vars(design).sdc
 
 # Write netlist for LVS
 #
