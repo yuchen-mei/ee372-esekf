@@ -55,6 +55,6 @@ placeInstance sram 55.4 65.4
 addHaloToBlock 3 3 3 3 sram
 
 # Somehow when li1 blockage is over the entire chip area, no cell can be placed
-# Have to open block the sram area.
+# Have to only block the sram area.
 
 createRouteBlk -layer {li1} -inst sram -cover
