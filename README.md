@@ -4,42 +4,19 @@ This repository runs the following pipecleaner designs through a digital physica
 *  SramUnit - uses an OpenRAM generated SRAM, plus a simple counter that supplies addresses to it
 
 # Setup
-To run this flow, please install the following dependencies first in this order:
+To run this flow, ensure the following dependencies are installed:
 
 1. `skywater-pdk` 
 
-Get SkyWater PDK:
-```
-git clone https://github.com/google/skywater-pdk.git
-cd skywater-pdk
-```
-The cell libraries are in submodules that need to be checked out independently:
-```
-git submodule update --init libraries/sky130_fd_sc_hd/latest
-git submodule update --init libraries/sky130_fd_pr/latest
-git submodule update --init libraries/sky130_fd_io/latest
-```
-To create the .lib timing files:
-```
-make timing
-cd ..
-```
-
 2. `open_pdks`
 
-```
-git clone https://github.com/RTimothyEdwards/open_pdks.git
-cd open_pdks
-./configure --enable-sky130-pdk=`realpath ../skywater-pdk/libraries` --with-sky130-local-path=`realpath ../PDKS`
-make
-make install
-cd .. 
-```
+3. `skywater-130nm-adk` - This repo has some scripts that convert the SkyWater PDK into the format that mflowgen expects. The files that are in `skywater-130nm-adk/view-standard` are the ones that mflowgen will use. (This is configured in the `design/construct.py` file for each pipecleaner.)
 
-3. `mflowgen` - This is a tool to create ASIC design flows in a modular fashion.
+The above technology dependencies should be available under: `/farmshare/home/classes/ee/372/PDKs`
+
+4. `mflowgen` - This is a tool to create ASIC design flows in a modular fashion.
 Follow the setup steps at https://mflowgen.readthedocs.io/en/latest/quick-start.html.
-
-4. `skywater-130nm-adk` - This repo has some scripts that convert the SkyWater PDK into the format that mflowgen expects. Follow the setup steps at https://code.stanford.edu/ee272/skywater-130nm-adk. The files that are in `skywater-130nm-adk/view-standard` are the ones that mflowgen will use. (This is configured in the `design/construct.py` file for each pipecleaner.)
+Note that if using a `csh` terminal you should source `venv/bin/activate.csh`.
 
 # Using the Pipecleaners
 
