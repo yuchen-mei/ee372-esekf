@@ -1,5 +1,5 @@
-export MFLOWGEN_PATH=/afs/ir.stanford.edu/class/ee272/
-export PDKPATH=/afs/ir.stanford.edu/class/ee272/PDKS/sky130A
+export MFLOWGEN_PATH=/farmshare/home/classes/ee/372/PDKs
+export PDKPATH=${MFLOWGEN_PATH}
 
 export PATH=/cad/mentor/2019.11/Catapult_Synthesis_10.4b-841621/Mgc_home/bin:$PATH
 export MGLS_LICENSE_FILE=1717@cadlic0.stanford.edu
