@@ -12,7 +12,7 @@ To run this flow, ensure the following dependencies are installed:
 
 3. `skywater-130nm-adk` - This repo has some scripts that convert the SkyWater PDK into the format that mflowgen expects. The files that are in `skywater-130nm-adk/view-standard` are the ones that mflowgen will use. (This is configured in the `design/construct.py` file for each pipecleaner.)
 
-The above technology dependencies should be available under: `/farmshare/home/classes/ee/372/PDKs`
+The above three technology dependencies should be available under: `/farmshare/home/classes/ee/372/PDKs`
 
 4. `mflowgen` - This is a tool to create ASIC design flows in a modular fashion.
 Follow the setup steps at https://mflowgen.readthedocs.io/en/latest/quick-start.html.
