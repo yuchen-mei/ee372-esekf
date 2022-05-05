@@ -8,7 +8,7 @@ setenv MGLS_LICENSE_FILE 1717@cadlic0.stanford.edu
 #source /cad/modules/tcl/init/csh
 
 module load base
-module load vcs
+module load vcs/S-2021.09-SP1
 module load lc
 module load syn
 module load xcelium
@@ -18,6 +18,7 @@ module load calibre/2019.1
 module load prime
 module load magic/latest
 module load netgen/latest
+module load verdi/S-2021.09-SP1
 
 # export PATH=/cad/openlane/build/bin:$PATH
 

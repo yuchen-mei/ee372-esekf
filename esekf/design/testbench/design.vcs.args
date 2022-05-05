@@ -1,0 +1,1 @@
+-debug_access+pp +lint=TFIPC-L -lca +neg_tchk -sverilog -y $SYNOPSYS/dw/sim_ver/ +libext+.v+ +incdir+/cad/synopsys/syn/S-2021.06-SP2/dw/sim_ver
