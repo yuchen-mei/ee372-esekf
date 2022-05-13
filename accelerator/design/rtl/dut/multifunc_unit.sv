@@ -19,7 +19,7 @@ module multifunc_unit #(
     .pi_multiple(1'b0)
   ) U1 (
     .a(data_in),
-    .func({{11{1'b0}}, func}),
+    .func({11'b0, func}),
     .rnd(rnd),
     .DG_ctrl(en),
     .z(data_out),

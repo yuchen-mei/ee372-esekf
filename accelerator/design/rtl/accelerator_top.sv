@@ -33,6 +33,21 @@ module accelerator_top #(
   input config_vld
 );
 
+  logic config_en;
+
+  // TODO: Instantiate global memory here
+
+  adr_gen_sequential #( 
+    .BANK_ADDR_WIDTH(WEIGHT_BANK_ADDR_WIDTH)
+  ) instr_wadr_gen_inst (
+    .clk(clk),
+    .rst_n(rst_n),
+    .adr_en(instr_wen),
+    .adr(instr_wadr),
+    .config_en(config_en),
+    .config_data(instr_max_adr_c)
+  );
+
   
 
 endmodule

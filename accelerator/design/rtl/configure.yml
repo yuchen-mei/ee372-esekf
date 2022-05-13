@@ -5,5 +5,5 @@ outputs:
   - design.vcs.v
 
 commands:
-  - cat dut/*.sv > outputs/design.v 
+  - cat dut/*.sv > outputs/design.v
   - cat dut/*.sv > outputs/design.vcs.v 
