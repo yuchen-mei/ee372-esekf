@@ -25,14 +25,14 @@ def construct():
 
   parameters = {
     'construct_path' : __file__,
-    'design_name'    : 'mvp_core',
+    'design_name'    : 'accelerator',
     'clock_period'   : 20.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
     'topographical'  : True,
-    'testbench_name' : 'mvp_core_tb',
-    'saif_instance'  : 'mvp_core_tb/mvp_core_inst',
-    'dut_name'       : 'mvp_core_inst'
+    'testbench_name' : 'accelerator_tb',
+    'saif_instance'  : 'accelerator_tb/accelerator_inst',
+    'dut_name'       : 'accelerator_inst'
   }
 
   #-----------------------------------------------------------------------

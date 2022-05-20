@@ -49,16 +49,16 @@ module mvp_core_tb;
   initial begin
     // TODO: calculate rotation matrix and store at 10000
     // TODO: load imu_f at 10001
-    instructions[0] = 32'b01110_0_10001_10000_0000_10011_1000100; // a = R @ imu_f - g
-    instructions[1] = 32'b00001_0_00010_01111_0000_00001_0100100; // p += v * t
-    instructions[3] = 32'b00010_0_10011_01111_0000_00010_0100100; // v += a * t
-    instructions[2] = 32'b00001_0_10011_01111_0010_00001_0100100; // p += a * 0.5t^2
+    instructions[0] = 32'b01110_0_10001_10000_000_10011_1000100; // a = R @ imu_f - g
+    instructions[1] = 32'b00001_0_00010_01111_101_00001_0100100; // p += v * t
+    instructions[3] = 32'b00010_0_10011_01111_101_00010_0100100; // v += a * t
+    instructions[2] = 32'b00001_0_10011_01111_101_00001_0100100; // p += a * 0.5t^2
     // TODO: load imu_w (in quaternion mode) at 10010
-    instructions[4] = 32'b00000_0_10010_00011_0000_00011_1010100; // q = q * imu_w
+    instructions[4] = 32'b00000_0_10010_00011_000_00011_1010100; // q = q * imu_w
 
-    instructions[5] = 32'b00000_0_00000_10001_0000_10001_0011100; // skew-symmetric
-    instructions[6] = 32'b00000_0_10001_10000_0000_10001_1001000; // rot * skew-symmetric
-    instructions[7] = 32'b00000_0_10001_01111_0000_10000_0100100; // RST
+    instructions[5] = 32'b00000_0_00000_10001_000_10001_0011100; // skew-symmetric
+    instructions[6] = 32'b00000_0_10001_10000_000_10001_1001000; // rot * skew-symmetric
+    instructions[7] = 32'b00000_0_10001_01111_101_10000_0100100; // RST
 
     // FIXME: Double check algorithm
     // instructions[8] =  32'b00100_0_00111_01111_0000_00100_0100100; // P11 += P21 * t
@@ -67,7 +67,7 @@ module mvp_core_tb;
 
     // instructions[11] = 32'b00101_0_01000_01111_0000_00101_0100100; // P12 += P22 * t
     // instructions[12] = 32'b00101_0_00110_10000_0000_00101_1000000; // P12 += RST @ P13
-    // // FIXME: Set reg to 0 first
+    // FIXME: Set reg to 0 first
     // instructions[13] = 32'b00000_0_01001_10000_0000_10001_1000000; // r17 = RST @ P23
     // instructions[14] = 32'b00101_0_10001_01111_0000_00101_0100100; // P12 += r17 * t
 

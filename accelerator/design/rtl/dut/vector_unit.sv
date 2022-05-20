@@ -19,7 +19,8 @@ module vector_unit #(
     logic [SIG_WIDTH + EXP_WIDTH : 0] inst_c;
 
     assign inst_b = func[0] ? 32'h3f800000 : vec_b[i];
-    
+
+    // FIXME: Case statement marked unique does not cover all possible conditions
     always_comb begin
       unique case (1'b1)
         func[0]: inst_c = vec_b[i];

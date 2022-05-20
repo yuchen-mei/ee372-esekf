@@ -1,0 +1,3 @@
+[submodule "PipecleanProj/skywater-digital-flow"]
+	path = PipecleanProj/skywater-digital-flow
+	url = https://code.stanford.edu/ee272/skywater-digital-flow.git

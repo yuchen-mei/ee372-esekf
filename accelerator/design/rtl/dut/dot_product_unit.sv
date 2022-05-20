@@ -51,14 +51,14 @@ module dot_product_unit #(
 
   // Dot product
   for (genvar i = 0; i < LEN / 4; i = i + 1) begin: dot_product
-    assign vec_dot4_in[i][0] = vec_a[4*i];
-    assign vec_dot4_in[i][2] = vec_a[4*i+1];
-    assign vec_dot4_in[i][4] = vec_a[4*i+2];
-    assign vec_dot4_in[i][6] = vec_a[4*i+3];
-    assign vec_dot4_in[i][1] = vec_b[4*i];
-    assign vec_dot4_in[i][3] = vec_b[4*i+1];
-    assign vec_dot4_in[i][5] = vec_b[4*i+2];
-    assign vec_dot4_in[i][7] = vec_b[4*i+3];
+    assign vec_dot4_in[4*i][0] = vec_a[4*i];
+    assign vec_dot4_in[4*i][2] = vec_a[4*i+1];
+    assign vec_dot4_in[4*i][4] = vec_a[4*i+2];
+    assign vec_dot4_in[4*i][6] = vec_a[4*i+3];
+    assign vec_dot4_in[4*i][1] = vec_b[4*i];
+    assign vec_dot4_in[4*i][3] = vec_b[4*i+1];
+    assign vec_dot4_in[4*i][5] = vec_b[4*i+2];
+    assign vec_dot4_in[4*i][7] = vec_b[4*i+3];
   end
 
   // Quaternion multiplication
@@ -74,36 +74,32 @@ module dot_product_unit #(
       assign qa_n[j][SIG_WIDTH + EXP_WIDTH - 1 : 0] = qa[j][SIG_WIDTH + EXP_WIDTH - 1 : 0];
     end
 
-    assign vec_qmul_in[4*i]   = {qa[0], qb[0], qa_n[1], qb[1], qa_n[2], qb[2], qa_n[3], qb[3]};
-    assign vec_qmul_in[4*i+1] = {qa[0], qb[1], qa[1],   qb[0], qa[2],   qb[3], qa_n[3], qb[2]};
-    assign vec_qmul_in[4*i+2] = {qa[0], qb[2], qa_n[1], qb[3], qa[2],   qb[0], qa[3],   qb[3]};
-    assign vec_qmul_in[4*i+3] = {qa[0], qb[3], qa[1],   qb[2], qa_n[2], qb[1], qa[3],   qb[0]};
+    assign vec_qmul_in[4*i]   = '{qa[0], qb[0], qa_n[1], qb[1], qa_n[2], qb[2], qa_n[3], qb[3]};
+    assign vec_qmul_in[4*i+1] = '{qa[0], qb[1], qa[1],   qb[0], qa[2],   qb[3], qa_n[3], qb[2]};
+    assign vec_qmul_in[4*i+2] = '{qa[0], qb[2], qa_n[1], qb[3], qa[2],   qb[0], qa[3],   qb[3]};
+    assign vec_qmul_in[4*i+3] = '{qa[0], qb[3], qa[1],   qb[2], qa_n[2], qb[1], qa[3],   qb[0]};
   end
 
   // Rotation matrix
-  // vec_a[0] = w
-  // vec_a[1] = x
-  // vec_a[2] = y
-  // vec_a[3] = z
-
-  // TODO: Operand negate
+  logic [SIG_WIDTH + EXP_WIDTH : 0] qa [3 : 0];
   logic [SIG_WIDTH + EXP_WIDTH : 0] qa_n [3 : 0];
   for (genvar i = 0; i < 4; i = i + 1) begin
-    assign qa_n[SIG_WIDTH + EXP_WIDTH] = ~vec_a[SIG_WIDTH + EXP_WIDTH];
-    assign qa_n[SIG_WIDTH + EXP_WIDTH - 1 : 0] = vec_a[SIG_WIDTH + EXP_WIDTH - 1 : 0];
+    assign qa[i] = vec_a[i];
+    assign qa_n[i][SIG_WIDTH + EXP_WIDTH] = ~qa[i][SIG_WIDTH + EXP_WIDTH];
+    assign qa_n[i][SIG_WIDTH + EXP_WIDTH - 1 : 0] = qa[i][SIG_WIDTH + EXP_WIDTH - 1 : 0];
   end
 
-  assign vec_rot_in[0] = '{vec_a[0], vec_a[0], vec_a[3], vec_a[3], vec_a[2], vec_a[2], vec_a[1], vec_a[1]};
-  assign vec_rot_in[1] = '{vec_a[3], vec_a[0], vec_a[0], vec_a[3], vec_a[1], vec_a[2], vec_a[2], vec_a[1]};
-  assign vec_rot_in[2] = '{vec_a[2], vec_a[0], vec_a[1], vec_a[3], vec_a[0], vec_a[2], vec_a[3], vec_a[1]};
+  assign vec_rot_in[0] = '{qa[1],   qa[1],   qa[2],   qa_n[2], qa_n[3], qa[3],   qa[0],   qa[0]};
+  assign vec_rot_in[1] = '{qa[2],   qa[1],   qa[1],   qa[2],   qa[0],   qa[3],   qa[3],   qa[0]};
+  assign vec_rot_in[2] = '{qa[3],   qa[1],   qa[0],   qa_n[2], qa[1],   qa[3],   qa_n[2], qa[0]};
 
-  assign vec_rot_in[3] = '{vec_a[0], vec_a[3], vec_a[3], vec_a[0], vec_a[2], vec_a[1], vec_a[1], vec_a[2]};
-  assign vec_rot_in[4] = '{vec_a[3], vec_a[3], vec_a[0], vec_a[0], vec_a[1], vec_a[1], vec_a[2], vec_a[2]};
-  assign vec_rot_in[5] = '{vec_a[2], vec_a[3], vec_a[1], vec_a[0], vec_a[0], vec_a[1], vec_a[3], vec_a[2]};
+  assign vec_rot_in[3] = '{qa[1],   qa[2],   qa[2],   qa[1],   qa_n[3], qa[0],   qa[0],   qa_n[3]};
+  assign vec_rot_in[4] = '{qa[2],   qa[2],   qa_n[1], qa[1],   qa[0],   qa[0],   qa[3],   qa_n[3]};
+  assign vec_rot_in[5] = '{qa[3],   qa[2],   qa[0],   qa[1],   qa[1],   qa[0],   qa[2],   qa[3]};
 
-  assign vec_rot_in[6] = '{vec_a[0], vec_a[2], vec_a[3], vec_a[1], vec_a[2], vec_a[0], vec_a[1], vec_a[3]};
-  assign vec_rot_in[7] = '{vec_a[3], vec_a[2], vec_a[0], vec_a[1], vec_a[1], vec_a[0], vec_a[2], vec_a[3]};
-  assign vec_rot_in[8] = '{vec_a[2], vec_a[2], vec_a[1], vec_a[1], vec_a[0], vec_a[0], vec_a[3], vec_a[3]};
+  assign vec_rot_in[6] = '{qa[1],   qa[3],   qa[2],   qa[0],   qa[3],   qa[1],   qa[0],   qa[2]};
+  assign vec_rot_in[7] = '{qa[2],   qa[3],   qa_n[1], qa[0],   qa[0],   qa_n[1], qa[3],   qa[2]};
+  assign vec_rot_in[8] = '{qa[3],   qa[3],   qa[0],   qa[0],   qa[1],   qa_n[1], qa_n[2], qa[2]};
 
   if (LEN > 9) begin
     for (genvar i = 9; i < LEN; i = i + 1) begin
