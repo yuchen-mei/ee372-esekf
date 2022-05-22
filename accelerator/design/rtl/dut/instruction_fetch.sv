@@ -1,5 +1,5 @@
 module instruction_fetch #(
-  parameter ADDR_WIDTH = 10
+  parameter ADDR_WIDTH = 8
 )
 (
   input clk,
@@ -11,12 +11,10 @@ module instruction_fetch #(
   // input [31:0] jr_pc,
   // input branch,
   // input [31:0] branch_offset,
-  output [ADDR_WIDTH - 1 : 0] pc
+  output [ADDR_WIDTH-1:0] pc
 );
 
-    reg [ADDR_WIDTH - 1 : 0] pc_r;
-
-    assign pc = pc_r;
+    reg [ADDR_WIDTH-1:0] pc_r;
 
     always @(posedge clk) begin
       if (!rst_n) begin
@@ -26,5 +24,7 @@ module instruction_fetch #(
         pc_r <= pc_r + 1;
       end
     end
+
+    assign pc = pc_r;
 
 endmodule

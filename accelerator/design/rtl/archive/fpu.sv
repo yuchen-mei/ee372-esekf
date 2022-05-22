@@ -4,27 +4,27 @@ module fpu #(
   parameter IEEE_COMPLIANCE = 0,
   parameter MATRIX_HEIGHT = 3,
   parameter MATRIX_WIDTH = 3,
-  parameter LEN = 9
+  parameter VECTOR_LANES = 9
 ) (
   input en,
   input [7 : 0] opcode,
-  input [SIG_WIDTH + EXP_WIDTH : 0] data_n [LEN - 1 : 0],
-  input [SIG_WIDTH + EXP_WIDTH : 0] data_m [LEN - 1 : 0],
-  input [SIG_WIDTH + EXP_WIDTH : 0] data_a [LEN - 1 : 0],
+  input [SIG_WIDTH + EXP_WIDTH : 0] data_n [VECTOR_LANES - 1 : 0],
+  input [SIG_WIDTH + EXP_WIDTH : 0] data_m [VECTOR_LANES - 1 : 0],
+  input [SIG_WIDTH + EXP_WIDTH : 0] data_a [VECTOR_LANES - 1 : 0],
   input [3 : 0] index,
-  input [LEN - 1 : 0] predicate,
-  output [SIG_WIDTH + EXP_WIDTH : 0] data_out [LEN - 1 : 0]
+  input [VECTOR_LANES - 1 : 0] predicate,
+  output [SIG_WIDTH + EXP_WIDTH : 0] data_out [VECTOR_LANES - 1 : 0]
 );
 
   logic [SIG_WIDTH + EXP_WIDTH : 0] mmul_out_w [MATRIX_WIDTH * MATRIX_HEIGHT - 1 : 0];
-  logic [SIG_WIDTH + EXP_WIDTH : 0] vmul_out_w [LEN - 1 : 0];
-  logic [SIG_WIDTH + EXP_WIDTH : 0] data_mul_w [LEN - 1 : 0];
+  logic [SIG_WIDTH + EXP_WIDTH : 0] vmul_out_w [VECTOR_LANES - 1 : 0];
+  logic [SIG_WIDTH + EXP_WIDTH : 0] data_mul_w [VECTOR_LANES - 1 : 0];
 
-  logic [SIG_WIDTH + EXP_WIDTH : 0] vadd_op2_w [LEN - 1 : 0];
-  logic [SIG_WIDTH + EXP_WIDTH : 0] vadd_out_w [LEN - 1 : 0];
+  logic [SIG_WIDTH + EXP_WIDTH : 0] vadd_op2_w [VECTOR_LANES - 1 : 0];
+  logic [SIG_WIDTH + EXP_WIDTH : 0] vadd_out_w [VECTOR_LANES - 1 : 0];
 
-  logic [SIG_WIDTH + EXP_WIDTH : 0] data_out_w [LEN - 1 : 0];
-  logic [SIG_WIDTH + EXP_WIDTH : 0] data_neg_w [LEN - 1 : 0];
+  logic [SIG_WIDTH + EXP_WIDTH : 0] data_out_w [VECTOR_LANES - 1 : 0];
+  logic [SIG_WIDTH + EXP_WIDTH : 0] data_neg_w [VECTOR_LANES - 1 : 0];
   logic [SIG_WIDTH + EXP_WIDTH : 0] quat_out_w [3 : 0];
 
   assign data_mul_w = opcode[5] ? vmul_out_w : mmul_out_w;
@@ -51,9 +51,9 @@ module fpu #(
     .SIG_WIDTH(SIG_WIDTH),
     .EXP_WIDTH(EXP_WIDTH),
     .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
-    .LEN(LEN)
+    .VECTOR_LANES(VECTOR_LANES)
   ) vector_mul_inst (
-    .en({LEN{opcode[5]}}), // TODO: use predicate register
+    .en({VECTOR_LANES{opcode[5]}}), // TODO: use predicate register
     .vec_a(data_n),
     .vec_b(data_m),
     .indexed(opcode[2]),
@@ -66,9 +66,9 @@ module fpu #(
     .SIG_WIDTH(SIG_WIDTH),
     .EXP_WIDTH(EXP_WIDTH),
     .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
-    .LEN(LEN)
+    .VECTOR_LANES(VECTOR_LANES)
   ) vector_add_inst (
-    .en({LEN{~opcode[1]}}), // TODO: add predicate
+    .en({VECTOR_LANES{~opcode[1]}}), // TODO: add predicate
     .vec_a(data_a),
     .vec_b(vadd_op2_w),
     .rnd(3'b0),
@@ -79,7 +79,7 @@ module fpu #(
   negate #(
     .SIG_WIDTH(SIG_WIDTH),
     .EXP_WIDTH(EXP_WIDTH),
-    .LEN(LEN)
+    .VECTOR_LANES(VECTOR_LANES)
   ) negate_inst (
     .en(opcode[3]),
     .vec_in(data_out_w),

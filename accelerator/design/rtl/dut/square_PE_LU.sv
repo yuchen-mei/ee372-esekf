@@ -38,25 +38,23 @@ module square_PE_LU #(
     assign uout = u_r;
     assign l = l_r;
 
-    DW_fp_mac_DG_inst 
-    mac_U0(
-        .inst_a({~l_r[DWIDTH - 1], l_r[DWIDTH - 2 : 0]}), 
-        .inst_b(uin), 
-        .inst_c(ain), 
-        .inst_rnd(3'h0), 
-        .inst_DG_ctrl(en),
-        .z_inst(mac_z0), 
-        .status_inst()
+    DW_fp_mac_DG mac_U0(
+        .a({~l_r[DWIDTH - 1], l_r[DWIDTH - 2 : 0]}), 
+        .b(uin), 
+        .c(ain), 
+        .rnd(3'h0), 
+        .DG_ctrl(en),
+        .z(mac_z0), 
+        .status()
     );
 
-    DW_fp_div_DG_inst 
-    div_U0( 
-        .inst_a(ain), 
-        .inst_b(uin), 
-        .inst_rnd(3'h0), 
-        .inst_DG_ctrl(en),
-        .z_inst(div_z0), 
-        .status_inst() 
+    DW_fp_div_DG div_U0( 
+        .a(ain), 
+        .b(uin), 
+        .rnd(3'h0), 
+        .DG_ctrl(en),
+        .z(div_z0), 
+        .status() 
     );
             
 endmodule

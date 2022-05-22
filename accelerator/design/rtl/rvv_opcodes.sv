@@ -45,3 +45,6 @@
 `define FPU_INVSQRT 5'b10010
 `define FPU_SIN  5'b10011
 `define FPU_COS  5'b10100
+
+`define SKEW_SYM 5'b11000
+`define TRANSPOSE  5'b11001

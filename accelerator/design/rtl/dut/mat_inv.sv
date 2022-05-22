@@ -1,16 +1,16 @@
 module mat_inv #(
     parameter DATA_WIDTH = 32,
     parameter MATSIZE = 3,
-    parameter LEN = MATSIZE * MATSIZE
+    parameter VECTOR_LANES = MATSIZE * MATSIZE
 ) (
-    input clk,
-    input rst_n,
-    input en,
-    input vld,
-    input [LEN*DATA_WIDTH - 1 : 0] mat_in,
-    output rdy,
-    output vld_out,
-    output [LEN*DATA_WIDTH - 1 : 0] mat_inv_out
+    input  logic                                    clk,
+    input  logic                                    rst_n,
+    input  logic                                    en,
+    input  logic                                    vld,
+    input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_in,
+    output logic                                    rdy,
+    output logic                                    vld_out,
+    output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_inv_out
 );
 
     // valid detection
@@ -18,18 +18,17 @@ module mat_inv #(
     logic data_vld;
     logic vld_out_r1;
     logic [7 : 0] vld_cnt;
-    logic [DATA_WIDTH - 1 : 0] mat_in_r[MATSIZE - 1 : 0][MATSIZE - 1 : 0];
-
-    logic [DATA_WIDTH - 1 : 0] mat_in_unpacked[MATSIZE - 1 : 0][MATSIZE - 1 : 0];
+    logic [DATA_WIDTH - 1 : 0] mat_in_r [MATSIZE - 1 : 0][MATSIZE - 1 : 0];
+    logic [DATA_WIDTH - 1 : 0] mat_row_major [MATSIZE - 1 : 0][MATSIZE - 1 : 0];
     
     for (genvar i = 0; i < 3; i = i + 1) begin
         for (genvar j = 0; j < 3; j = j + 1) begin
-            assign mat_in_unpacked[i][j] = mat_in[(3*j+i) * DATA_WIDTH +: DATA_WIDTH];
+            assign mat_row_major[i][j] = mat_in[3*j+i];
         end
     end
 
     always_ff @(posedge clk) begin
-        if(~rst_n) begin
+        if (~rst_n) begin
             data_vld <= 'h0;
             vld_out_r1 <= 'h0;
             mat_in_r <= '{default:'0};
@@ -38,7 +37,7 @@ module mat_inv #(
             if (vld) begin
                 data_vld <= 'h1;
                 vld_out_r1 <= 'h0;
-                mat_in_r <= mat_in_unpacked;
+                mat_in_r <= mat_row_major;
             end
             else begin
                 if (vld_cnt != 'h16) data_vld <= data_vld;
@@ -202,7 +201,6 @@ module mat_inv #(
 
     logic [DATA_WIDTH - 1 : 0] mat_inv_out_w[MATSIZE - 1 : 0][MATSIZE - 1 : 0];
     logic [DATA_WIDTH - 1 : 0] mat_inv_out_r[MATSIZE - 1 : 0][MATSIZE - 1 : 0];
-    logic [DATA_WIDTH - 1 : 0] mat_inv_out_flat[MATSIZE * MATSIZE - 1 : 0];
 
     always@(posedge clk) begin
         if(~rst_n) begin
@@ -218,17 +216,14 @@ module mat_inv #(
 
     for (genvar i = 0; i < 3; i = i + 1) begin
         for (genvar j = 0; j < 3; j = j + 1) begin
-            assign mat_inv_out_flat[3*j+i] = mat_inv_out_r[i][j];
+            assign mat_inv_out[3*j+i] = mat_inv_out_r[i][j];
         end
     end
-
-    assign mat_inv_out = { << { mat_inv_out_flat }};
 
     matmul_3x3 #(
         .ARRAY_HEIGHT(MATSIZE),
         .ARRAY_WIDTH(MATSIZE)
-    )
-    matmul_3x3_U(
+    ) matmul_3x3_U(
         .clk(clk),
         .rst_n(rst_n),
         .en(en),
