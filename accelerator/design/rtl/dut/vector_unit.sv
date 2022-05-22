@@ -4,7 +4,7 @@ module vector_unit #(
     parameter IEEE_COMPLIANCE = 0,
     parameter VECTOR_LANES    = 16,
     parameter DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
-)(
+) (
     input  logic [  DATA_WIDTH-1:0] vec_a [VECTOR_LANES-1:0],
     input  logic [  DATA_WIDTH-1:0] vec_b [VECTOR_LANES-1:0],
     input  logic [  DATA_WIDTH-1:0] vec_c [VECTOR_LANES-1:0],
@@ -23,17 +23,17 @@ module vector_unit #(
         assign inst_c = func[0] ? vec_b[i] : (func[2] ? vec_c[i] : 32'b0);
 
         DW_fp_mac_DG #(
-            .sig_width(SIG_WIDTH),
-            .exp_width(EXP_WIDTH),
+            .sig_width      (SIG_WIDTH      ),
+            .exp_width      (EXP_WIDTH      ),
             .ieee_compliance(IEEE_COMPLIANCE)
         ) DW_fp_mac_inst (
-            .a(vec_a[i]),
-            .b(inst_b),
-            .c(inst_c),
-            .rnd(rnd),
-            .DG_ctrl(en[i]),
-            .z(vec_out[i]),
-            .status(status[i])
+            .a      (vec_a[i]  ),
+            .b      (inst_b    ),
+            .c      (inst_c    ),
+            .rnd    (rnd       ),
+            .DG_ctrl(en[i]     ),
+            .z      (vec_out[i]),
+            .status (status[i] )
         );
     end
 

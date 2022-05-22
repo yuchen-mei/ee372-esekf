@@ -13,7 +13,7 @@
 # rectangular chip with a height that is twice the width.
 
 set core_aspect_ratio   1.00; # Aspect ratio 1.0 for a square chip
-set core_density_target 0.60; # Placement density of 70% is reasonable
+set core_density_target 0.70; # Placement density of 70% is reasonable
 
 # Make room in the floorplan for the core power ring
 
@@ -48,13 +48,13 @@ setFlipping s
 
 # Use automatic floorplan synthesis to pack macros (e.g., SRAMs) together
 
-#planDesign
+planDesign
 
-placeInstance sram 55.4 65.4
+# placeInstance sram 55.4 65.4
 
-addHaloToBlock 3 3 3 3 sram
+# addHaloToBlock 3 3 3 3 sram
 
 # Somehow when li1 blockage is over the entire chip area, no cell can be placed
 # Have to only block the sram area.
 
-createRouteBlk -layer {li1} -inst sram -cover
+# createRouteBlk -layer {li1} -inst sram -cover

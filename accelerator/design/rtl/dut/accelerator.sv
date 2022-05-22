@@ -37,6 +37,7 @@ module accelerator #(
     logic                         instr_fifo_deq;
     logic                         input_fifo_deq;
     logic                         input_fifo_empty_n;
+    logic                         input_rdy_w;
 
     logic [OUTPUT_FIFO_WIDTH-1:0] output_fifo_din;
     logic                         output_fifo_enq;
@@ -226,8 +227,8 @@ module accelerator #(
     assign output_vld = output_vld_w;
 
     deaggregator #(
-        .DATA_WIDTH (DATA_WIDTH  ),
-        .FETCH_WIDTH(VECTOR_LANES)
+        .DATA_WIDTH (OUTPUT_FIFO_WIDTH),
+        .FETCH_WIDTH(VECTOR_LANES*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
     ) output_deaggregator_inst (
         .clk            (clk               ),
         .rst_n          (rst_n             ),

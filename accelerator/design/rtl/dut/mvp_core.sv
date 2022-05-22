@@ -29,9 +29,9 @@ module mvp_core #(
 
     logic                        rst_id;
     logic                        en_q;
-    logic                        pl_en;
+    logic                        en_pl;
     logic                        en_if;
-    logic [INSTR_ADDR_WIDTH-1:0] pc_if;
+    logic [INSTR_ADDR_WIDTH-1:0] pc;
     logic [                31:0] instr_sav;
     logic [                31:0] instr_id;
     logic                        stall;
@@ -76,14 +76,15 @@ module mvp_core #(
 
     assign en_if        = ~stall & en;
     assign rst_id       = stall & en;
-    assign pl_en        = en & en_q;
+    assign en_pl        = en & en_q;
 
     assign data_out     = reg_write_data_wb;
     assign data_out_vld = reg_we_wb;
     assign reg_wb       = vd_addr_wb;
 
-    always @(posedge clk)
+    always @(posedge clk) begin
         en_q <= en;
+    end
 
     instruction_fetch #(
         .ADDR_WIDTH(INSTR_ADDR_WIDTH)
@@ -100,14 +101,12 @@ module mvp_core #(
         // .jump_reg      (jump_reg_id),
         // .jr_pc         (jr_pc_id),
 
-        .pc            (pc_if)
+        .pc            (pc)
     );
 
-    assign pc = pc_if; // output pc to parent module
-
     // Saved ID instruction after a stall
-    dff #(32, 1, 1) instr_sav_dff (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(instr), .out(instr_sav));
-    dff #(1, 1, 1)  stall_f_dff   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(stall), .out(stall_r));
+    dff #(32, 1, 1) instr_sav_dff (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(instr), .out(instr_sav));
+    dff #(1, 1, 1)  stall_f_dff   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(stall), .out(stall_r));
     assign instr_id = (stall_r) ? instr_sav : instr;
 
     //=======================================================
@@ -160,22 +159,22 @@ module mvp_core #(
 
     assign vs1_data_id = (funct3_id == 3'b101) ? {VECTOR_LANES{vs1_data_in[0]}} : vs1_data_in;
 
-    dff #(5, 1, 1) vd_addr_id2ex  (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vd_addr_id), .out(vd_addr_ex));
-    dff #(5, 1, 1) vs1_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vs1_addr_id), .out(vs1_addr_ex));
-    dff #(5, 1, 1) vs2_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vs2_addr_id), .out(vs2_addr_ex));
-    dff #(5, 1, 1) vs3_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vs3_addr_id), .out(vs3_addr_ex));
-    dff #(3, 1, 1) funct3_id2ex   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(funct3_id), .out(funct3_ex));
-    dff #(1, 1, 1) fpu_src_id2ex  (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(fpu_src_id), .out(fpu_src_ex));
-    dff #(1, 1, 1) reg_we_id2ex   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(reg_we_id & ~rst_id), .out(reg_we_ex));
+    dff #(5, 1, 1) vd_addr_id2ex  (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vd_addr_id), .out(vd_addr_ex));
+    dff #(5, 1, 1) vs1_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vs1_addr_id), .out(vs1_addr_ex));
+    dff #(5, 1, 1) vs2_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vs2_addr_id), .out(vs2_addr_ex));
+    dff #(5, 1, 1) vs3_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vs3_addr_id), .out(vs3_addr_ex));
+    dff #(3, 1, 1) funct3_id2ex   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(funct3_id), .out(funct3_ex));
+    dff #(1, 1, 1) fpu_src_id2ex  (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(fpu_src_id & ~rst_id), .out(fpu_src_ex));
+    dff #(1, 1, 1) reg_we_id2ex   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(reg_we_id & ~rst_id), .out(reg_we_ex));
 
-    dff #(5, 1, 1) fpu_opcode_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(fpu_opcode_id), .out(fpu_opcode_ex));
-    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vs1_data_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vs1_data_id), .out(vs1_data_ex));
-    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vs2_data_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vs2_data_id), .out(vs2_data_ex));
-    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vs3_data_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vs3_data_id), .out(vs3_data_ex));
+    dff #(5, 1, 1) fpu_opcode_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(fpu_opcode_id), .out(fpu_opcode_ex));
+    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vs1_data_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vs1_data_id), .out(vs1_data_ex));
+    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vs2_data_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vs2_data_id), .out(vs2_data_ex));
+    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vs3_data_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vs3_data_id), .out(vs3_data_ex));
 
-    dff #(1, 1, 1)  mem_we_id2ex   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(mem_we_id & ~rst_id), .out(mem_we_ex));
-    dff #(1, 1, 1)  mem_read_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(mem_read_id & ~rst_id), .out(mem_read_ex));
-    dff #(12, 1, 1) mem_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(mem_addr_id), .out(mem_addr_ex));
+    dff #(1, 1, 1)  mem_we_id2ex   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(mem_we_id & ~rst_id), .out(mem_we_ex));
+    dff #(1, 1, 1)  mem_read_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(mem_read_id & ~rst_id), .out(mem_read_ex));
+    dff #(12, 1, 1) mem_addr_id2ex (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(mem_addr_id), .out(mem_addr_ex));
 
     //=======================================================
     // Execute Stage
@@ -193,7 +192,7 @@ module mvp_core #(
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_permute_ex;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_permute_mem;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] fpu_result_mem;
-    logic [             1:0]                 opcode_mem;
+    logic [             1:0]                 op_sel;
 
     assign fpu_op1 = ((vs1_addr_ex == vd_addr_wb) & reg_we_wb) ? reg_write_data_wb : vs1_data_ex;
     assign fpu_op2 = ((vs2_addr_ex == vd_addr_wb) & reg_we_wb) ? reg_write_data_wb : vs2_data_ex;
@@ -229,43 +228,43 @@ module mvp_core #(
     dff #(VECTOR_LANES*DATA_WIDTH, 1, 0) vec_out_ex2mem (
         .clk  (clk        ),
         .rst_n(rst_n      ),
-        .en   (pl_en      ),
+        .en   (en_pl      ),
         .in   (vec_out_ex ),
         .out  (vec_out_mem)
     );
     dff #(VECTOR_LANES*DATA_WIDTH, 1, 0) mat_out_ex2mem (
         .clk  (clk        ),
         .rst_n(rst_n      ),
-        .en   (pl_en      ),
+        .en   (en_pl      ),
         .in   (mat_out_ex ),
         .out  (mat_out_mem)
     );
     dff #(DATA_WIDTH, 1, 0) scalar_out_ex2mem (
         .clk  (clk           ),
         .rst_n(rst_n         ),
-        .en   (pl_en         ),
+        .en   (en_pl         ),
         .in   (scalar_out_ex ),
         .out  (scalar_out_mem)
     );
     dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) vec_permute_ex2mem (
         .clk  (clk            ),
         .rst_n(rst_n          ),
-        .en   (pl_en          ),
+        .en   (en_pl          ),
         .in   (vec_permute_ex ),
         .out  (vec_permute_mem)
     );
 
-    dff #(2, 1, 1) opcode_ex2mem   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(fpu_opcode_ex[4:3]), .out(opcode_mem));
-    dff #(5, 1, 1) addr_d_ex2mem   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vd_addr_ex), .out(vd_addr_mem));
-    dff #(1, 1, 1) reg_we_ex2mem   (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(reg_we_ex), .out(reg_we_mem));
-    dff #(1, 1, 1) mem_read_ex2mem (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(mem_read_ex), .out(mem_read_mem));
+    dff #(2, 1, 1) opcode_ex2mem   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(fpu_opcode_ex[4:3]), .out(op_sel));
+    dff #(5, 1, 1) addr_d_ex2mem   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vd_addr_ex), .out(vd_addr_mem));
+    dff #(1, 1, 1) reg_we_ex2mem   (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(reg_we_ex), .out(reg_we_mem));
+    dff #(1, 1, 1) mem_read_ex2mem (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(mem_read_ex), .out(mem_read_mem));
 
     //=======================================================
     // Memroy and Ex2 Stage
     //=======================================================
 
     always_comb begin
-        casez (opcode_mem)
+        casez (op_sel)
             2'b00:   fpu_result_mem = vec_out_mem;
             2'b01:   fpu_result_mem = mat_out_mem;
             2'b10:   fpu_result_mem = {fpu_op1[VECTOR_LANES-1:1], scalar_out_mem};
@@ -283,9 +282,9 @@ module mvp_core #(
     // TODO: Read memory with different width
     assign reg_write_data_mem = mem_read_mem ? mem_read_data : fpu_result_mem;
 
-    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) reg_write_data_mem2wb (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(reg_write_data_mem), .out(reg_write_data_wb));
-    dff #(1, 1, 1) reg_we_mem2wb (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(reg_we_mem), .out(reg_we_wb));
-    dff #(5, 1, 1) addr_d_mem2wb (.clk(clk), .rst_n(rst_n), .en(pl_en), .in(vd_addr_mem), .out(vd_addr_wb));
+    dff #(VECTOR_LANES*DATA_WIDTH, 1, 1) reg_write_data_mem2wb (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(reg_write_data_mem), .out(reg_write_data_wb));
+    dff #(1, 1, 1) reg_we_mem2wb (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(reg_we_mem), .out(reg_we_wb));
+    dff #(5, 1, 1) addr_d_mem2wb (.clk(clk), .rst_n(rst_n), .en(en_pl), .in(vd_addr_mem), .out(vd_addr_wb));
 
 endmodule
 

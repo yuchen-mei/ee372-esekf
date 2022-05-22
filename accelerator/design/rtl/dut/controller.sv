@@ -7,9 +7,9 @@
 
 module controller #(
     parameter INPUT_FIFO_WIDTH   = 16,
+    parameter NUM_CONFIGS        = 12,
     parameter CONFIG_DATA_WIDTH  = 8,
     parameter CONFIG_ADDR_WIDTH  = $clog2(NUM_CONFIGS),
-    parameter NUM_CONFIGS        = 12,
     parameter DATA_WIDTH         = 32,
     parameter INSTR_ADDR_WIDTH   = 8,
     parameter GLB_MEM_ADDR_WIDTH = 12
