@@ -25,19 +25,17 @@
 # top left and the last pin is on the top right.
 
 set pins_top {\
-  {dout1[31]} {dout1[30]} {dout1[29]} {dout1[28]} {dout1[27]} {dout1[26]}\
-  {dout1[25]} {dout1[24]} {dout1[23]} {dout1[22]} {dout1[21]} {dout1[20]}\
-  {dout1[19]} {dout1[18]} {dout1[17]} {dout1[16]} {dout1[15]} {dout1[14]}\
-  {dout1[13]} {dout1[12]} {dout1[11]} {dout1[10]} {dout1[9]}  {dout1[8]} \
-  {dout1[7]}  {dout1[6]}  {dout1[5]}  {dout1[4]}  {dout1[3]}  {dout1[2]} \
-  {dout1[1]}  {dout1[0]}   csb1\
+  clk                 rst_n               input_rdy            input_vld          output_rdy           output_vld \    
 }
 
 # Pins on the right side. In this example we are not placing pins on the right
 # side, since we haven't routed out the pins on the right side of the SRAM. In
 # your design, you can use the right side as well.
 
-set pins_right []
+set pins_right {\
+  {output_data[0]}    {output_data[1]}    {output_data[2]}    {output_data[3]}    {output_data[4]}     {output_data[5]} \
+  {output_data[6]}    {output_data[7]} \ 
+}
 
 # Pins on the bottom side from right (dout0[0]) to left (din0[31]). I list pins
 # out explicitly here because the dout0 and din0 pins on the SRAM macro are
@@ -46,30 +44,20 @@ set pins_right []
 # loop.
 
 set pins_bottom {\
-  {dout0[0]}  {dout0[1]}  {dout0[2]}  {dout0[3]}  {dout0[4]}  {dout0[5]} \
-  {dout0[6]}  {dout0[7]}  {din0[0]}   {dout0[8]}  {din0[1]}   {dout0[9]} \
-  {din0[2]}   {dout0[10]} {din0[3]}   {dout0[11]} {din0[4]}   {din0[5]}  \
-  {dout0[12]} {din0[6]}   {dout0[13]} {din0[7]}   {dout0[14]} {din0[8]}  \
-  {dout0[15]} {din0[9]}   {dout0[16]} {din0[10]}  {dout0[17]} {din0[11]} \
-  {dout0[18]} {din0[12]}  {dout0[19]} {din0[13]}  {dout0[20]} {din0[14]} \
-  {dout0[21]} {din0[15]}  {dout0[22]} {din0[16]}  {dout0[23]} {din0[17]} \
-  {dout0[24]} {din0[18]}  {dout0[25]} {din0[19]}  {dout0[26]} {din0[20]} \
-  {dout0[27]} {din0[21]}  {dout0[28]} {din0[22]}  {din0[23]}  {dout0[29]}\
-  {din0[24]}  {dout0[30]} {din0[25]}  {dout0[31]} {din0[26]}  {din0[27]} \
-  {din0[28]}  {din0[29]}  {din0[30]}  {din0[31]}\
+  {input_data[8]}     {input_data[9]}    {input_data[10]}    {input_data[11]}    {input_data[12]}     {input_data[13]} \
+  {input_data[14]}    {input_data[15]} \ 
 }
 
 # Pins on the left side from bottom (rst_n) to top (addr0[0]).
 
 set pins_left {\
-   rst_n      {wmask0[0]} {wmask0[1]} {wmask0[2]} {wmask0[3]} {addr0[7]}\
-   clk         csb0        web0       {addr0[6]}  {addr0[5]}  {addr0[4]}\
-   {addr0[3]} {addr0[2]}  {addr0[1]}  {addr0[0]}\
+  {input_data[0]}    {input_data[1]}    {input_data[2]}    {input_data[3]}    {input_data[4]}     {input_data[5]} \
+  {input_data[6]}    {input_data[7]} \ 
 }
 
 # Spread the pins evenly along the sides of the block
 
-#editPin -layer met3 -pin $pins_right  -side RIGHT  -spreadType SIDE
+editPin -layer met3 -pin $pins_right  -side RIGHT  -spreadType SIDE
 editPin -layer met3 -pin $pins_left   -side LEFT   -spreadType SIDE
 editPin -layer met2 -pin $pins_bottom -side BOTTOM -spreadType SIDE
 editPin -layer met2 -pin $pins_top    -side TOP    -spreadType SIDE
