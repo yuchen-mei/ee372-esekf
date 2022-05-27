@@ -7,14 +7,17 @@ inputs:
 
 outputs:
   - testbench.sv
-  - test_vectors.txt
+  # - test_vectors.txt
+  - instr_data.txt
+  - input_data.txt
   - design.args
   - design.args.gls
 
 commands:
   - cp accelerator_tb.sv outputs/testbench.sv
   # - python3 generate_test_vectors.py
-  - cp test_vectors.txt outputs/test_vectors.txt
+  - cp instr_data.txt outputs/instr_data.txt
+  - cp input_data.txt outputs/input_data.txt
   - cp design.vcs.args outputs/design.args
   - cp design.vcs.args.gls outputs/design.args.gls
   # - cp design.icarus.args outputs/design.args

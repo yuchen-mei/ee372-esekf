@@ -1,18 +1,18 @@
 `define INPUT_WIDTH 16
 `define OUTPUT_WIDTH 8
 
-`define INPUT_DATA_SIZE 10
-`define OUTPUT_DATA_SIZE 3
+`define INPUT_DATA_SIZE 16
+`define OUTPUT_DATA_SIZE 16
 
 `define VECTOR_LANES 16
 `define DATA_WIDTH 32
 `define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 8
+`define NUM_INSTRUCTIONS 6
 
 `define INSTR_BANK_DEPTH 512
 `define INSTR_BANK_ADDR_WIDTH 9
 `define GLB_BANK_DEPTH 2048
-`define GLB_MEM_ADDR_WIDTH 11
+`define GLB_MEM_ADDR_WIDTH 12
 
 `define CONFIG_ADDR_WIDTH 8
 `define CONFIG_DATA_WIDTH 8
@@ -44,15 +44,15 @@ module accelerator_tb;
     assign instr_max_wadr_c  = `NUM_INSTRUCTIONS - 1;
     assign input_max_wadr_c  = `INPUT_DATA_SIZE - 1;
     assign output_max_adr_c  = `OUTPUT_DATA_SIZE - 1;
-    assign input_wadr_offset = 'h3e00;
-    assign output_adr_offset = 'h3f00;
-    assign mat_inv_offset    = 'h4000;
+    assign input_wadr_offset = 12'hfe0;
+    assign output_adr_offset = 12'hff0;
+    assign mat_inv_offset    = 12'hfff;
 
     reg [7:0] state_r;
     reg counter;
 
     reg [      `INSTR_WIDTH - 1 : 0] instr_memory [`NUM_INSTRUCTIONS - 1 : 0];
-    reg [       `DATA_WIDTH - 1 : 0] input_memory [`VECTOR_LANES*`INPUT_DATA_SIZE - 1 : 0];
+    reg [       `DATA_WIDTH - 1 : 0] input_memory [`INPUT_DATA_SIZE - 1 : 0];
     reg [     `OUTPUT_WIDTH - 1 : 0] output_memory [`OUTPUT_DATA_SIZE - 1 : 0];
     reg [`CONFIG_DATA_WIDTH - 1 : 0] config_r [`NUM_CONFIGS - 1 : 0];
 
@@ -70,7 +70,8 @@ module accelerator_tb;
     );
 
     initial begin
-        $readmemb("inputs/test_vectors.txt", instr_memory);
+        $readmemb("inputs/instr_data.txt", instr_memory);
+        $readmemh("inputs/input_data.txt", input_memory);
 
         clk <= 0;
         rst_n <= 0;
@@ -80,7 +81,7 @@ module accelerator_tb;
         input_adr_r  <= 0;
         input_data_r <= 0;
         output_rdy_r <= 1;
-        counter       <= 0;
+        counter      <= 0;
 
         config_r[0]  <=  instr_max_wadr_c;
         config_r[1]  <= (instr_max_wadr_c >> 8);
@@ -110,12 +111,35 @@ module accelerator_tb;
                         state_r <= 1;
                     end
                 end
-            end else if (state_r == 1) begin
+            end
+            else if (state_r == 1) begin
                 if (input_rdy_w) begin
                     input_data_r <= instr_memory[input_adr_r][counter*16 +: 16]; 
-                    input_adr_r  <= counter ? input_adr_r + 1 : input_adr_r;
-                    counter      <= ~counter;
+                    input_adr_r  <= (counter == 1) ? input_adr_r + 1 : input_adr_r;
+                    counter      <= counter + 1;
+                    if ((input_adr_r == `NUM_INSTRUCTIONS - 1) && (counter == 1)) begin
+                        state_r <= 2;
+                        input_adr_r <= 0;
+                    end
                 end
+            end
+            else if (state_r == 2) begin
+                if (input_rdy_w) begin
+                    input_data_r <= input_memory[input_adr_r][counter*16 +: 16]; 
+                    input_adr_r  <= (counter == 1) ? input_adr_r + 1 : input_adr_r;
+                    counter      <= counter + 1;
+                    if ((input_adr_r == `INPUT_DATA_SIZE - 1) && (counter == 1)) begin
+                        state_r <= 3;
+                        input_vld_r <= 0;
+                    end
+                end
+
+                // if (data_out_vld) begin
+                //     for (int i = `LEN - 1; i >= 0 ; i = i - 1) begin
+                //         $write("%h_", data_out[i]);
+                //     end
+                //     $display();
+                // end
             end
             else begin
                 input_vld_r <= 0;

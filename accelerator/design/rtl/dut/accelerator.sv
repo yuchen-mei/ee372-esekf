@@ -105,11 +105,11 @@ module accelerator #(
         .en            (mvp_core_en   ),
         .pc            (pc            ),
         .instr         (instr         ),
-        .mem_write_en  (mem_write     ),
-        .mem_read_en   (mem_read      ),
         .mem_addr      (mem_addr      ),
-        .mem_write_data(mem_write_data),
-        .mem_read_data (mem_read_data ),
+        .mem_wdata     (mem_write_data),
+        .mem_we        (mem_write     ),
+        .mem_rdata     (mem_read_data ),
+        .mem_read_en   (mem_read      ),
         // Debug signals
         .data_out_vld  (              ),
         .data_out      (              ),
@@ -279,7 +279,8 @@ module accelerator #(
         // Debug signal
         .state_r            (                  ),
         .config_adr         (                  ),
-        .config_data        (                  )
+        .config_data        (                  ),
+        .input_wadr_offset  (                  )
     );
 
 endmodule

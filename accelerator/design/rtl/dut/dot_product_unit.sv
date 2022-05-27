@@ -4,37 +4,21 @@ module dot_product_unit #(
     parameter IEEE_COMPLIANCE = 0,
     parameter VECTOR_LANES    = 16,
     parameter DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
-)(
-    input  logic [DATA_WIDTH-1:0]  vec_a [VECTOR_LANES-1:0],
-    input  logic [DATA_WIDTH-1:0]  vec_b [VECTOR_LANES-1:0],
-    input  logic [DATA_WIDTH-1:0]  vec_c [VECTOR_LANES-1:0],
-    input  logic [3:0]             func,
-    input  logic [2:0]             rnd,
-    input  logic                   en,
-    output logic [DATA_WIDTH-1:0]  vec_out [VECTOR_LANES-1:0],
-    output logic [7:0]             status [VECTOR_LANES-1:0]
+) (
+    input  logic                                    en,
+    input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_a,
+    input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_b,
+    input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_c,
+    input  logic [             2:0]                 funct,
+    input  logic [             2:0]                 rnd,
+    output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out 
 );
 
-    logic [DATA_WIDTH-1:0] vec_in [VECTOR_LANES-1:0][7:0];
+    logic [DATA_WIDTH-1:0] vec_in      [VECTOR_LANES-1:0][7:0];
     logic [DATA_WIDTH-1:0] vec_mat3_in [VECTOR_LANES-1:0][7:0];
-    logic [DATA_WIDTH-1:0] vec_mat4_in [VECTOR_LANES-1:0][7:0];
     logic [DATA_WIDTH-1:0] vec_dot4_in [VECTOR_LANES-1:0][7:0];
     logic [DATA_WIDTH-1:0] vec_qmul_in [VECTOR_LANES-1:0][7:0];
     logic [DATA_WIDTH-1:0] vec_rot_in  [VECTOR_LANES-1:0][7:0];
-
-    // 4x4x4 Matrix multiplication
-    for (genvar i = 0; i < 4; i = i + 1) begin: col_4x4
-        for (genvar j = 0; j < 4; j = j + 1) begin: row_4x4
-            assign vec_mat4_in[4*i+j][0] = vec_a[j];
-            assign vec_mat4_in[4*i+j][2] = vec_a[4+j];
-            assign vec_mat4_in[4*i+j][4] = vec_a[4*2+j];
-            assign vec_mat4_in[4*i+j][6] = vec_a[4*3+j];
-            assign vec_mat4_in[4*i+j][1] = vec_b[4*i];
-            assign vec_mat4_in[4*i+j][3] = vec_b[4*i+1];
-            assign vec_mat4_in[4*i+j][5] = vec_b[4*i+2];
-            assign vec_mat4_in[4*i+j][7] = vec_b[4*i+3];
-        end
-    end
 
     // 3x3x3 Matrix multiply-accumulate
     for (genvar i = 0; i < 3; i = i + 1) begin: col_3x3
@@ -63,31 +47,28 @@ module dot_product_unit #(
     end
 
     // Quaternion multiplication
-    for (genvar i = 0; i < VECTOR_LANES / 4; i = i + 1) begin: quat_mult
-        logic [DATA_WIDTH-1:0] qa [3:0];
-        logic [DATA_WIDTH-1:0] qb [3:0];
-        logic [DATA_WIDTH-1:0] qa_n [3:0];
+    logic [DATA_WIDTH-1:0] qa[3:0];
+    logic [DATA_WIDTH-1:0] qb[3:0];
+    logic [DATA_WIDTH-1:0] qa_n[3:0];
 
-        for (genvar j = 0; j < 4; j = j + 1) begin
-            assign qa[j] = vec_a[4*i+j];
-            assign qb[j] = vec_b[4*i+j];
-            assign qa_n[j] = {~qa[j][DATA_WIDTH-1], qa[j][DATA_WIDTH-2:0]};
-        end
-
-        assign vec_qmul_in[4*i]   = '{qa[0],   qb[0],   qa_n[1], qb[1],   qa_n[2], qb[2], qa_n[3], qb[3]};
-        assign vec_qmul_in[4*i+1] = '{qa[0],   qb[1],   qa[1],   qb[0],   qa[2],   qb[3], qa_n[3], qb[2]};
-        assign vec_qmul_in[4*i+2] = '{qa[0],   qb[2],   qa_n[1], qb[3],   qa[2],   qb[0], qa[3],   qb[3]};
-        assign vec_qmul_in[4*i+3] = '{qa[0],   qb[3],   qa[1],   qb[2],   qa_n[2], qb[1], qa[3],   qb[0]};
-    end
-
-    // Rotation matrix
-    logic [DATA_WIDTH-1:0] qa [3:0];
-    logic [DATA_WIDTH-1:0] qa_n [3:0];
     for (genvar i = 0; i < 4; i = i + 1) begin
         assign qa[i] = vec_a[i];
+        assign qb[i] = vec_b[i];
         assign qa_n[i] = {~qa[i][DATA_WIDTH-1], qa[i][DATA_WIDTH-2:0]};
     end
 
+    assign vec_qmul_in[0] = '{qa[0],   qb[0],   qa_n[1], qb[1],   qa_n[2], qb[2],   qa_n[3], qb[3]};
+    assign vec_qmul_in[1] = '{qa[0],   qb[1],   qa[1],   qb[0],   qa[2],   qb[3],   qa_n[3], qb[2]};
+    assign vec_qmul_in[2] = '{qa[0],   qb[2],   qa_n[1], qb[3],   qa[2],   qb[0],   qa[3],   qb[3]};
+    assign vec_qmul_in[3] = '{qa[0],   qb[3],   qa[1],   qb[2],   qa_n[2], qb[1],   qa[3],   qb[0]};
+
+    if (VECTOR_LANES > 4) begin
+        for (genvar i = 4; i < VECTOR_LANES; i = i + 1) begin
+            assign vec_qmul_in[i] = '{default:'0};
+        end
+    end
+
+    // Rotation matrix
     assign vec_rot_in[0] = '{qa[1],   qa[1],   qa[2],   qa_n[2], qa_n[3], qa[3],   qa[0],   qa[0]};
     assign vec_rot_in[1] = '{qa[2],   qa[1],   qa[1],   qa[2],   qa[0],   qa[3],   qa[3],   qa[0]};
     assign vec_rot_in[2] = '{qa[3],   qa[1],   qa[0],   qa_n[2], qa[1],   qa[3],   qa_n[2], qa[0]};
@@ -108,11 +89,11 @@ module dot_product_unit #(
     end
 
     always_comb begin
-        unique case (1'b1)
-            func[0]: vec_in = vec_mat3_in;
-            func[1]: vec_in = vec_dot4_in;
-            func[2]: vec_in = vec_qmul_in;
-            func[3]: vec_in = vec_rot_in;
+        case (funct)
+            3'b000: vec_in = vec_mat3_in;
+            3'b001: vec_in = vec_dot4_in;
+            3'b010: vec_in = vec_qmul_in;
+            3'b011: vec_in = vec_rot_in;
             default: vec_in = '{default:'0};
         endcase
     end
@@ -124,17 +105,17 @@ module dot_product_unit #(
             .ieee_compliance(IEEE_COMPLIANCE),
             .arch_type      (1              )
         ) DW_fp_dp4_inst (
-            .a     (vec_in[i][0]),
-            .b     (vec_in[i][1]),
-            .c     (vec_in[i][2]),
-            .d     (vec_in[i][3]),
-            .e     (vec_in[i][4]),
-            .f     (vec_in[i][5]),
-            .g     (vec_in[i][6]),
-            .h     (vec_in[i][7]),
-            .rnd   (rnd         ),
-            .z     (vec_out[i]  ),
-            .status(status[i]   )
+            .a              (vec_in[i][0]   ),
+            .b              (vec_in[i][1]   ),
+            .c              (vec_in[i][2]   ),
+            .d              (vec_in[i][3]   ),
+            .e              (vec_in[i][4]   ),
+            .f              (vec_in[i][5]   ),
+            .g              (vec_in[i][6]   ),
+            .h              (vec_in[i][7]   ),
+            .rnd            (rnd            ),
+            .z              (vec_out[i]     ),
+            .status         (               )
         );
     end
 

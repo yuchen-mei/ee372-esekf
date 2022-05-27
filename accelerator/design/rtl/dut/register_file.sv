@@ -53,7 +53,8 @@ module register_file #(
             vectors[20] <= 32'h37d1b717; // t^2
             vectors[21] <= 32'h3751b717; // 0.5t^2
             vectors[22] <= 32'h348637bd; // vif*t^2
-            vectors[23] <= 32'h348637bd; // viw*t^2
+
+            vectors[23] <= {32'hbd4a4f00, 32'hbe07b428, 32'hbcb943b7};
 
             vectors[31:24] <= '{default:0};
         end

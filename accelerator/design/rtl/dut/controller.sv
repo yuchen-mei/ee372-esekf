@@ -46,7 +46,9 @@ module controller #(
     // Debug Signal
     output reg   [      `STATE_WIDTH-1:0] state_r,
     output logic [ CONFIG_ADDR_WIDTH-1:0] config_adr,
-    output logic [ CONFIG_DATA_WIDTH-1:0] config_data
+    output logic [ CONFIG_DATA_WIDTH-1:0] config_data,
+
+    output logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr_offset
 );
 
     // ---------------------------------------------------------------------------
@@ -55,9 +57,9 @@ module controller #(
 
     reg [CONFIG_DATA_WIDTH-1:0] config_r [NUM_CONFIGS-1:0];
 
-    logic [GLB_MEM_ADDR_WIDTH-1:0] instr_max_wadr_c;
+    logic [  INSTR_ADDR_WIDTH-1:0] instr_max_wadr_c;
     logic [GLB_MEM_ADDR_WIDTH-1:0] input_max_wadr_c;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr_offset;
+    // logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr_offset;
     logic [GLB_MEM_ADDR_WIDTH-1:0] output_max_adr_c;
     logic [GLB_MEM_ADDR_WIDTH-1:0] output_radr_offset;
     logic [GLB_MEM_ADDR_WIDTH-1:0] mat_inv_offset;
@@ -89,8 +91,8 @@ module controller #(
     assign config_data     = params_fifo_dout[CONFIG_DATA_WIDTH-1:0];
     assign params_fifo_deq = params_fifo_empty_n && (state_r == `IDLE);
 
-    assign mat_inv_en  = (mem_write & (mem_addr == mat_inv_offset) & ~mat_inv_vld_out);
-    assign mat_inv_vld = mat_inv_en & ~mat_inv_en_r;
+    assign mat_inv_en  = (mem_write && (mem_addr == mat_inv_offset) && ~mat_inv_vld_out);
+    assign mat_inv_vld = mat_inv_en && ~mat_inv_en_r;
 
     always @(posedge clk)
         mat_inv_en_r <= mat_inv_en;
@@ -129,30 +131,33 @@ module controller #(
             end
             else if (state_r == `INNER_LOOP) begin
                 // Special instruction to invoke I/O
-                if (mem_read & (mem_addr == input_wadr_offset)) begin
-                    input_wadr_r <= input_wadr_offset;
+                if (mem_read && (mem_addr == input_wadr_offset)) begin
+                    mvp_core_en    <= 0;
+                    input_wadr_r   <= input_wadr_offset;
                     output_wbadr_r <= output_radr_offset;
                     output_empty_n <= 1;
-                    state_r <= `RESET_INNER_LOOP;
+                    state_r        <= `RESET_INNER_LOOP;
                 end
                 
-                // if (mem_write & (mem_addr == output_radr_offset)) begin
+                // if (mem_write && (mem_addr == output_radr_offset)) begin
                 //   output_empty_n <= 1;
                 // end
                 
                 // Halt MVP Core when running matrix inversion
-                if (mem_write & (mem_addr == mat_inv_offset)) begin
+                else if (mem_write && (mem_addr == mat_inv_offset)) begin
                     mvp_core_en <= 0;
+                    // mat_inv_en  <= 1;
                 end
-                if (mat_inv_en && mat_inv_vld_out) begin
+                else if (mat_inv_en && mat_inv_vld_out) begin
+                    // mat_inv_en  <= 0;
                     mvp_core_en <= 1;
                 end
 
-                if (mem_read & (mem_addr == mat_inv_offset))
+                else if (mem_read && (mem_addr == mat_inv_offset))
                     mem_read_data <= mat_inv_out;
             end
             else if (state_r == `RESET_INNER_LOOP) begin
-                input_wadr_r <= (input_wen && input_full_n) ? input_wadr_r + 1 : input_wadr_r;
+                input_wadr_r   <= (input_wen && input_full_n) ? input_wadr_r + 1 : input_wadr_r;
                 output_wbadr_r <= (output_wb_ren && output_empty_n) ? output_wbadr_r + 1 : output_wbadr_r;
 
                 output_empty_n <= (output_wbadr_r <= output_radr_offset + output_max_adr_c);

@@ -3,7 +3,7 @@ module vector_permute #(
     parameter VECTOR_LANES = 16
 ) (
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_in,
-    input  logic [                             2:0] func,
+    input  logic [                             2:0] funct,
     input  logic [                             2:0] width,
     output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out
 );
@@ -38,7 +38,7 @@ module vector_permute #(
     end
 
     always_comb begin
-        case (func)
+        case (funct)
             2'b00:   vec_out = skew_symmetric;
             2'b01:   vec_out = transpose;
             default: vec_out = '0;

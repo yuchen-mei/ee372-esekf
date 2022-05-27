@@ -4,13 +4,13 @@ module ram_sync_1rw1r#(
   parameter DEPTH = 256,
   parameter DELAY = 0
 )(
-  input clk,
-  input wen,
-  input [ADDR_WIDTH - 1 : 0] wadr,
-  input [DATA_WIDTH - 1 : 0] wdata,
-  input ren,
-  input [ADDR_WIDTH - 1 : 0] radr,
-  output [DATA_WIDTH - 1 : 0] rdata
+  input  logic clk,
+  input  logic wen,
+  input  logic [ADDR_WIDTH - 1 : 0] wadr,
+  input  logic [DATA_WIDTH - 1 : 0] wdata,
+  input  logic ren,
+  input  logic [ADDR_WIDTH - 1 : 0] radr,
+  output logic [DATA_WIDTH - 1 : 0] rdata
 );
 
   genvar i, j;
