@@ -13,7 +13,7 @@ module decoder (
     output logic        reg_we,
 
     output logic        mem_we,
-    output logic        mem_read,
+    output logic        mem_ren,
     output logic [11:0] mem_addr,
     output logic [ 3:0] imm,
 
@@ -36,16 +36,16 @@ module decoder (
     assign masking = instr[25];
     assign funct6  = instr[31:26];
 
-    assign overwrite_multiplicand = ((opcode == `VFMACC) ||
+    assign overwrite_multiplicand = ((opcode == `VFMACC)  ||
                                      (opcode == `VFNMACC) || 
-                                     (opcode == `VFMSAC) || 
+                                     (opcode == `VFMSAC)  || 
                                      (opcode == `VFNMSAC));
     assign vs1_addr = src1;
     assign vs2_addr = overwrite_multiplicand ? dest : src2;
     assign vs3_addr = overwrite_multiplicand ? src2 : dest;
     assign vd_addr  = dest;
 
-    always @(*) begin
+    always_comb begin
         case ({opcode, funct6})
             {`OP_V, `VFADD}:   vfu_opcode = `VFU_ADD;
             {`OP_V, `VFSUB}:   vfu_opcode = `VFU_SUB;
@@ -81,7 +81,7 @@ module decoder (
     assign mem_addr = instr[31:20];
     assign imm      = instr[18:15];
     assign mem_we   = (opcode == `STORE_FP);
-    assign mem_read = (opcode == `LOAD_FP);
+    assign mem_ren  = (opcode == `LOAD_FP);
     assign reg_we   = ~mem_we;
 
     assign stall = (vs1_addr == vd_addr_ex | vs2_addr == vd_addr_ex | vs3_addr == vd_addr_ex) & reg_we_ex;

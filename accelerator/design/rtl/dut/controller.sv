@@ -6,49 +6,46 @@
 `define RESET_INNER_LOOP 3
 
 module controller #(
-    parameter INPUT_FIFO_WIDTH   = 16,
-    parameter NUM_CONFIGS        = 12,
-    parameter CONFIG_DATA_WIDTH  = 8,
-    parameter CONFIG_ADDR_WIDTH  = $clog2(NUM_CONFIGS),
-    parameter DATA_WIDTH         = 32,
-    parameter INSTR_ADDR_WIDTH   = 8,
-    parameter GLB_MEM_ADDR_WIDTH = 12
+    parameter INPUT_FIFO_WIDTH     = 16,
+    parameter DATA_WIDTH           = 32,
+    parameter ADDR_WIDTH           = 13,
+    parameter INSTR_MEM_ADDR_WIDTH = 8,
+    parameter DATA_MEM_ADDR_WIDTH  = 12,
+    parameter NUM_CONFIGS          = 12,
+    parameter CONFIG_DATA_WIDTH    = 8,
+    parameter CONFIG_ADDR_WIDTH    = $clog2(NUM_CONFIGS)
 ) (
-    input  logic                          clk,
-    input  logic                          rst_n,
+    input  logic                            clk,
+    input  logic                            rst_n,
 
-    input  logic [  INPUT_FIFO_WIDTH-1:0] params_fifo_dout,
-    output logic                          params_fifo_deq,
-    input  logic                          params_fifo_empty_n,
+    input  logic [    INPUT_FIFO_WIDTH-1:0] params_fifo_dout,
+    output logic                            params_fifo_deq,
+    input  logic                            params_fifo_empty_n,
 
-    input  logic                          instr_wen,
-    input  logic                          input_wen,
-    input  logic                          output_wb_ren,
+    input  logic                            instr_wen,
+    input  logic                            input_wen,
+    input  logic                            output_wb_ren,
 
-    output logic                          instr_full_n,
-    output logic                          input_full_n,
-    output reg                            output_empty_n,
+    output logic                            instr_full_n,
+    output logic                            input_full_n,
+    output reg                              output_empty_n,
 
-    output logic [  INSTR_ADDR_WIDTH-1:0] instr_wadr,
-    output logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr,
-    output logic [GLB_MEM_ADDR_WIDTH-1:0] output_wb_radr,
+    output logic [INSTR_MEM_ADDR_WIDTH-1:0] instr_wadr,
+    output logic [ DATA_MEM_ADDR_WIDTH-1:0] input_wadr,
+    output logic [ DATA_MEM_ADDR_WIDTH-1:0] output_wb_radr,
 
-    input  logic                          mem_read,
-    input  logic                          mem_write,
-    input  logic [                  11:0] mem_addr,
-    output reg   [        DATA_WIDTH-1:0] mem_read_data,
+    input  logic [          ADDR_WIDTH-1:0] mem_addr,
+    input  logic                            mem_read,
+    input  logic                            mem_write,
 
-    output logic                          mat_inv_en,
-    output logic                          mat_inv_vld,
-    input  logic                          mat_inv_vld_out,
-    input  logic [        DATA_WIDTH-1:0] mat_inv_out,
-    output reg                            mvp_core_en,
+    output logic                            mat_inv_en,
+    output logic                            mat_inv_vld,
+    input  logic                            mat_inv_vld_out,
+    output reg                              mvp_core_en,
     // Debug Signal
-    output reg   [      `STATE_WIDTH-1:0] state_r,
-    output logic [ CONFIG_ADDR_WIDTH-1:0] config_adr,
-    output logic [ CONFIG_DATA_WIDTH-1:0] config_data,
-
-    output logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr_offset
+    output reg   [        `STATE_WIDTH-1:0] state_r,
+    output logic [   CONFIG_ADDR_WIDTH-1:0] config_adr,
+    output logic [   CONFIG_DATA_WIDTH-1:0] config_data
 );
 
     // ---------------------------------------------------------------------------
@@ -57,23 +54,22 @@ module controller #(
 
     reg [CONFIG_DATA_WIDTH-1:0] config_r [NUM_CONFIGS-1:0];
 
-    logic [  INSTR_ADDR_WIDTH-1:0] instr_max_wadr_c;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] input_max_wadr_c;
-    // logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr_offset;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] output_max_adr_c;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] output_radr_offset;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] mat_inv_offset;
+    logic [INSTR_MEM_ADDR_WIDTH-1:0] instr_max_wadr_c;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0] input_max_wadr_c;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0] input_wadr_offset;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0] output_max_adr_c;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0] output_radr_offset;
 
     // ---------------------------------------------------------------------------
     // Registers for keeping track of the state of the accelerator
     // ---------------------------------------------------------------------------
 
     // reg [`STATE_WIDTH-1:0]       state_r;
-    reg [ CONFIG_ADDR_WIDTH-1:0] config_adr_r;
-    reg [GLB_MEM_ADDR_WIDTH-1:0] instr_wadr_r;
-    reg [GLB_MEM_ADDR_WIDTH-1:0] input_wadr_r;
-    reg [GLB_MEM_ADDR_WIDTH-1:0] output_wbadr_r;
-    reg                          mat_inv_en_r;
+    reg [  CONFIG_ADDR_WIDTH-1:0] config_adr_r;
+    reg [DATA_MEM_ADDR_WIDTH-1:0] instr_wadr_r;
+    reg [DATA_MEM_ADDR_WIDTH-1:0] input_wadr_r;
+    reg [DATA_MEM_ADDR_WIDTH-1:0] output_wbadr_r;
+    reg                           mat_inv_en_r;
 
     assign config_adr     = config_adr_r;
     assign instr_wadr     = instr_wadr_r;
@@ -91,7 +87,7 @@ module controller #(
     assign config_data     = params_fifo_dout[CONFIG_DATA_WIDTH-1:0];
     assign params_fifo_deq = params_fifo_empty_n && (state_r == `IDLE);
 
-    assign mat_inv_en  = (mem_write && (mem_addr == mat_inv_offset) && ~mat_inv_vld_out);
+    assign mat_inv_en  = (mem_write && (mem_addr == 13'h1200) && ~mat_inv_vld_out);
     assign mat_inv_vld = mat_inv_en && ~mat_inv_en_r;
 
     always @(posedge clk)
@@ -103,7 +99,7 @@ module controller #(
 
             config_adr_r   <= 0;
             instr_wadr_r   <= 0;
-            input_wadr_r   <= {GLB_MEM_ADDR_WIDTH{1'b1}};;
+            input_wadr_r   <= {DATA_MEM_ADDR_WIDTH{1'b1}};;
             output_wbadr_r <= 0;
 
             output_empty_n <= 0;
@@ -144,17 +140,12 @@ module controller #(
                 // end
                 
                 // Halt MVP Core when running matrix inversion
-                else if (mem_write && (mem_addr == mat_inv_offset)) begin
+                else if (mem_write && (mem_addr == 16'h2000)) begin
                     mvp_core_en <= 0;
-                    // mat_inv_en  <= 1;
                 end
                 else if (mat_inv_en && mat_inv_vld_out) begin
-                    // mat_inv_en  <= 0;
                     mvp_core_en <= 1;
                 end
-
-                else if (mem_read && (mem_addr == mat_inv_offset))
-                    mem_read_data <= mat_inv_out;
             end
             else if (state_r == `RESET_INNER_LOOP) begin
                 input_wadr_r   <= (input_wen && input_full_n) ? input_wadr_r + 1 : input_wadr_r;
@@ -182,6 +173,5 @@ module controller #(
     assign input_wadr_offset  = {config_r[5], config_r[4]};
     assign output_max_adr_c   = {config_r[7], config_r[6]};
     assign output_radr_offset = {config_r[9], config_r[8]};
-    assign mat_inv_offset     = {config_r[11], config_r[10]};
 
 endmodule

@@ -1,18 +1,18 @@
 module accelerator #(
-    parameter SIG_WIDTH          = 23,
-    parameter EXP_WIDTH          = 8,
-    parameter IEEE_COMPLIANCE    = 0,
+    parameter SIG_WIDTH            = 23,
+    parameter EXP_WIDTH            = 8,
+    parameter IEEE_COMPLIANCE      = 0,
 
-    parameter INPUT_FIFO_WIDTH   = 16,
-    parameter OUTPUT_FIFO_WIDTH  = 8,
-    parameter CONFIG_DATA_WIDTH  = 8,
+    parameter INPUT_FIFO_WIDTH     = 16,
+    parameter OUTPUT_FIFO_WIDTH    = 8,
+    parameter CONFIG_DATA_WIDTH    = 8,
 
-    parameter VECTOR_LANES       = 16,
+    parameter VECTOR_LANES         = 16,
 
-    parameter INSTR_BANK_DEPTH   = 512,
-    parameter INSTR_ADDR_WIDTH   = $clog2(INSTR_BANK_DEPTH),
-    parameter GLB_MEM_BANK_DEPTH = 256,
-    parameter GLB_MEM_ADDR_WIDTH = $clog2(GLB_MEM_BANK_DEPTH)
+    parameter INSTR_MEM_BANK_DEPTH = 512,
+    parameter INSTR_MEM_ADDR_WIDTH = $clog2(INSTR_MEM_BANK_DEPTH),
+    parameter DATA_MEM_BANK_DEPTH  = 256,
+    parameter DATA_MEM_ADDR_WIDTH  = $clog2(DATA_MEM_BANK_DEPTH)
 ) (
     input  logic                         clk,
     input  logic                         rst_n,
@@ -27,6 +27,7 @@ module accelerator #(
 );
 
     localparam DATA_WIDTH = SIG_WIDTH + EXP_WIDTH + 1;
+    localparam MEM_ADDR_WIDTH = 13;
 
     // ---------------------------------------------------------------------------
     // Wires connecting to the interface FIFOs.
@@ -56,106 +57,162 @@ module accelerator #(
     // Control signals coming out of the convolution controller 
     // ---------------------------------------------------------------------------
 
-    logic                          instr_full_n;
-    logic                          input_full_n;
-    logic                          output_empty_n;
+    logic                            instr_full_n;
+    logic                            input_full_n;
+    logic                            output_empty_n;
 
-    logic [  INSTR_ADDR_WIDTH-1:0] instr_wadr;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] input_wadr;
-    logic [GLB_MEM_ADDR_WIDTH-1:0] output_wb_radr;
+    logic [INSTR_MEM_ADDR_WIDTH-1:0] instr_wadr;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0] input_wadr;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0] output_wb_radr;
 
-    logic                          mat_inv_en;
-    logic                          mat_inv_vld;
-    logic                          mvp_core_en;
+    logic                            mat_inv_en;
+    logic                            mat_inv_vld;
+    logic                            mvp_core_en;
 
     // ---------------------------------------------------------------------------
     // Data connections between the MVP and memory.
     // ---------------------------------------------------------------------------
 
-    logic [INSTR_ADDR_WIDTH-1:0]             pc;
-    logic [            31:0]                 instr;
+    logic [INSTR_MEM_ADDR_WIDTH-1:0]                 pc;
+    logic [                    31:0]                 instr;
 
-    logic                                    mem_read;
-    logic                                    mem_write;
-    logic [            11:0]                 mem_addr;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_write_data;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_read_data;
+    logic [      MEM_ADDR_WIDTH-1:0]                 mvp_mem_addr;
+    logic                                            mvp_mem_we;
+    logic                                            mvp_mem_ren;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_wdata;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_rdata;
+    logic [                     2:0]                 width;
 
-    logic                                    mat_inv_vld_out;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_inv_out;
+    logic [INSTR_MEM_ADDR_WIDTH-1:0]                 instr_mem_addr;
+    logic                                            instr_mem_csb;
+    logic                                            instr_mem_web;
+    logic [          DATA_WIDTH-1:0]                 instr_mem_wdata;
+    logic [          DATA_WIDTH-1:0]                 instr_mem_rdata;
 
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] glb_mem_rdata;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] input_aggregator_dout;
-    logic [  DATA_WIDTH-1:0]                 instr_aggregator_dout;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_addr;
+    logic                                            data_mem_csb;
+    logic                                            data_mem_web;
+    logic [        VECTOR_LANES-1:0]                 data_mem_wmask0;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] data_mem_wdata;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] data_mem_rdata;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] output_wb_data;
+
+    logic                                            mat_inv_vld_out;
+    logic [                     8:0][DATA_WIDTH-1:0] mat_inv_out_l;
+    logic [                     8:0][DATA_WIDTH-1:0] mat_inv_out_u;
+    
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] input_aggregator_dout;
+    logic [          DATA_WIDTH-1:0]                 instr_aggregator_dout;
 
     // ---------------------------------------------------------------------------
     //  MVP Core and memory
     // ---------------------------------------------------------------------------
 
     mvp_core #(
-        .SIG_WIDTH         (SIG_WIDTH         ),
-        .EXP_WIDTH         (EXP_WIDTH         ),
-        .IEEE_COMPLIANCE   (IEEE_COMPLIANCE   ),
-        .VECTOR_LANES      (VECTOR_LANES      ),
-        .INSTR_ADDR_WIDTH  (INSTR_ADDR_WIDTH  ),
-        .GLB_MEM_ADDR_WIDTH(GLB_MEM_ADDR_WIDTH)
+        .SIG_WIDTH           (SIG_WIDTH           ),
+        .EXP_WIDTH           (EXP_WIDTH           ),
+        .IEEE_COMPLIANCE     (IEEE_COMPLIANCE     ),
+        .VECTOR_LANES        (VECTOR_LANES        ),
+        .ADDR_WIDTH          (13                  ),
+        .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
+        .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
     ) mvp_core_inst (
-        .clk           (clk           ),
-        .rst_n         (rst_n         ),
-        .en            (mvp_core_en   ),
-        .pc            (pc            ),
-        .instr         (instr         ),
-        .mem_addr      (mem_addr      ),
-        .mem_wdata     (mem_write_data),
-        .mem_we        (mem_write     ),
-        .mem_rdata     (mem_read_data ),
-        .mem_read_en   (mem_read      ),
+        .clk                 (clk                 ),
+        .rst_n               (rst_n               ),
+        .en                  (mvp_core_en         ),
+        .pc                  (pc                  ),
+        .instr               (instr               ),
+        .mem_addr            (mvp_mem_addr        ),
+        .mem_we              (mvp_mem_we          ),
+        .mem_ren             (mvp_mem_ren         ),
+        .mem_wdata           (mvp_mem_wdata       ),
+        .mem_rdata           (mvp_mem_rdata       ),
+        .width               (width               ),
         // Debug signals
-        .data_out_vld  (              ),
-        .data_out      (              ),
-        .reg_wb        (              )
+        .data_out            (                    ),
+        .data_out_vld        (                    ),
+        .reg_wb              (                    )
     );
 
     mat_inv mat_inv_inst (
-        .clk        (clk                ),
-        .rst_n      (rst_n              ),
-        .en         (mat_inv_en         ),
-        .vld        (mat_inv_vld        ),
-        .rdy        (                   ),
-        .vld_out    (mat_inv_vld_out    ),
-        .mat_in     (mem_write_data[8:0]),
-        .mat_inv_out(mat_inv_out[8:0]   )
+        .clk          (clk               ),
+        .rst_n        (rst_n             ),
+        .en           (mat_inv_en        ),
+        .vld          (mat_inv_vld       ),
+        .mat_in       (mvp_mem_wdata[8:0]),
+        .rdy          (                  ),
+        .vld_out      (mat_inv_vld_ou    ),
+        .mat_inv_out_l(mat_inv_out_l     ),
+        .mat_inv_out_u(mat_inv_out_u     )
     );
 
-    if (VECTOR_LANES > 9)
-        assign mat_inv_out[VECTOR_LANES-1:9] = '0;
 
     ram_sync_1rw1r #(
-        .DATA_WIDTH(32              ),
-        .ADDR_WIDTH(INSTR_ADDR_WIDTH),
-        .DEPTH     (INSTR_BANK_DEPTH)
+        .DATA_WIDTH(32                   ),
+        .ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH ),
+        .DEPTH     (INSTR_MEM_BANK_DEPTH )
     ) instr_mem (
-        .clk  (clk                  ),
-        .wen  (instr_wen            ),
-        .wadr (instr_wadr           ),
-        .wdata(instr_aggregator_dout),
-        .ren  (~instr_full_n        ),
-        .radr (pc                   ),
-        .rdata(instr                )
+        .clk       (clk                  ),
+        .csb0      (instr_wen || instr_mem_csb),
+        .web0      (instr_wen || instr_mem_web),
+        .addr0     (instr_wen ? instr_wadr : instr_mem_addr),
+        .wmask0    (1'b1                 ),
+        .din0      (instr_aggregator_dout),
+        .dout0     (instr_mem_rdata      ),
+        .csb1      (~instr_full_n        ),
+        .addr1     (pc                   ),
+        .dout1     (instr                )
     );
 
     ram_sync_1rw1r #(
         .DATA_WIDTH(VECTOR_LANES*DATA_WIDTH),
-        .ADDR_WIDTH(GLB_MEM_ADDR_WIDTH     ),
-        .DEPTH     (GLB_MEM_BANK_DEPTH     )
-    ) glb_mem (
-        .clk  (clk                                               ),
-        .wen  (input_wen | mem_write                             ),
-        .wadr (input_wen ? input_wadr : mem_addr[11:4]           ),
-        .wdata(input_wen ? input_aggregator_dout : mem_write_data),
-        .ren  (output_wb_ren | mem_read                          ),
-        .radr (output_wb_ren ? output_wb_radr : mem_addr[11:4]   ),
-        .rdata(glb_mem_rdata                                     )
+        .ADDR_WIDTH(DATA_MEM_ADDR_WIDTH    ),
+        .DEPTH     (DATA_MEM_BANK_DEPTH    )
+    ) data_mem (
+        .clk       (clk                    ),
+        .csb0      (input_wen || data_mem_csb),
+        .web0      (input_wen || data_mem_web),
+        .addr0     (input_wen ? input_wadr : data_mem_addr),
+        .wmask0    (data_mem_wmask0        ),
+        .din0      (input_wen ? input_aggregator_dout : data_mem_wdata),
+        .dout0     (data_mem_rdata         ),
+        .csb1      (output_wb_ren          ),
+        .addr1     (output_wb_radr         ),
+        .dout1     (output_wb_data         )
+    );
+
+    memory_controller #(
+        .ADDR_WIDTH          (13                  ),
+        .DATA_WIDTH          (32                  ),
+        .VECTOR_LANES        (VECTOR_LANES        ),
+        .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
+        .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
+    ) mem_ctrl_inst (
+        .clk                 (clk                 ),
+        .rst_n               (rst_n               ),
+        // Physical memory address
+        .mem_addr            (mvp_mem_addr        ),
+        .mem_we              (mvp_mem_we          ),
+        .mem_ren             (mvp_mem_ren         ),
+        .mem_wdata           (mvp_mem_wdata       ),
+        .mem_rdata           (mvp_mem_rdata       ),
+        .width               (width               ),
+        // Instruction memory
+        .instr_mem_addr      (instr_mem_addr      ),
+        .instr_mem_csb       (instr_mem_csb       ),
+        .instr_mem_web       (instr_mem_web       ),
+        .instr_mem_wdata     (),
+        .instr_mem_rdata     (instr_mem_rdata     ),
+        // Data memory
+        .data_mem_addr       (data_mem_addr       ),
+        .data_mem_csb        (data_mem_csb        ),
+        .data_mem_web        (data_mem_web        ),
+        .data_mem_wmask      (data_mem_wmask0     ),
+        .data_mem_wdata      (data_mem_wdata      ),
+        .data_mem_rdata      (data_mem_rdata      ),
+        // Matrix inversion
+        .mat_inv_in_l        (mat_inv_out_l       ),
+        .mat_inv_in_u        (mat_inv_out_u       )
     );
 
   // ---------------------------------------------------------------------------
@@ -163,26 +220,26 @@ module accelerator #(
   // ---------------------------------------------------------------------------
 
     fifo #(
-        .DATA_WIDTH   (INPUT_FIFO_WIDTH),
-        .FIFO_DEPTH   (3               ),
-        .COUNTER_WIDTH(1               )
+        .DATA_WIDTH   (INPUT_FIFO_WIDTH        ),
+        .FIFO_DEPTH   (3                       ),
+        .COUNTER_WIDTH(1                       )
     ) input_fifo_inst (
-        .clk    (clk                     ),
-        .rst_n  (rst_n                   ),
-        .din    (input_data              ),
-        .enq    (input_rdy_w && input_vld),
-        .full_n (input_rdy_w             ),
-        .dout   (input_fifo_dout         ),
-        .deq    (params_fifo_deq || instr_fifo_deq || input_fifo_deq),
-        .empty_n(input_fifo_empty_n      ),
-        .clr    (1'b0                    )
+        .clk          (clk                     ),
+        .rst_n        (rst_n                   ),
+        .din          (input_data              ),
+        .enq          (input_rdy_w && input_vld),
+        .full_n       (input_rdy_w             ),
+        .dout         (input_fifo_dout         ),
+        .deq          (params_fifo_deq || instr_fifo_deq || input_fifo_deq),
+        .empty_n      (input_fifo_empty_n      ),
+        .clr          (1'b0                    )
     );
 
     assign input_rdy = input_rdy_w;
 
     aggregator #(
-        .DATA_WIDTH (INPUT_FIFO_WIDTH   ),
-        .FETCH_WIDTH(32/INPUT_FIFO_WIDTH)
+        .DATA_WIDTH     (INPUT_FIFO_WIDTH     ),
+        .FETCH_WIDTH    (32/INPUT_FIFO_WIDTH  )
     ) instr_aggregator_inst (
         .clk            (clk                  ),
         .rst_n          (rst_n                ),
@@ -195,8 +252,8 @@ module accelerator #(
     );
 
     aggregator #(
-        .DATA_WIDTH (INPUT_FIFO_WIDTH),
-        .FETCH_WIDTH(VECTOR_LANES*DATA_WIDTH/INPUT_FIFO_WIDTH)
+        .DATA_WIDTH     (INPUT_FIFO_WIDTH     ),
+        .FETCH_WIDTH    (VECTOR_LANES*DATA_WIDTH/INPUT_FIFO_WIDTH)
     ) input_aggregator_inst (
         .clk            (clk                  ),
         .rst_n          (rst_n                ),
@@ -209,30 +266,30 @@ module accelerator #(
     );
 
     fifo #(
-        .DATA_WIDTH   (OUTPUT_FIFO_WIDTH),
-        .FIFO_DEPTH   (3                ),
-        .COUNTER_WIDTH(1                )
+        .DATA_WIDTH   (OUTPUT_FIFO_WIDTH         ),
+        .FIFO_DEPTH   (3                         ),
+        .COUNTER_WIDTH(1                         )
     ) output_fifo_inst (
-        .clk    (clk                       ),
-        .rst_n  (rst_n                     ),
-        .din    (output_fifo_din           ),
-        .enq    (output_fifo_enq           ),
-        .full_n (output_fifo_full_n        ),
-        .dout   (output_data               ),
-        .deq    (output_rdy && output_vld_w),
-        .empty_n(output_vld_w              ),
-        .clr    (1'b0                      )
+        .clk          (clk                       ),
+        .rst_n        (rst_n                     ),
+        .din          (output_fifo_din           ),
+        .enq          (output_fifo_enq           ),
+        .full_n       (output_fifo_full_n        ),
+        .dout         (output_data               ),
+        .deq          (output_rdy && output_vld_w),
+        .empty_n      (output_vld_w              ),
+        .clr          (1'b0                      )
     );
 
     assign output_vld = output_vld_w;
 
     deaggregator #(
-        .DATA_WIDTH (OUTPUT_FIFO_WIDTH),
-        .FETCH_WIDTH(VECTOR_LANES*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
+        .DATA_WIDTH     (OUTPUT_FIFO_WIDTH ),
+        .FETCH_WIDTH    (VECTOR_LANES*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
     ) output_deaggregator_inst (
         .clk            (clk               ),
         .rst_n          (rst_n             ),
-        .sender_data    (glb_mem_rdata     ),
+        .sender_data    (output_wb_data    ),
         .sender_empty_n (output_empty_n    ),
         .sender_deq     (output_wb_ren     ),
         .receiver_data  (output_fifo_din   ),
@@ -241,46 +298,43 @@ module accelerator #(
     );
 
     controller #(
-        .CONFIG_DATA_WIDTH (CONFIG_DATA_WIDTH      ),
-        .DATA_WIDTH        (VECTOR_LANES*DATA_WIDTH),
-        .INSTR_ADDR_WIDTH  (INSTR_ADDR_WIDTH       ),
-        .GLB_MEM_ADDR_WIDTH(GLB_MEM_ADDR_WIDTH     )
+        .CONFIG_DATA_WIDTH   (CONFIG_DATA_WIDTH      ),
+        .DATA_WIDTH          (VECTOR_LANES*DATA_WIDTH),
+        .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH   ),
+        .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH    )
     ) controller_inst (
-        .clk                (clk               ),
-        .rst_n              (rst_n             ),
-
-        .params_fifo_dout   (input_fifo_dout   ),
-        .params_fifo_deq    (params_fifo_deq   ),
-        .params_fifo_empty_n(input_fifo_empty_n),
+        .clk                 (clk                    ),
+        .rst_n               (rst_n                  ),
+        // Configuration data
+        .params_fifo_dout    (input_fifo_dout        ),
+        .params_fifo_deq     (params_fifo_deq        ),
+        .params_fifo_empty_n (input_fifo_empty_n     ),
         // Aggregator signal
-        .instr_full_n       (instr_full_n      ),
-        .input_full_n       (input_full_n      ),
-        .output_empty_n     (output_empty_n    ),
+        .instr_full_n        (instr_full_n           ),
+        .input_full_n        (input_full_n           ),
+        .output_empty_n      (output_empty_n         ),
         // Address generator
-        .instr_wadr         (instr_wadr        ),
-        .input_wadr         (input_wadr        ),
-        .output_wb_radr     (output_wb_radr    ),
+        .instr_wadr          (instr_wadr             ),
+        .input_wadr          (input_wadr             ),
+        .output_wb_radr      (output_wb_radr         ),
         // Input control signal
-        .instr_wen          (instr_wen         ),
-        .input_wen          (input_wen         ),
-        .output_wb_ren      (output_wb_ren     ),
+        .instr_wen           (instr_wen              ),
+        .input_wen           (input_wen              ),
+        .output_wb_ren       (output_wb_ren          ),
         // MMIO
-        .mem_read           (mem_read          ),
-        .mem_write          (mem_write         ),
-        .mem_addr           (mem_addr          ),
-        .mem_read_data      (mem_read_data     ),
+        .mem_addr            (mvp_mem_addr           ),
+        .mem_read            (mvp_mem_ren            ),
+        .mem_write           (mvp_mem_we             ),
         // Matrix inversion
-        .mat_inv_en         (mat_inv_en        ),
-        .mat_inv_vld        (mat_inv_vld       ),
-        .mat_inv_vld_out    (mat_inv_vld_out   ),
-        .mat_inv_out        (mat_inv_out       ),
+        .mat_inv_en          (mat_inv_en             ),
+        .mat_inv_vld         (mat_inv_vld            ),
+        .mat_inv_vld_out     (mat_inv_vld_out        ),
 
-        .mvp_core_en        (mvp_core_en       ),
-        // Debug signal
-        .state_r            (                  ),
-        .config_adr         (                  ),
-        .config_data        (                  ),
-        .input_wadr_offset  (                  )
+        .mvp_core_en         (mvp_core_en            ),
+        // Debug/WB signal
+        .state_r             (),
+        .config_adr          (),
+        .config_data         ()
     );
 
 endmodule

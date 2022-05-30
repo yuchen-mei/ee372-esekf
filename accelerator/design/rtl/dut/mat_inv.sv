@@ -10,8 +10,8 @@ module mat_inv #(
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_in,
     output logic                                    rdy,
     output logic                                    vld_out,
-    output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] l_mat_inv_out,
-    output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] u_mat_inv_out
+    output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_inv_out_l,
+    output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_inv_out_u
     // output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mat_inv_out
 );
 
@@ -204,8 +204,8 @@ module mat_inv #(
 
     for (genvar i = 0; i < 3; i = i + 1) begin
         for (genvar j = 0; j < 3; j = j + 1) begin
-            assign u_mat_inv_out[3*j+i] = u_mat_inv_r[i][j];
-            assign l_mat_inv_out[3*j+i] = l_mat_inv_r[i][j];
+            assign mat_inv_out_u[3*j+i] = u_mat_inv_r[i][j];
+            assign mat_inv_out_l[3*j+i] = l_mat_inv_r[i][j];
         end
     end
 

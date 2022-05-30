@@ -4,7 +4,6 @@ module vector_permute #(
 ) (
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_in,
     input  logic [                             2:0] funct,
-    input  logic [                             2:0] width,
     output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out
 );
 
@@ -25,7 +24,7 @@ module vector_permute #(
     assign skew_symmetric[6] = vec_in[1];
     assign skew_symmetric[7] = vec_in_n[0];
     assign skew_symmetric[8] = 32'b0;
-  
+
     for (genvar i = 0; i < 3; i = i + 1) begin
         for (genvar j = 0; j < 3; j = j + 1) begin
             assign transpose[3*i+j] = vec_in[3*j+i];
