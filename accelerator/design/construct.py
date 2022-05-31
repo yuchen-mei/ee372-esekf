@@ -91,7 +91,8 @@ def construct():
 
   vcs_sim         = Step( 'synopsys-vcs-sim',            default=True )
   # rtl_sim         = vcs_sim.clone()
-  gl_sim          = vcs_sim.clone()
+  # gl_sim          = vcs_sim.clone()
+  gl_sim          = Step( this_dir + '/synopsys-vcs-sim-sdf'            )
   # icarus_sim          = Step( this_dir + '/open-icarus-simulation'          )
   # rtl_sim         = icarus_sim.clone()
   # gl_sim          = icarus_sim.clone()
