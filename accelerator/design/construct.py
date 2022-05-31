@@ -58,6 +58,7 @@ def construct():
   pin_placement   = Step( this_dir + '/pin-placement'                   )
   floorplan       = Step( this_dir + '/floorplan'                       )
   syn_compile     = Step( this_dir + '/synopsys-dc-compile'             )
+  custom_flowstep = Step( this_dir + '/custom-flowstep'                 ) 
 
   # Power node is custom because power and gnd pins are named differently in
   # the standard cells compared to the default node, and the layer numbering is
@@ -144,6 +145,7 @@ def construct():
   g.add_step( pin_placement   )
   g.add_step( floorplan       )
   g.add_step( init            )
+  g.add_step( custom_flowstep )
   g.add_step( power           )
   g.add_step( place           )
   g.add_step( cts             )
@@ -195,6 +197,7 @@ def construct():
 
   init.extend_inputs(['floorplan.tcl', 'pin-assignments.tcl'])
   dc.extend_inputs(['compile.tcl'])
+  iflow.extend_inputs ( custom_flowstep.all_outputs()  )
 
   # Connect by name
 
@@ -275,6 +278,7 @@ def construct():
   # Core place and route flow
   g.connect_by_name( floorplan,       init            )
   g.connect_by_name( pin_placement,   init            )
+  g.connect_by_name( custom_flowstep, iflow           )
   g.connect_by_name( init,            power           )
   g.connect_by_name( power,           place           )
   g.connect_by_name( place,           cts             )

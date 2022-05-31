@@ -35,42 +35,75 @@ setFlipping s
 
 
 # Use automatic floorplan synthesis to pack macros (e.g., SRAMs) together
-placeInstance instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 2315.8150000000 2915.4350000000 R90
-addHaloToBlock 7 7 7 7 instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
-placeInstance instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 2315.8150000000 2346.6650000000 R90
-addHaloToBlock 7 7 7 7 instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
-placeInstance glb_mem/genblk1_width_macro_15__sram 1650.1100000000 2346.6650000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_15__sram
-placeInstance glb_mem/genblk1_width_macro_14__sram 1143.7100000000 2346.6650000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_14__sram
-placeInstance glb_mem/genblk1_width_macro_13__sram 1650.1100000000 2915.4350000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_13__sram
-placeInstance glb_mem/genblk1_width_macro_12__sram 1143.7100000000 2915.4350000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_12__sram
-placeInstance glb_mem/genblk1_width_macro_11__sram 637.3100000000 2915.4350000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_11__sram
-placeInstance glb_mem/genblk1_width_macro_10__sram 130.9100000000 2915.4350000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_10__sram
-placeInstance glb_mem/genblk1_width_macro_9__sram 637.3100000000 2346.6650000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_9__sram
-placeInstance glb_mem/genblk1_width_macro_8__sram 130.9100000000 2346.6650000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_8__sram
-placeInstance glb_mem/genblk1_width_macro_7__sram 637.3100000000 1777.8950000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_7__sram
-placeInstance glb_mem/genblk1_width_macro_6__sram 130.9100000000 1777.8950000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_6__sram
-placeInstance glb_mem/genblk1_width_macro_5__sram 637.3100000000 1209.1300000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_5__sram
-placeInstance glb_mem/genblk1_width_macro_4__sram 130.9100000000 1209.1300000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_4__sram
-placeInstance glb_mem/genblk1_width_macro_3__sram 637.3100000000 640.3600000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_3__sram
-placeInstance glb_mem/genblk1_width_macro_2__sram 130.9100000000 640.3600000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_2__sram
-placeInstance glb_mem/genblk1_width_macro_1__sram 637.3100000000 71.5900000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_1__sram
-placeInstance glb_mem/genblk1_width_macro_0__sram 130.9100000000 71.5900000000 R90
-addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_0__sram
+# planDesign
+
+placeInstance instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 774.1600000000 183.5050000000 R0
+addHaloToBlock 10 10 10 10 instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
+setInstancePlacementStatus -status placed -name instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
+placeInstance instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 194.3800000000 183.5050000000 MY
+addHaloToBlock 10 10 10 10 instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+setInstancePlacementStatus -status placed -name instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+placeInstance data_mem/genblk1_width_macro_7__sram_macro 1933.7200000000 2393.9750000000 MX
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_7__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_7__sram_macro
+placeInstance data_mem/genblk1_width_macro_6__sram_macro 1353.9400000000 2393.9750000000 MX
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_6__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_6__sram_macro
+placeInstance data_mem/genblk1_width_macro_5__sram_macro 774.1600000000 2393.9750000000 MX
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_5__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_5__sram_macro
+placeInstance data_mem/genblk1_width_macro_4__sram_macro 194.3800000000 2393.9750000000 MX
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_4__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_4__sram_macro
+placeInstance data_mem/genblk1_width_macro_3__sram_macro 1933.7200000000 2891.4750000000 R0
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_3__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_3__sram_macro
+placeInstance data_mem/genblk1_width_macro_2__sram_macro 1353.9400000000 2891.4750000000 R0
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_2__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_2__sram_macro
+placeInstance data_mem/genblk1_width_macro_1__sram_macro 774.1600000000 2891.4750000000 R0
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_1__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_1__sram_macro
+placeInstance data_mem/genblk1_width_macro_0__sram_macro 194.3800000000 2891.4750000000 R0
+addHaloToBlock 10 10 10 10 data_mem/genblk1_width_macro_0__sram_macro
+setInstancePlacementStatus -status placed -name data_mem/genblk1_width_macro_0__sram_macro
+
+# placeInstance instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 2315.8150000000 2915.4350000000 R90
+# addHaloToBlock 7 7 7 7 instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
+# placeInstance instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 2315.8150000000 2346.6650000000 R90
+# addHaloToBlock 7 7 7 7 instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+# placeInstance glb_mem/genblk1_width_macro_15__sram 1650.1100000000 2346.6650000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_15__sram
+# placeInstance glb_mem/genblk1_width_macro_14__sram 1143.7100000000 2346.6650000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_14__sram
+# placeInstance glb_mem/genblk1_width_macro_13__sram 1650.1100000000 2915.4350000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_13__sram
+# placeInstance glb_mem/genblk1_width_macro_12__sram 1143.7100000000 2915.4350000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_12__sram
+# placeInstance glb_mem/genblk1_width_macro_11__sram 637.3100000000 2915.4350000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_11__sram
+# placeInstance glb_mem/genblk1_width_macro_10__sram 130.9100000000 2915.4350000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_10__sram
+# placeInstance glb_mem/genblk1_width_macro_9__sram 637.3100000000 2346.6650000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_9__sram
+# placeInstance glb_mem/genblk1_width_macro_8__sram 130.9100000000 2346.6650000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_8__sram
+# placeInstance glb_mem/genblk1_width_macro_7__sram 637.3100000000 1777.8950000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_7__sram
+# placeInstance glb_mem/genblk1_width_macro_6__sram 130.9100000000 1777.8950000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_6__sram
+# placeInstance glb_mem/genblk1_width_macro_5__sram 637.3100000000 1209.1300000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_5__sram
+# placeInstance glb_mem/genblk1_width_macro_4__sram 130.9100000000 1209.1300000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_4__sram
+# placeInstance glb_mem/genblk1_width_macro_3__sram 637.3100000000 640.3600000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_3__sram
+# placeInstance glb_mem/genblk1_width_macro_2__sram 130.9100000000 640.3600000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_2__sram
+# placeInstance glb_mem/genblk1_width_macro_1__sram 637.3100000000 71.5900000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_1__sram
+# placeInstance glb_mem/genblk1_width_macro_0__sram 130.9100000000 71.5900000000 R90
+# addHaloToBlock 7 7 7 7 glb_mem/genblk1_width_macro_0__sram
 
 
 # create Routing Blockage

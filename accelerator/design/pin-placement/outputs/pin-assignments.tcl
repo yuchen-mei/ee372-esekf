@@ -25,7 +25,6 @@
 # top left and the last pin is on the top right.
 
 set pins_top {\
-  clk                 rst_n               input_rdy            input_vld          output_rdy           output_vld \    
 }
 
 # Pins on the right side. In this example we are not placing pins on the right
@@ -33,8 +32,8 @@ set pins_top {\
 # your design, you can use the right side as well.
 
 set pins_right {\
-  {output_data[0]}    {output_data[1]}    {output_data[2]}    {output_data[3]}    {output_data[4]}     {output_data[5]} \
-  {output_data[6]}    {output_data[7]} \ 
+  {input_data[7]}     {input_data[8]}     {input_data[9]}    {input_data[10]}    {input_data[11]}    {input_data[12]} \
+  {input_data[13]}    {input_data[14]}    {input_data[15]} \
 }
 
 # Pins on the bottom side from right (dout0[0]) to left (din0[31]). I list pins
@@ -43,22 +42,22 @@ set pins_right {\
 # are to be kept together then you can generate this pin list using a tcl for
 # loop.
 
-set pins_bottom {\
-  {input_data[8]}     {input_data[9]}    {input_data[10]}    {input_data[11]}    {input_data[12]}     {input_data[13]} \
-  {input_data[14]}    {input_data[15]} \ 
-}
+# set pins_bottom {\         
+# }
 
 # Pins on the left side from bottom (rst_n) to top (addr0[0]).
 
 set pins_left {\
-  {input_data[0]}    {input_data[1]}    {input_data[2]}    {input_data[3]}    {input_data[4]}     {input_data[5]} \
-  {input_data[6]}    {input_data[7]} \ 
+  clk                input_rdy          rst_n              output_vld         input_vld           {output_data[0]} \
+  output_rdy         {output_data[1]}   {input_data[0]}    {output_data[2]}   {input_data[1]}     {output_data[3]} \
+  {input_data[2]}    {output_data[4]}   {input_data[3]}    {output_data[5]}   {input_data[4]}     {output_data[6]} \
+  {input_data[5]}    {output_data[7]}   {input_data[6]} \
 }
 
 # Spread the pins evenly along the sides of the block
 
 editPin -layer met3 -pin $pins_right  -side RIGHT  -spreadType SIDE
 editPin -layer met3 -pin $pins_left   -side LEFT   -spreadType SIDE
-editPin -layer met2 -pin $pins_bottom -side BOTTOM -spreadType SIDE
-editPin -layer met2 -pin $pins_top    -side TOP    -spreadType SIDE
+# editPin -layer met2 -pin $pins_bottom -side BOTTOM -spreadType SIDE
+# editPin -layer met2 -pin $pins_top    -side TOP    -spreadType SIDE
 
