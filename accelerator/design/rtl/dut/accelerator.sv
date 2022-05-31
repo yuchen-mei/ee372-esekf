@@ -8,6 +8,7 @@ module accelerator #(
     parameter CONFIG_DATA_WIDTH    = 8,
 
     parameter VECTOR_LANES         = 16,
+    parameter DATA_MEM_BW          = 8,
 
     parameter INSTR_MEM_BANK_DEPTH = 512,
     parameter INSTR_MEM_ADDR_WIDTH = $clog2(INSTR_MEM_BANK_DEPTH),
@@ -92,16 +93,16 @@ module accelerator #(
     logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_addr;
     logic                                            data_mem_csb;
     logic                                            data_mem_web;
-    logic [        VECTOR_LANES-1:0]                 data_mem_wmask0;
-    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] data_mem_wdata;
-    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] data_mem_rdata;
-    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] output_wb_data;
+    logic [         DATA_MEM_BW-1:0]                 data_mem_wmask0;
+    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] data_mem_wdata;
+    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] data_mem_rdata;
+    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] output_wb_data;
 
     logic                                            mat_inv_vld_out;
     logic [                     8:0][DATA_WIDTH-1:0] mat_inv_out_l;
     logic [                     8:0][DATA_WIDTH-1:0] mat_inv_out_u;
     
-    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] input_aggregator_dout;
+    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] input_aggregator_dout;
     logic [          DATA_WIDTH-1:0]                 instr_aggregator_dout;
 
     // ---------------------------------------------------------------------------
@@ -165,7 +166,7 @@ module accelerator #(
     );
 
     ram_sync_1rw1r #(
-        .DATA_WIDTH(VECTOR_LANES*DATA_WIDTH),
+        .DATA_WIDTH(DATA_MEM_BW*DATA_WIDTH ),
         .ADDR_WIDTH(DATA_MEM_ADDR_WIDTH    ),
         .DEPTH     (DATA_MEM_BANK_DEPTH    )
     ) data_mem (
@@ -185,6 +186,7 @@ module accelerator #(
         .ADDR_WIDTH          (MEM_ADDR_WIDTH      ),
         .DATA_WIDTH          (DATA_WIDTH          ),
         .VECTOR_LANES        (VECTOR_LANES        ),
+        .DATA_MEM_BW         (DATA_MEM_BW         ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
     ) mem_ctrl_inst (
@@ -253,7 +255,7 @@ module accelerator #(
 
     aggregator #(
         .DATA_WIDTH     (INPUT_FIFO_WIDTH     ),
-        .FETCH_WIDTH    (8*DATA_WIDTH/INPUT_FIFO_WIDTH)
+        .FETCH_WIDTH    (DATA_MEM_BW*DATA_WIDTH/INPUT_FIFO_WIDTH)
     ) input_aggregator_inst (
         .clk            (clk                  ),
         .rst_n          (rst_n                ),
@@ -285,7 +287,7 @@ module accelerator #(
 
     deaggregator #(
         .DATA_WIDTH     (OUTPUT_FIFO_WIDTH ),
-        .FETCH_WIDTH    (VECTOR_LANES*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
+        .FETCH_WIDTH    (DATA_MEM_BW*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
     ) output_deaggregator_inst (
         .clk            (clk               ),
         .rst_n          (rst_n             ),
@@ -299,7 +301,6 @@ module accelerator #(
 
     controller #(
         .CONFIG_DATA_WIDTH   (CONFIG_DATA_WIDTH      ),
-        .DATA_WIDTH          (VECTOR_LANES*DATA_WIDTH),
         .ADDR_WIDTH          (MEM_ADDR_WIDTH         ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH   ),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH    )

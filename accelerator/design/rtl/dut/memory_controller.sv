@@ -1,9 +1,10 @@
 module memory_controller #(
-    parameter ADDR_WIDTH = 16,
-    parameter DATA_WIDTH = 32,
-    parameter VECTOR_LANES = 16,
+    parameter ADDR_WIDTH           = 16,
+    parameter DATA_WIDTH           = 32,
+    parameter VECTOR_LANES         = 16,
+    parameter DATA_MEM_BW          = 8,
     parameter INSTR_MEM_ADDR_WIDTH = 8,
-    parameter DATA_MEM_ADDR_WIDTH = 12
+    parameter DATA_MEM_ADDR_WIDTH  = 12
 ) (
     input  logic                                            clk,
     input  logic                                            rst_n,
@@ -24,17 +25,17 @@ module memory_controller #(
     output logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_addr,
     output logic                                            data_mem_csb,
     output logic                                            data_mem_web,
-    output logic [        VECTOR_LANES-1:0]                 data_mem_wmask,
-    output logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] data_mem_wdata,
-    input  logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] data_mem_rdata,
+    output logic [         DATA_MEM_BW-1:0]                 data_mem_wmask,
+    output logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] data_mem_wdata,
+    input  logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] data_mem_rdata,
     // Matrix inversion
     input  logic [                     8:0][DATA_WIDTH-1:0] mat_inv_in_l,
     input  logic [                     8:0][DATA_WIDTH-1:0] mat_inv_in_u
 );
 
-    localparam ADDR_MASK = 16'hF000;
-    localparam DATA_ADDR = 16'h0000;
-    localparam TEXT_ADDR = 16'h1000;
+    localparam ADDR_MASK      = 16'hF000;
+    localparam DATA_ADDR      = 16'h0000;
+    localparam TEXT_ADDR      = 16'h1000;
     localparam MAT_INV_ADDR_L = 16'h1200;
     localparam MAT_INV_ADDR_U = 16'h1201;
 

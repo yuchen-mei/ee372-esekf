@@ -7,7 +7,6 @@
 
 module controller #(
     parameter INPUT_FIFO_WIDTH     = 16,
-    parameter DATA_WIDTH           = 32,
     parameter ADDR_WIDTH           = 16,
     parameter INSTR_MEM_ADDR_WIDTH = 8,
     parameter DATA_MEM_ADDR_WIDTH  = 12,
