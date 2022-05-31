@@ -8,7 +8,7 @@
 module controller #(
     parameter INPUT_FIFO_WIDTH     = 16,
     parameter DATA_WIDTH           = 32,
-    parameter ADDR_WIDTH           = 13,
+    parameter ADDR_WIDTH           = 16,
     parameter INSTR_MEM_ADDR_WIDTH = 8,
     parameter DATA_MEM_ADDR_WIDTH  = 12,
     parameter NUM_CONFIGS          = 12,
@@ -153,7 +153,7 @@ module controller #(
 
                 output_empty_n <= (output_wbadr_r <= output_radr_offset + output_max_adr_c);
 
-                // Enable MVP Core after complete reading input and sending out outputs
+                // Enable MVP Core after complete reading inputs and sending out outputs
                 if ((input_wadr_r >= input_wadr_offset + input_max_wadr_c) && 
                     (output_wbadr_r >= output_radr_offset + output_max_adr_c))
                     mvp_core_en <= 1;

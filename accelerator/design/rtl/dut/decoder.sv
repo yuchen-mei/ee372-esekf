@@ -14,8 +14,7 @@ module decoder (
 
     output logic        mem_we,
     output logic        mem_ren,
-    output logic [11:0] mem_addr,
-    output logic [ 3:0] imm,
+    output logic [15:0] mem_addr,
 
     input  logic [ 4:0] vd_addr_ex,
     input  logic        reg_we_ex,
@@ -78,8 +77,7 @@ module decoder (
     end
 
     // Load and Store
-    assign mem_addr = instr[31:20];
-    assign imm      = instr[18:15];
+    assign mem_addr = instr[31:16];
     assign mem_we   = (opcode == `STORE_FP);
     assign mem_ren  = (opcode == `LOAD_FP);
     assign reg_we   = ~mem_we;

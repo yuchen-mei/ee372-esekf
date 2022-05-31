@@ -27,7 +27,7 @@ module accelerator #(
 );
 
     localparam DATA_WIDTH = SIG_WIDTH + EXP_WIDTH + 1;
-    localparam MEM_ADDR_WIDTH = 13;
+    localparam MEM_ADDR_WIDTH = 16;
 
     // ---------------------------------------------------------------------------
     // Wires connecting to the interface FIFOs.
@@ -113,7 +113,7 @@ module accelerator #(
         .EXP_WIDTH           (EXP_WIDTH           ),
         .IEEE_COMPLIANCE     (IEEE_COMPLIANCE     ),
         .VECTOR_LANES        (VECTOR_LANES        ),
-        .ADDR_WIDTH          (13                  ),
+        .ADDR_WIDTH          (MEM_ADDR_WIDTH      ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
     ) mvp_core_inst (
@@ -182,8 +182,8 @@ module accelerator #(
     );
 
     memory_controller #(
-        .ADDR_WIDTH          (13                  ),
-        .DATA_WIDTH          (32                  ),
+        .ADDR_WIDTH          (MEM_ADDR_WIDTH      ),
+        .DATA_WIDTH          (DATA_WIDTH          ),
         .VECTOR_LANES        (VECTOR_LANES        ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
@@ -300,6 +300,7 @@ module accelerator #(
     controller #(
         .CONFIG_DATA_WIDTH   (CONFIG_DATA_WIDTH      ),
         .DATA_WIDTH          (VECTOR_LANES*DATA_WIDTH),
+        .ADDR_WIDTH          (MEM_ADDR_WIDTH         ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH   ),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH    )
     ) controller_inst (

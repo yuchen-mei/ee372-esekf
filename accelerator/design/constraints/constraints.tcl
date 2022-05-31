@@ -54,4 +54,4 @@ set_max_transition [expr 0.25*${dc_clock_period}] $dc_design_name
 
 set_dont_use [get_lib_cells {*/*probec* }]
 
-set_optimize_registers
+set_optimize_registers -verbose

@@ -1,5 +1,5 @@
 module memory_controller #(
-    parameter ADDR_WIDTH = 13,
+    parameter ADDR_WIDTH = 16,
     parameter DATA_WIDTH = 32,
     parameter VECTOR_LANES = 16,
     parameter INSTR_MEM_ADDR_WIDTH = 8,
