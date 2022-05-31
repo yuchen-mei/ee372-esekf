@@ -2,26 +2,29 @@ module multifunc_unit #(
     parameter SIG_WIDTH       = 23,
     parameter EXP_WIDTH       = 8,
     parameter IEEE_COMPLIANCE = 0,
+    parameter NUM_STAGES      = 2,
     parameter DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
 ) (
+    input  logic                  clk,
     input  logic                  en,
     input  logic [DATA_WIDTH-1:0] data_in,
-    input  logic [           2:0] funct,
-    input  logic [           2:0] rnd,
-    output logic [DATA_WIDTH-1:0] data_out,
-    output logic [           7:0] status
+    input  logic            [2:0] funct,
+    input  logic            [2:0] rnd,
+    output logic [DATA_WIDTH-1:0] data_out
 );
-
-    logic [4:0] func_i;
+    logic [           7:0] status;
+    logic [          15:0] inst_func;
+    logic [DATA_WIDTH-1:0] z_inst_pipe1, z_inst_pipe2, z_inst_pipe3, z_inst_pipe4;
+    logic [DATA_WIDTH-1:0] z_inst_internal;
 
     always_comb begin
         case (funct)
-            3'b000:  func_i = 5'b00001; // reciprocal, 1/A
-            3'b001:  func_i = 5'b00010; // square root of A
-            3'b010:  func_i = 5'b00100; // reciprocal square root of A
-            3'b011:  func_i = 5'b01000; // sine, sin(A)
-            3'b100:  func_i = 5'b10000; // cosine, cos(A)
-            default: func_i = 5'b00001;
+            3'b000:  inst_func = 16'b00001; // reciprocal, 1/A
+            3'b001:  inst_func = 16'b00010; // square root of A
+            3'b010:  inst_func = 16'b00100; // reciprocal square root of A
+            3'b011:  inst_func = 16'b01000; // sine, sin(A)
+            3'b100:  inst_func = 16'b10000; // cosine, cos(A)
+            default: inst_func = 16'b00000;
         endcase
     end
 
@@ -33,11 +36,24 @@ module multifunc_unit #(
         .pi_multiple    (1'b0           )
     ) DW_lp_fp_multifunc_DG_inst (
         .a              (data_in        ),
-        .func           ({11'b0, func_i}),
+        .func           (inst_func      ),
         .rnd            (rnd            ),
         .DG_ctrl        (en             ),
-        .z              (data_out       ),
+        .z              (z_inst_internal),
         .status         (status         )
     );
+
+    assign data_out = z_inst_internal;
+
+    // always @(posedge clk) begin
+    //     z_inst_pipe1 <= z_inst_internal;
+    //     z_inst_pipe2 <= z_inst_pipe1;
+    //     z_inst_pipe3 <= z_inst_pipe2;
+    //     z_inst_pipe4 <= z_inst_pipe3;
+    // end
+
+    // assign data_out = (NUM_STAGES == 4) ? z_inst_pipe4 :
+    //                   (NUM_STAGES == 3) ? z_inst_pipe3 :
+    //                   (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
 
 endmodule

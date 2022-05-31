@@ -52,9 +52,9 @@ set_max_transition [expr 0.25*${dc_clock_period}] $dc_design_name
 #set_input_transition 1 [all_inputs]
 #set_max_transition 10 [all_outputs]
 
-set_dont_use [get_lib_cells {*/*probec* }]
+set_optimize_registers true -designs mvp_core_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_VECTOR_LANES16_ADDR_WIDTH16_INSTR_MEM_ADDR_WIDTH9_DATA_MEM_ADDR_WIDTH8
 
-set_optimize_registers -verbose
+set_dont_use [get_lib_cells {*/*probec* }]
 
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__probec_p_8]
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__probe_p_8]

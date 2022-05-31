@@ -1,6 +1,6 @@
 module dff2 #(
     parameter WIDTH      = 32,
-    parameter ARRAY_SIZE = 8,
+    parameter ARRAY_SIZE = 16,
     parameter PIPE_DEPTH = 1,
     parameter OUT_REG    = 1
 ) (

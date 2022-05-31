@@ -3,8 +3,10 @@ module dot_product_unit #(
     parameter EXP_WIDTH       = 8,
     parameter IEEE_COMPLIANCE = 0,
     parameter VECTOR_LANES    = 16,
+    parameter NUM_STAGES      = 2,
     parameter DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
 ) (
+    input  logic                                    clk,
     input  logic                                    en,
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_a,
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_b,
@@ -14,18 +16,22 @@ module dot_product_unit #(
     output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out 
 );
 
-    logic [DATA_WIDTH-1:0] vec_in      [VECTOR_LANES-1:0][7:0];
-    logic [DATA_WIDTH-1:0] vec_mat3_in [VECTOR_LANES-1:0][7:0];
-    logic [DATA_WIDTH-1:0] vec_dot4_in [VECTOR_LANES-1:0][7:0];
-    logic [DATA_WIDTH-1:0] vec_qmul_in [VECTOR_LANES-1:0][7:0];
-    logic [DATA_WIDTH-1:0] vec_rot_in  [VECTOR_LANES-1:0][7:0];
+    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] vec_in;
+    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] vec_mat3_in;
+    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] vec_dot4_in;
+    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] vec_qmul_in;
+    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] vec_rot_in;
+
+    logic [VECTOR_LANES-1:0][           7:0] status_inst;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] z_inst_pipe1, z_inst_pipe2, z_inst_pipe3, z_inst_pipe4;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] z_inst;
 
     // 3x3x3 Matrix multiply-accumulate
     for (genvar i = 0; i < 3; i = i + 1) begin: col_3x3
         for (genvar j = 0; j < 3; j = j + 1) begin: row_3x3
             assign vec_mat3_in[3*i+j][0] = vec_a[j];
             assign vec_mat3_in[3*i+j][2] = vec_a[3+j];
-            assign vec_mat3_in[3*i+j][4] = vec_a[3*2+j];
+            assign vec_mat3_in[3*i+j][4] = vec_a[6+j];
             assign vec_mat3_in[3*i+j][6] = vec_c[3*i+j];
             assign vec_mat3_in[3*i+j][1] = vec_b[3*i];
             assign vec_mat3_in[3*i+j][3] = vec_b[3*i+1];
@@ -47,45 +53,39 @@ module dot_product_unit #(
     end
 
     // Quaternion multiplication
-    logic [DATA_WIDTH-1:0] qa[3:0];
-    logic [DATA_WIDTH-1:0] qb[3:0];
-    logic [DATA_WIDTH-1:0] qa_n[3:0];
+    logic [DATA_WIDTH-1:0] a[3:0];
+    logic [DATA_WIDTH-1:0] b[3:0];
+    logic [DATA_WIDTH-1:0] a_neg[3:0];
 
     for (genvar i = 0; i < 4; i = i + 1) begin
-        assign qa[i] = vec_a[i];
-        assign qb[i] = vec_b[i];
-        assign qa_n[i] = {~qa[i][DATA_WIDTH-1], qa[i][DATA_WIDTH-2:0]};
+        assign a[i] = vec_a[i];
+        assign b[i] = vec_b[i];
+        assign a_neg[i] = {~a[i][DATA_WIDTH-1], a[i][DATA_WIDTH-2:0]};
     end
 
-    assign vec_qmul_in[0] = '{qa[0],   qb[0],   qa_n[1], qb[1],   qa_n[2], qb[2],   qa_n[3], qb[3]};
-    assign vec_qmul_in[1] = '{qa[0],   qb[1],   qa[1],   qb[0],   qa[2],   qb[3],   qa_n[3], qb[2]};
-    assign vec_qmul_in[2] = '{qa[0],   qb[2],   qa_n[1], qb[3],   qa[2],   qb[0],   qa[3],   qb[3]};
-    assign vec_qmul_in[3] = '{qa[0],   qb[3],   qa[1],   qb[2],   qa_n[2], qb[1],   qa[3],   qb[0]};
-
-    if (VECTOR_LANES > 4) begin
-        for (genvar i = 4; i < VECTOR_LANES; i = i + 1) begin
-            assign vec_qmul_in[i] = '{default:'0};
-        end
-    end
+    assign vec_qmul_in[0] = {a[0],     b[0],     a_neg[1], b[1],     a_neg[2], b[2],     a_neg[3], b[3]};
+    assign vec_qmul_in[1] = {a[0],     b[1],     a[1],     b[0],     a[2],     b[3],     a_neg[3], b[2]};
+    assign vec_qmul_in[2] = {a[0],     b[2],     a_neg[1], b[3],     a[2],     b[0],     a[3],     b[3]};
+    assign vec_qmul_in[3] = {a[0],     b[3],     a[1],     b[2],     a_neg[2], b[1],     a[3],     b[0]};
 
     // Rotation matrix
-    assign vec_rot_in[0] = '{qa[1],   qa[1],   qa[2],   qa_n[2], qa_n[3], qa[3],   qa[0],   qa[0]};
-    assign vec_rot_in[1] = '{qa[2],   qa[1],   qa[1],   qa[2],   qa[0],   qa[3],   qa[3],   qa[0]};
-    assign vec_rot_in[2] = '{qa[3],   qa[1],   qa[0],   qa_n[2], qa[1],   qa[3],   qa_n[2], qa[0]};
+    assign vec_rot_in[0] = {a[1],     a[1],     a[2],     a_neg[2], a_neg[3], a[3],     a[0],     a[0]    };
+    assign vec_rot_in[1] = {a[2],     a[1],     a[1],     a[2],     a[0],     a[3],     a[3],     a[0]    };
+    assign vec_rot_in[2] = {a[3],     a[1],     a[0],     a_neg[2], a[1],     a[3],     a_neg[2], a[0]    };
+    assign vec_rot_in[3] = {a[1],     a[2],     a[2],     a[1],     a_neg[3], a[0],     a[0],     a_neg[3]};
+    assign vec_rot_in[4] = {a[2],     a[2],     a_neg[1], a[1],     a[0],     a[0],     a[3],     a_neg[3]};
+    assign vec_rot_in[5] = {a[3],     a[2],     a[0],     a[1],     a[1],     a[0],     a[2],     a[3]    };
+    assign vec_rot_in[6] = {a[1],     a[3],     a[2],     a[0],     a[3],     a[1],     a[0],     a[2]    };
+    assign vec_rot_in[7] = {a[2],     a[3],     a_neg[1], a[0],     a[0],     a_neg[1], a[3],     a[2]    };
+    assign vec_rot_in[8] = {a[3],     a[3],     a[0],     a[0],     a[1],     a_neg[1], a_neg[2], a[2]    };
 
-    assign vec_rot_in[3] = '{qa[1],   qa[2],   qa[2],   qa[1],   qa_n[3], qa[0],   qa[0],   qa_n[3]};
-    assign vec_rot_in[4] = '{qa[2],   qa[2],   qa_n[1], qa[1],   qa[0],   qa[0],   qa[3],   qa_n[3]};
-    assign vec_rot_in[5] = '{qa[3],   qa[2],   qa[0],   qa[1],   qa[1],   qa[0],   qa[2],   qa[3]};
-
-    assign vec_rot_in[6] = '{qa[1],   qa[3],   qa[2],   qa[0],   qa[3],   qa[1],   qa[0],   qa[2]};
-    assign vec_rot_in[7] = '{qa[2],   qa[3],   qa_n[1], qa[0],   qa[0],   qa_n[1], qa[3],   qa[2]};
-    assign vec_rot_in[8] = '{qa[3],   qa[3],   qa[0],   qa[0],   qa[1],   qa_n[1], qa_n[2], qa[2]};
+    if (VECTOR_LANES > 4) begin
+        assign vec_qmul_in[VECTOR_LANES-1:4] = '0;
+    end
 
     if (VECTOR_LANES > 9) begin
-        for (genvar i = 9; i < VECTOR_LANES; i = i + 1) begin
-            assign vec_mat3_in[i] = '{default:'0};
-            assign vec_rot_in[i] = '{default:'0};
-        end
+        assign vec_mat3_in[VECTOR_LANES-1:9] = '0;
+        assign vec_rot_in[VECTOR_LANES-1:9] = '0;
     end
 
     always_comb begin
@@ -94,7 +94,7 @@ module dot_product_unit #(
             3'b001: vec_in = vec_dot4_in;
             3'b010: vec_in = vec_qmul_in;
             3'b011: vec_in = vec_rot_in;
-            default: vec_in = '{default:'0};
+            default: vec_in = '0;
         endcase
     end
 
@@ -114,9 +114,22 @@ module dot_product_unit #(
             .g              (vec_in[i][6]   ),
             .h              (vec_in[i][7]   ),
             .rnd            (rnd            ),
-            .z              (vec_out[i]     ),
-            .status         (               )
+            .z              (z_inst[i]      ),
+            .status         (status_inst[i] )
         );
     end
+
+    assign vec_out = z_inst;
+
+    // always @(posedge clk) begin
+    //     z_inst_pipe1 <= z_inst;
+    //     z_inst_pipe2 <= z_inst_pipe1;
+    //     z_inst_pipe3 <= z_inst_pipe2;
+    //     z_inst_pipe4 <= z_inst_pipe3;
+    // end
+
+    // assign vec_out = (NUM_STAGES == 4) ? z_inst_pipe4 :
+    //                  (NUM_STAGES == 3) ? z_inst_pipe3 :
+    //                  (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
 
 endmodule

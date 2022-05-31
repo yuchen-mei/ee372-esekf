@@ -25,7 +25,7 @@ module register_file #(
     assign data_r3 = (wen & (addr_w == addr_r3)) ? data_w : vectors[addr_r3];
 
     always_ff @(posedge clk) begin
-        if (!rst_n) begin
+        if (~rst_n) begin
             vectors[0] <= '0;
             vectors[1] <= '0; // p_est
             vectors[2] <= {32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3b6d8000, 32'h38a36038, 32'hb8cbffed}; // v_est

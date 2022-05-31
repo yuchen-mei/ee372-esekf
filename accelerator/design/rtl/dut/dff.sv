@@ -1,5 +1,5 @@
 module dff #(
-    parameter WIDTH      = 64, // Signal bit widths
+    parameter WIDTH      = 32, // Signal bit widths
     parameter PIPE_DEPTH = 1,  // Pipeline depth
     parameter OUT_REG    = 0   // Pipeline Is Retimeable
 ) (
@@ -10,16 +10,13 @@ module dff #(
     output logic [WIDTH - 1:0] out
 );
 
-    if (PIPE_DEPTH == 0) begin
-        assign out = in & {WIDTH{rst_n}};
-    end
-    else if (OUT_REG) begin
+    if (OUT_REG) begin
         DW_pl_reg #(
-            .width      (WIDTH          ),
-            .in_reg     (0              ),
-            .stages     (PIPE_DEPTH     ),
-            .out_reg    (1              ),
-            .rst_mode   (0              )
+            .width      (WIDTH           ),
+            .in_reg     (0               ),
+            .stages     (PIPE_DEPTH      ),
+            .out_reg    (1               ),
+            .rst_mode   (0               )
         ) dff_pipe (
             .clk        (clk             ),
             .rst_n      (rst_n           ),
@@ -30,11 +27,11 @@ module dff #(
     end
     else begin
         DW_pl_reg #(
-            .width      (WIDTH          ),
-            .in_reg     (0              ),
-            .stages     (PIPE_DEPTH + 1 ),
-            .out_reg    (0              ),
-            .rst_mode   (0              )
+            .width      (WIDTH           ),
+            .in_reg     (0               ),
+            .stages     (PIPE_DEPTH + 1  ),
+            .out_reg    (0               ),
+            .rst_mode   (0               )
         ) dff_pipe (
             .clk        (clk             ),
             .rst_n      (rst_n           ),

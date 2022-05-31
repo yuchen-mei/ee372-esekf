@@ -253,7 +253,7 @@ module accelerator #(
 
     aggregator #(
         .DATA_WIDTH     (INPUT_FIFO_WIDTH     ),
-        .FETCH_WIDTH    (VECTOR_LANES*DATA_WIDTH/INPUT_FIFO_WIDTH)
+        .FETCH_WIDTH    (8*DATA_WIDTH/INPUT_FIFO_WIDTH)
     ) input_aggregator_inst (
         .clk            (clk                  ),
         .rst_n          (rst_n                ),

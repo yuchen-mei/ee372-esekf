@@ -94,7 +94,7 @@ module controller #(
         mat_inv_en_r <= mat_inv_en;
 
     always @ (posedge clk) begin
-        if (!rst_n) begin
+        if (~rst_n) begin
             state_r <= `IDLE;
 
             config_adr_r   <= 0;
