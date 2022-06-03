@@ -35,16 +35,16 @@ addRing -nets {vccd1 vssd1} -type core_rings -follow core   \
         -extend_corner {tl tr bl br lt lb rt rb}
 
 # selectInst sram
-selectInst instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
-selectInst instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
-selectInst data_mem/genblk1_width_macro_7__sram_macro
-selectInst data_mem/genblk1_width_macro_6__sram_macro
-selectInst data_mem/genblk1_width_macro_5__sram_macro
-selectInst data_mem/genblk1_width_macro_4__sram_macro
-selectInst data_mem/genblk1_width_macro_3__sram_macro
-selectInst data_mem/genblk1_width_macro_2__sram_macro
-selectInst data_mem/genblk1_width_macro_1__sram_macro
-selectInst data_mem/genblk1_width_macro_0__sram_macro
+selectInst accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
+selectInst accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_6__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_5__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_4__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_3__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_2__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_1__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
 
 setAddRingMode -ring_target default -extend_over_row 0 -ignore_rows 0 \
                -avoid_short 0 -skip_crossing_trunks none -stacked_via_top_layer met4 \
@@ -103,26 +103,26 @@ addStripe -nets {vssd1 vccd1} -layer $pmesh_bot -direction vertical \
 
 deselectAll
 # selectInst sram
-selectInst instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
-selectInst instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
-selectInst data_mem/genblk1_width_macro_7__sram_macro
-selectInst data_mem/genblk1_width_macro_6__sram_macro
-selectInst data_mem/genblk1_width_macro_5__sram_macro
-selectInst data_mem/genblk1_width_macro_4__sram_macro
-selectInst data_mem/genblk1_width_macro_3__sram_macro
-selectInst data_mem/genblk1_width_macro_2__sram_macro
-selectInst data_mem/genblk1_width_macro_1__sram_macro
-selectInst data_mem/genblk1_width_macro_0__sram_macro
+selectInst accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
+selectInst accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_6__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_5__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_4__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_3__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_2__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_1__sram_macro
+selectInst accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
 
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_7__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_6__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_5__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_4__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_3__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_2__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_1__sram_macro
-sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst data_mem/genblk1_width_macro_0__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_6__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_5__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_4__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_3__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_2__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_1__sram_macro
+sroute -connect {blockPin} -layerChangeRange {met1 met4} -blockPinTarget { nearestTarget } -nets {vccd1 vssd1} -allowLayerChange 1 -blockPin useLef -inst accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
 
 
