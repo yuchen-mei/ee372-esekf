@@ -33,7 +33,9 @@ module ram_sync_1rw1r #(
         for (i = 0; i < DEPTH / 256; i = i + 1) begin: depth_macro
             for (j = 0; j < DATA_WIDTH / 32; j = j + 1) begin: width_macro
                 sky130_sram_1kbyte_1rw1r_32x256_8 #(
-                    .VERBOSE(0                   )
+                    .DELAY  (0                   ),
+                    .VERBOSE(0                   ),
+                    .T_HOLD (0                   )
                 ) sram_macro (
                     .clk0   (clk                 ),
                     .csb0   (~(csb0 && (addr0[ADDR_WIDTH-1:8] == i))),
@@ -57,7 +59,9 @@ module ram_sync_1rw1r #(
 
         for (i = 0; i < DATA_WIDTH/32; i = i + 1) begin: width_macro
             sky130_sram_1kbyte_1rw1r_32x256_8 #(
-                .VERBOSE(0                 )
+                .DELAY  (0                 ),
+                .VERBOSE(0                 ),
+                .T_HOLD (0                 )
             ) sram_macro (
                 .clk0   (clk               ),
                 .csb0   (~csb0             ),

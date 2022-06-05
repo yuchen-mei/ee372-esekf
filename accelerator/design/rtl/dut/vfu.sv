@@ -110,18 +110,18 @@ module vector_unit #(
             endcase
         end
 
-        assign vec_out[i] = z_inst_internal;
+        // assign vec_out[i] = z_inst_internal;
 
-        // always @(posedge clk) begin
-        //     z_inst_pipe1 <= z_inst_internal;
-        //     z_inst_pipe2 <= z_inst_pipe1;
-        //     z_inst_pipe3 <= z_inst_pipe2;
-        //     z_inst_pipe4 <= z_inst_pipe3;
-        // end
+        always @(posedge clk) begin
+            z_inst_pipe1 <= z_inst_internal;
+            z_inst_pipe2 <= z_inst_pipe1;
+            z_inst_pipe3 <= z_inst_pipe2;
+            z_inst_pipe4 <= z_inst_pipe3;
+        end
 
-        // assign vec_out[i] = (NUM_STAGES == 4) ? z_inst_pipe4 :
-        //                     (NUM_STAGES == 3) ? z_inst_pipe3 :
-        //                     (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
+        assign vec_out[i] = (NUM_STAGES == 4) ? z_inst_pipe4 :
+                            (NUM_STAGES == 3) ? z_inst_pipe3 :
+                            (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
     end
 
 endmodule

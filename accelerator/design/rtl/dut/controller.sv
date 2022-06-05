@@ -27,7 +27,7 @@ module controller #(
 
     output logic                            instr_full_n,
     output logic                            input_full_n,
-    output reg                              output_empty_n,
+    output logic                            output_empty_n,
 
     output logic [INSTR_MEM_ADDR_WIDTH-1:0] instr_wadr,
     output logic [ DATA_MEM_ADDR_WIDTH-1:0] input_wadr,
@@ -46,6 +46,8 @@ module controller #(
     output logic [   CONFIG_ADDR_WIDTH-1:0] config_adr,
     output logic [   CONFIG_DATA_WIDTH-1:0] config_data
 );
+
+    localparam MAT_INV_ADDR = 16'h2000;
 
     // ---------------------------------------------------------------------------
     // Configuration registers
@@ -86,11 +88,8 @@ module controller #(
     assign config_data     = params_fifo_dout[CONFIG_DATA_WIDTH-1:0];
     assign params_fifo_deq = params_fifo_empty_n && (state_r == `IDLE);
 
-    assign mat_inv_en  = (mem_write && (mem_addr == 13'h1200) && ~mat_inv_vld_out);
+    // assign mat_inv_en  = (mem_write && (mem_addr == MAT_INV_ADDR) && ~mat_inv_vld_out);
     assign mat_inv_vld = mat_inv_en && ~mat_inv_en_r;
-
-    always @(posedge clk)
-        mat_inv_en_r <= mat_inv_en;
 
     always @ (posedge clk) begin
         if (~rst_n) begin
@@ -103,8 +102,13 @@ module controller #(
 
             output_empty_n <= 0;
             mvp_core_en    <= 0;
+
+            mat_inv_en <= 0;
+            mat_inv_en_r <= 0;
         end
         else begin
+            mat_inv_en_r <= mat_inv_en;
+
             if (state_r == `IDLE) begin
                 if (params_fifo_empty_n) begin
                     config_r[config_adr_r] <= config_data;
@@ -128,9 +132,9 @@ module controller #(
                 // Special instruction to invoke I/O
                 if (mem_read && (mem_addr == input_wadr_offset)) begin
                     mvp_core_en    <= 0;
+                    output_empty_n <= 1;
                     input_wadr_r   <= input_wadr_offset;
                     output_wbadr_r <= output_radr_offset;
-                    output_empty_n <= 1;
                     state_r        <= `RESET_INNER_LOOP;
                 end
                 
@@ -139,11 +143,13 @@ module controller #(
                 // end
                 
                 // Halt MVP Core when running matrix inversion
-                else if (mem_write && (mem_addr == 16'h2000)) begin
+                else if (mem_write && (mem_addr == MAT_INV_ADDR)) begin
                     mvp_core_en <= 0;
+                    mat_inv_en  <= 1;
                 end
                 else if (mat_inv_en && mat_inv_vld_out) begin
                     mvp_core_en <= 1;
+                    mat_inv_en  <= 0;
                 end
             end
             else if (state_r == `RESET_INNER_LOOP) begin

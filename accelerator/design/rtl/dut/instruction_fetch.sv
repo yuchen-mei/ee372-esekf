@@ -13,17 +13,19 @@ module instruction_fetch #(
     output logic [ADDR_WIDTH-1:0] pc
 );
 
-    logic [ADDR_WIDTH-1:0] pc_r;
+    logic [ADDR_WIDTH-1:0] pc_pipe1, pc_pipe2;
 
     always @(posedge clk) begin
         if (~rst_n) begin
-            pc_r <= 0;
+            pc_pipe1 <= 0;
+            pc_pipe2 <= 0;
         end
         else if (en) begin
-            pc_r <= pc_r + 1;
+            pc_pipe1 <= pc_pipe1 + 1;
+            pc_pipe2 <= pc_pipe1;
         end
     end
 
-    assign pc = pc_r;
+    assign pc = en ? pc_pipe1 : pc_pipe2;
 
 endmodule
