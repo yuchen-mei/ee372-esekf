@@ -19,12 +19,14 @@ module multifunc_unit #(
 
     always_comb begin
         case (funct)
-            3'b000:  inst_func = 16'b00001; // reciprocal, 1/A
-            3'b001:  inst_func = 16'b00010; // square root of A
-            3'b010:  inst_func = 16'b00100; // reciprocal square root of A
-            3'b011:  inst_func = 16'b01000; // sine, sin(A)
-            3'b100:  inst_func = 16'b10000; // cosine, cos(A)
-            default: inst_func = 16'b00000;
+            3'b000:  inst_func = 16'b0000_0001; // reciprocal, 1/A
+            3'b001:  inst_func = 16'b0000_0010; // square root of A
+            3'b010:  inst_func = 16'b0000_0100; // reciprocal square root of A
+            3'b011:  inst_func = 16'b0000_1000; // sine, sin(A)
+            3'b100:  inst_func = 16'b0001_0000; // cosine, cos(A)
+            3'b101:  inst_func = 16'b0010_0000; // base-2 logarithm
+            3'b110:  inst_func = 16'b0100_0000; // base-2 exponential
+            default: inst_func = 16'b0000_0000;
         endcase
     end
 
@@ -32,8 +34,8 @@ module multifunc_unit #(
         .sig_width      (SIG_WIDTH      ),
         .exp_width      (EXP_WIDTH      ),
         .ieee_compliance(IEEE_COMPLIANCE),
-        .func_select    (7'b11111       ),
-        .pi_multiple    (1'b0           )
+        .func_select    (127            ),
+        .pi_multiple    (0              )
     ) DW_lp_fp_multifunc_DG_inst (
         .a              (data_in        ),
         .func           (inst_func      ),
@@ -43,17 +45,17 @@ module multifunc_unit #(
         .status         (status         )
     );
 
-    assign data_out = z_inst_internal;
+    // assign data_out = z_inst_internal;
 
-    // always @(posedge clk) begin
-    //     z_inst_pipe1 <= z_inst_internal;
-    //     z_inst_pipe2 <= z_inst_pipe1;
-    //     z_inst_pipe3 <= z_inst_pipe2;
-    //     z_inst_pipe4 <= z_inst_pipe3;
-    // end
+    always @(posedge clk) begin
+        z_inst_pipe1 <= z_inst_internal;
+        z_inst_pipe2 <= z_inst_pipe1;
+        z_inst_pipe3 <= z_inst_pipe2;
+        z_inst_pipe4 <= z_inst_pipe3;
+    end
 
-    // assign data_out = (NUM_STAGES == 4) ? z_inst_pipe4 :
-    //                   (NUM_STAGES == 3) ? z_inst_pipe3 :
-    //                   (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
+    assign data_out = (NUM_STAGES == 4) ? z_inst_pipe4 :
+                      (NUM_STAGES == 3) ? z_inst_pipe3 :
+                      (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
 
 endmodule

@@ -8,7 +8,7 @@ module accelerator #(
     parameter CONFIG_DATA_WIDTH    = 8,
 
     parameter VECTOR_LANES         = 16,
-    parameter DATA_MEM_BW          = 8,
+    parameter DATAPATH             = 8,
 
     parameter INSTR_MEM_BANK_DEPTH = 512,
     parameter INSTR_MEM_ADDR_WIDTH = $clog2(INSTR_MEM_BANK_DEPTH),
@@ -28,7 +28,7 @@ module accelerator #(
 );
 
     localparam DATA_WIDTH = SIG_WIDTH + EXP_WIDTH + 1;
-    localparam MEM_ADDR_WIDTH = 16;
+    localparam ADDR_WIDTH = 16;
 
     // ---------------------------------------------------------------------------
     // Wires connecting to the interface FIFOs.
@@ -77,7 +77,7 @@ module accelerator #(
     logic [INSTR_MEM_ADDR_WIDTH-1:0]                 pc;
     logic [                    31:0]                 instr;
 
-    logic [      MEM_ADDR_WIDTH-1:0]                 mvp_mem_addr;
+    logic [          ADDR_WIDTH-1:0]                 mvp_mem_addr;
     logic                                            mvp_mem_we;
     logic                                            mvp_mem_ren;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_wdata;
@@ -93,16 +93,16 @@ module accelerator #(
     logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_addr;
     logic                                            data_mem_csb;
     logic                                            data_mem_web;
-    logic [         DATA_MEM_BW-1:0]                 data_mem_wmask0;
-    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] data_mem_wdata;
-    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] data_mem_rdata;
-    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] output_wb_data;
+    logic [            DATAPATH-1:0]                 data_mem_wmask0;
+    logic [            DATAPATH-1:0][DATA_WIDTH-1:0] data_mem_wdata;
+    logic [            DATAPATH-1:0][DATA_WIDTH-1:0] data_mem_rdata;
+    logic [            DATAPATH-1:0][DATA_WIDTH-1:0] output_wb_data;
 
     logic                                            mat_inv_vld_out;
     logic [                     8:0][DATA_WIDTH-1:0] mat_inv_out_l;
     logic [                     8:0][DATA_WIDTH-1:0] mat_inv_out_u;
     
-    logic [         DATA_MEM_BW-1:0][DATA_WIDTH-1:0] input_aggregator_dout;
+    logic [            DATAPATH-1:0][DATA_WIDTH-1:0] input_aggregator_dout;
     logic [          DATA_WIDTH-1:0]                 instr_aggregator_dout;
 
     // ---------------------------------------------------------------------------
@@ -114,7 +114,7 @@ module accelerator #(
         .EXP_WIDTH           (EXP_WIDTH           ),
         .IEEE_COMPLIANCE     (IEEE_COMPLIANCE     ),
         .VECTOR_LANES        (VECTOR_LANES        ),
-        .ADDR_WIDTH          (MEM_ADDR_WIDTH      ),
+        .ADDR_WIDTH          (ADDR_WIDTH          ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
     ) mvp_core_inst (
@@ -142,7 +142,7 @@ module accelerator #(
         .vld          (mat_inv_vld       ),
         .mat_in       (mvp_mem_wdata[8:0]),
         .rdy          (                  ),
-        .vld_out      (mat_inv_vld_ou    ),
+        .vld_out      (mat_inv_vld_out   ),
         .mat_inv_out_l(mat_inv_out_l     ),
         .mat_inv_out_u(mat_inv_out_u     )
     );
@@ -166,7 +166,7 @@ module accelerator #(
     );
 
     ram_sync_1rw1r #(
-        .DATA_WIDTH(DATA_MEM_BW*DATA_WIDTH ),
+        .DATA_WIDTH(DATAPATH*DATA_WIDTH    ),
         .ADDR_WIDTH(DATA_MEM_ADDR_WIDTH    ),
         .DEPTH     (DATA_MEM_BANK_DEPTH    )
     ) data_mem (
@@ -183,10 +183,10 @@ module accelerator #(
     );
 
     memory_controller #(
-        .ADDR_WIDTH          (MEM_ADDR_WIDTH      ),
+        .ADDR_WIDTH          (ADDR_WIDTH          ),
         .DATA_WIDTH          (DATA_WIDTH          ),
         .VECTOR_LANES        (VECTOR_LANES        ),
-        .DATA_MEM_BW         (DATA_MEM_BW         ),
+        .DATAPATH            (DATAPATH            ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
     ) mem_ctrl_inst (
@@ -255,7 +255,7 @@ module accelerator #(
 
     aggregator #(
         .DATA_WIDTH     (INPUT_FIFO_WIDTH     ),
-        .FETCH_WIDTH    (DATA_MEM_BW*DATA_WIDTH/INPUT_FIFO_WIDTH)
+        .FETCH_WIDTH    (DATAPATH*DATA_WIDTH/INPUT_FIFO_WIDTH)
     ) input_aggregator_inst (
         .clk            (clk                  ),
         .rst_n          (rst_n                ),
@@ -287,7 +287,7 @@ module accelerator #(
 
     deaggregator #(
         .DATA_WIDTH     (OUTPUT_FIFO_WIDTH ),
-        .FETCH_WIDTH    (DATA_MEM_BW*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
+        .FETCH_WIDTH    (DATAPATH*DATA_WIDTH/OUTPUT_FIFO_WIDTH)
     ) output_deaggregator_inst (
         .clk            (clk               ),
         .rst_n          (rst_n             ),
@@ -301,7 +301,7 @@ module accelerator #(
 
     controller #(
         .CONFIG_DATA_WIDTH   (CONFIG_DATA_WIDTH      ),
-        .ADDR_WIDTH          (MEM_ADDR_WIDTH         ),
+        .ADDR_WIDTH          (ADDR_WIDTH             ),
         .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH   ),
         .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH    )
     ) controller_inst (

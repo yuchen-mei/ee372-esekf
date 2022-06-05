@@ -1,4 +1,4 @@
-module register_file #(
+module vrf #(
     parameter DATA_WIDTH = 512,
     parameter ADDR_WIDTH = 5,
     parameter DEPTH      = 32
@@ -26,11 +26,14 @@ module register_file #(
 
     always_ff @(posedge clk) begin
         if (~rst_n) begin
-            vectors[0] <= '0;
-            vectors[1] <= '0; // p_est
-            vectors[2] <= {32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3b6d8000, 32'h38a36038, 32'hb8cbffed}; // v_est
-            vectors[3] <= {32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h350eca6a, 32'hb80e4003, 32'hb7ac04fe, 32'h3f800000}; // q_est
+            vectors[0] <= '0; // mask
 
+            // State
+            vectors[1] <= '0; // p_est
+            vectors[2] <= {32'h3b6d8000, 32'h38a36038, 32'hb8cbffed}; // v_est
+            vectors[3] <= {32'h350eca6a, 32'hb80e4003, 32'hb7ac04fe, 32'h3f800000}; // q_est
+
+            // Covariance Matrix
             vectors[4] <= {32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000}; // p_cov_11
             vectors[5] <= '0; // p_cov_12
             vectors[6] <= '0; // p_cov_13
@@ -41,20 +44,22 @@ module register_file #(
             vectors[11] <= '0; // p_cov_32
             vectors[12] <= {32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000}; // p_cov_33
 
-            vectors[13] <= {32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000}; // identity matrix
-            vectors[14] <= {32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'hc11cf5c3, 32'h00000000, 32'h00000000}; // gravity
-            vectors[15] <= '0;
+            // Sensor inputs
+            vectors[13] <= {32'hc11d21cc, 32'hbb151d87, 32'h3bbc24c0}; // imu_f
+            vectors[14] <= {32'h3809634f, 32'h382233c6, 32'hba1011be, 32'h3f7ffffd}; // imu_w
+            vectors[15] <= {32'hbd4a4f00, 32'hbe07b428, 32'hbcb943b7}; // gnss
 
-            vectors[16] <= {32'h3f800000, 32'h382c04f4, 32'hb88e4006, 32'hb82c0508, 32'h3f800000, 32'hb58e9a9f, 32'h388e4000, 32'h358efa35, 32'h3f800000}; // rotation matrix
-            vectors[17] <= {32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'hc11d21cc, 32'hbb151d87, 32'h3bbc24c0}; // imu_f
-            vectors[18] <= {32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3809634f, 32'h382233c6, 32'hba1011be, 32'h3f7ffffd}; // imu_w in quaternion 
+            // Constants
+            vectors[16] <= 32'h348637bd; // var_imu * t^2
+            vectors[17] <= 32'h3dcccccd; // var_gnss
+            vectors[18] <= 32'h420c0000; // var_lidar
+            vectors[19] <= {32'h411cf5c3, 32'h00000000, 32'h00000000}; // gravity
 
-            vectors[19] <= 32'h3ba3d70a; // t
-            vectors[20] <= 32'h37d1b717; // t^2
-            vectors[21] <= 32'h3751b717; // 0.5t^2
-            vectors[22] <= 32'h348637bd; // vif*t^2
-
-            vectors[23] <= {32'hbd4a4f00, 32'hbe07b428, 32'hbcb943b7};
+            // Nice to have values
+            vectors[20] <= {32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000}; // identity matrix
+            vectors[21] <= 32'h3ba3d70a; // t = 0.005
+            vectors[22] <= 32'h37d1b717; // t^2 = 0.000025
+            vectors[23] <= 32'h3751b717; // 0.5t^2 = 0.0000125
 
             vectors[31:24] <= '{default:0};
         end

@@ -1,23 +1,29 @@
 module decoder (
     input  logic [31:0] instr,
 
-    output logic [ 3:0] vfu_opcode,
-    output logic [ 4:0] vd_addr,
-    output logic [ 4:0] vs1_addr,
-    output logic [ 4:0] vs2_addr,
-    output logic [ 4:0] vs3_addr,
+    output logic  [3:0] vfu_opcode,
+    output logic  [4:0] vd_addr,
+    output logic  [4:0] vs1_addr,
+    output logic  [4:0] vs2_addr,
+    output logic  [4:0] vs3_addr,
 
-    output logic [ 2:0] op_sel,
-    output logic [ 2:0] funct3,
+    output logic  [3:0] op_sel,
+    output logic  [2:0] funct3,
     output logic        masking,
     output logic        reg_we,
 
     output logic        mem_we,
-    output logic        mem_ren,
     output logic [15:0] mem_addr,
 
-    input  logic [ 4:0] vd_addr_ex,
-    input  logic        reg_we_ex,
+    input  logic  [4:0] vd_addr_ex1,
+    input  logic  [4:0] vd_addr_ex2,
+    input  logic  [4:0] vd_addr_ex3,
+    input  logic        reg_we_ex1,
+    input  logic        reg_we_ex2,
+    input  logic        reg_we_ex3,
+    input  logic  [3:0] op_sel_ex1,
+    input  logic  [3:0] op_sel_ex2,
+    input  logic  [3:0] op_sel_ex3,
     output logic        stall
 );
 
@@ -41,7 +47,8 @@ module decoder (
                                      (opcode == `VFNMSAC));
     assign vs1_addr = src1;
     assign vs2_addr = overwrite_multiplicand ? dest : src2;
-    assign vs3_addr = overwrite_multiplicand ? src2 : dest;
+    assign vs3_addr = (opcode == `OP_M)      ? instr[31:27] :
+                      overwrite_multiplicand ? src2         : dest;
     assign vd_addr  = dest;
 
     always_comb begin
@@ -69,20 +76,31 @@ module decoder (
         endcase
 
         case (opcode)
-            `OP_V:   op_sel = 3'b001;
-            `OP_M:   op_sel = 3'b010;
-            `OP_FP:  op_sel = 3'b100;
-            default: op_sel = 3'b000;
+            `OP_V:    op_sel = 4'b0001;
+            `OP_M:    op_sel = 4'b0010;
+            `OP_FP:   op_sel = 4'b0100;
+            `LOAD_FP: op_sel = 4'b1000;
+            default:  op_sel = 4'b0000;
         endcase
+
+        if ((opcode == `OP_V) && (funct6 == `VSMUL)) begin
+            op_sel = 4'b0;
+        end
     end
 
     // Load and Store
     assign mem_addr = instr[31:16];
     assign mem_we   = (opcode == `STORE_FP);
-    assign mem_ren  = (opcode == `LOAD_FP);
     assign reg_we   = ~mem_we;
 
-    assign stall = (vs1_addr == vd_addr_ex | vs2_addr == vd_addr_ex | vs3_addr == vd_addr_ex) & reg_we_ex;
+    logic stage1_dependency, stage2_dependency, stage3_dependency;
+
+    assign stage1_dependency = (vs1_addr == vd_addr_ex1 || vs2_addr == vd_addr_ex1 || vs3_addr == vd_addr_ex1) && reg_we_ex1;
+    assign stage2_dependency = (vs1_addr == vd_addr_ex2 || vs2_addr == vd_addr_ex2 || vs3_addr == vd_addr_ex2) && reg_we_ex2;
+    assign stage3_dependency = (vs1_addr == vd_addr_ex3 || vs2_addr == vd_addr_ex3 || vs3_addr == vd_addr_ex3) && reg_we_ex3;
+    assign stall = (stage1_dependency && |op_sel_ex1)   ||
+                   (stage2_dependency && op_sel_ex2[1]) ||
+                   (stage3_dependency && op_sel_ex3[1]);
 
 endmodule
 
