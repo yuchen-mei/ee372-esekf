@@ -25,14 +25,14 @@ def construct():
 
   parameters = {
     'construct_path' : __file__,
-    'design_name'    : 'accelerator',
+    'design_name'    : 'user_proj_example',
     'clock_period'   : 20.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
     'topographical'  : True,
-    'testbench_name' : 'accelerator_tb',
-    'saif_instance'  : 'accelerator_tb/accelerator_inst',
-    'dut_name'       : 'accelerator_inst'
+    'testbench_name' : 'user_proj_example_tb',
+    'saif_instance'  : 'user_proj_example_tb/user_proj_example_inst',
+    'dut_name'       : 'user_proj_example_inst'
   }
 
   #-----------------------------------------------------------------------
@@ -76,6 +76,7 @@ def construct():
   pt_timing       = Step( this_dir + '/synopsys-pt-timing-signoff'      )
 
   magic_drc       = Step( this_dir + '/open-magic-drc'                  )
+  klayout_drc     = Step( this_dir + '/klayout-drc-gds'                 )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
   magic_gds2spice_nobbox = Step( this_dir + '/open-magic-gds2spice-nobbox'            )
@@ -160,6 +161,7 @@ def construct():
   g.add_step( pt_power_rtl    )
   g.add_step( pt_power_gl     )
   g.add_step( magic_drc       )
+  g.add_step( klayout_drc     )
   g.add_step( magic_antenna   )
   g.add_step( magic_def2spice )
   g.add_step( netgen_lvs_def  )
@@ -290,6 +292,7 @@ def construct():
   
   # DRC, LVS, timing signoff and power signoff
   g.connect_by_name( gdsmerge,        magic_drc       )
+  g.connect_by_name( gdsmerge,        klayout_drc     )
   g.connect_by_name( gdsmerge,        magic_antenna   )
 
   # LVS using DEF

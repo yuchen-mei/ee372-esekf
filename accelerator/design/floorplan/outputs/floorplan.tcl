@@ -70,10 +70,10 @@ setFlipping s
 # createPlaceBlockage -type partial -density 60 -name defScreenName -box {1329.8600000000 858.1600000000 2785.7600000000 1062.1600000000}
 # createPlaceBlockage -type partial -density 60 -name defScreenName -box {1330.7800000000 1062.1600000000 1645.8800000000 3417.6800000000}
 
-createPlaceBlockage -type hard -name defScreenName -box {1463.2600000000 1260.7200000000 2763.6800000000 1396.7200000000}
-createPlaceBlockage -type hard -name defScreenName -box {1460.9600000000 1399.4400000000 1596.2000000000 2713.2000000000}
-createPlaceBlockage -type hard -name defScreenName -box {438.3800000000 2715.9200000000 1597.1200000000 2892.7200000000}
-createPlaceBlockage -type hard -name defScreenName -box {284.2800000000 2713.2000000000 440.2200000000 3387.7600000000}
+# createPlaceBlockage -type hard -name defScreenName -box {1463.2600000000 1260.7200000000 2763.6800000000 1396.7200000000}
+# createPlaceBlockage -type hard -name defScreenName -box {1460.9600000000 1399.4400000000 1596.2000000000 2713.2000000000}
+# createPlaceBlockage -type hard -name defScreenName -box {438.3800000000 2715.9200000000 1597.1200000000 2892.7200000000}
+# createPlaceBlockage -type hard -name defScreenName -box {284.2800000000 2713.2000000000 440.2200000000 3387.7600000000}
 placeInstance accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro 2228.4450000000 1451.0750000000 R0
 addHaloToBlock 50 50 50 50 accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro
 setInstancePlacementStatus -status fixed -name accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro
@@ -104,6 +104,8 @@ setInstancePlacementStatus -status fixed -name accelerator_inst/instr_mem/genblk
 placeInstance accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 489.1050000000 2943.5750000000 R0
 addHaloToBlock 50 50 50 50 accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+createPlaceBlockage -type partial -density 20 -name defScreenName -box {379.0400000000 2645.2000000000 2810.6000000000 3414.9600000000}
+createPlaceBlockage -type partial -density 20 -name defScreenName -box {1352.8600000000 1132.8800000000 2806.9200000000 2762.1600000000}
 
 
 # create Routing Blockage
