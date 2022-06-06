@@ -1,0 +1,52 @@
+build_dir: 25-ptpx-gl
+build_id: '25'
+commands:
+- source run.sh
+debug:
+- source debug.sh
+edges_i:
+  adk:
+  - f: adk
+    step: 7-skywater-130nm
+  design.pt.sdc:
+  - f: design.sdc
+    step: 13-synopsys-dc-synthesis
+  design.spef.gz:
+  - f: design.spef.gz
+    step: 22-cadence-innovus-signoff
+  design.vcs.v:
+  - f: design.vcs.v
+    step: 22-cadence-innovus-signoff
+  run.saif:
+  - f: run.saif
+    step: 3-gen-saif-gl
+  sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db:
+  - f: sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db
+    step: 8-sram
+edges_o: {}
+inputs:
+- adk
+- design.vcs.v
+- design.pt.sdc
+- design.spef.gz
+- run.saif
+- run.vcd
+- design.namemap
+- sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db
+name: ptpx-gl
+outputs:
+- primetime.session
+- design.sdf
+parameters:
+  analysis_mode: averaged
+  design_name: accelerator
+  lib_op_condition: undefined
+  order:
+  - designer-interface.tcl
+  - setup-session.tcl
+  - read-design.tcl
+  - report-timing.tcl
+  - report-power.tcl
+  saif_instance: accelerator_tb/accelerator_inst
+  zero_delay_simulation: false
+source: /home/users/jeffreyy/ee372/skywater-digital-flow/accelerator/design/synopsys-pt-power

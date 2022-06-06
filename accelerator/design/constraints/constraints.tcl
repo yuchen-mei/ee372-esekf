@@ -52,9 +52,9 @@ set_max_transition [expr 0.25*${dc_clock_period}] $dc_design_name
 #set_input_transition 1 [all_inputs]
 #set_max_transition 10 [all_outputs]
 
-set_optimize_registers true -designs vector_unit_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_VECTOR_LANES16_NUM_STAGES2
-set_optimize_registers true -designs dot_product_unit_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_VECTOR_LANES9_NUM_STAGES4
-set_optimize_registers true -designs multifunc_unit_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_NUM_STAGES2
+set_optimize_registers true -designs DW_fp_mac_DG_inst_pipe_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_NUM_STAGES3
+set_optimize_registers true -designs DW_fp_dp4_inst_pipe_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_ARCH_TYPE1_NUM_STAGES4
+set_optimize_registers true -designs DW_lp_fp_multifunc_DG_inst_pipe_SIG_WIDTH23_EXP_WIDTH8_IEEE_COMPLIANCE0_NUM_STAGES3
 
 set_dont_use [get_lib_cells {*/*probec* }]
 

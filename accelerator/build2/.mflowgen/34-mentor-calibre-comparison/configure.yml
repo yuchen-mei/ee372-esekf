@@ -1,0 +1,31 @@
+build_dir: 34-mentor-calibre-comparison
+build_id: '34'
+commands:
+- sh run_lvs.sh
+debug:
+- calibre -rve -lvs svdb
+edges_i:
+  adk:
+  - f: adk
+    step: 7-skywater-130nm
+  design.lvs.v:
+  - f: design.lvs.v
+    step: 22-cadence-innovus-signoff
+  design_extracted.spice:
+  - f: design_extracted.spice
+    step: 32-open-magic-gds2spice
+  sky130_sram_1kbyte_1rw1r_32x256_8.sp:
+  - f: sky130_sram_1kbyte_1rw1r_32x256_8.sp
+    step: 8-sram
+edges_o: {}
+inputs:
+- adk
+- design_extracted.spice
+- design.lvs.v
+- sky130_sram_1kbyte_1rw1r_32x256_8.sp
+name: mentor-calibre-comparison
+outputs:
+- lvs.report
+parameters:
+  design_name: accelerator
+source: /home/users/jeffreyy/ee372/skywater-digital-flow/accelerator/design/mentor-calibre-comparison

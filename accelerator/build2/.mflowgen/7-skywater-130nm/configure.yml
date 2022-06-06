@@ -1,0 +1,66 @@
+build_dir: 7-skywater-130nm
+build_id: '7'
+commands:
+- mkdir -p outputs && cd outputs
+- ln -sf ../view-standard adk
+edges_i: {}
+edges_o:
+  adk:
+  - f: adk
+    step: 10-testbench
+  - f: adk
+    step: 13-synopsys-dc-synthesis
+  - f: adk
+    step: 14-cadence-innovus-flowsetup
+  - f: adk
+    step: 15-cadence-innovus-init
+  - f: adk
+    step: 16-cadence-innovus-power
+  - f: adk
+    step: 17-cadence-innovus-place
+  - f: adk
+    step: 18-cadence-innovus-cts
+  - f: adk
+    step: 19-cadence-innovus-postcts_hold
+  - f: adk
+    step: 20-cadence-innovus-route
+  - f: adk
+    step: 21-cadence-innovus-postroute
+  - f: adk
+    step: 22-cadence-innovus-signoff
+  - f: adk
+    step: 23-mentor-calibre-gdsmerge
+  - f: adk
+    step: 31-open-magic-drc
+  - f: adk
+    step: 30-open-magic-antenna
+  - f: adk
+    step: 24-open-magic-def2spice
+  - f: adk
+    step: 32-open-magic-gds2spice
+  - f: adk
+    step: 33-open-magic-gds2spice-nobbox
+  - f: adk
+    step: 29-netgen-lvs-def
+  - f: adk
+    step: 36-netgen-lvs-gds
+  - f: adk
+    step: 34-mentor-calibre-comparison
+  - f: adk
+    step: 35-mentor-calibre-comparison-nobbox
+  - f: adk
+    step: 27-synopsys-pt-timing-signoff
+  - f: adk
+    step: 26-ptpx-rtl
+  - f: adk
+    step: 25-ptpx-gl
+  - f: adk
+    step: 28-gl-sim
+name: skywater-130nm
+outputs:
+- adk
+parameters:
+  adk: skywater-130nm-adk
+  adk_view: view-standard
+sandbox: true
+source: /farmshare/home/classes/ee/372/PDKs/skywater-130nm-adk

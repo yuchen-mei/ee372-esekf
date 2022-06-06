@@ -19,6 +19,7 @@
 `define VFSGNJX     6'b001010
 `define VFSLIDEUP   6'b001110
 `define VFSLIDEDOWN 6'b001111
+`define VFUNARY0    6'b010010
 `define VFUNARY1    6'b010011
 `define VFMERGE     6'b010111
 `define VMFEQ       6'b011000
@@ -40,22 +41,23 @@
 `define VFNMSAC     6'b101111
 
 // VFU Opcodes
-`define VFU_ADD     4'b0000
-`define VFU_SUB     4'b0001
-`define VFU_MUL     4'b0010
-`define VFU_DIV     4'b0011
-`define VFU_FMA     4'b0100
-`define VFU_FMS     4'b0101
-`define VFU_FNMA    4'b0110
-`define VFU_FNMS    4'b0111
-`define VFU_MIN     4'b1000
-`define VFU_MAX     4'b1001
-`define VFU_SGNJ    4'b1010
-`define VFU_SGNJN   4'b1011
-`define VFU_SGNJX   4'b1100
-`define VFU_EQ      4'b1101
-`define VFU_LT      4'b1110
-`define VFU_LE      4'b1111
+`define VFU_ADD     5'b00000
+`define VFU_SUB     5'b00001
+`define VFU_MUL     5'b00010
+`define VFU_DIV     5'b00011
+`define VFU_FMA     5'b00100
+`define VFU_FMS     5'b00101
+`define VFU_FNMA    5'b00110
+`define VFU_FNMS    5'b00111
+`define VFU_MIN     5'b01000
+`define VFU_MAX     5'b01001
+`define VFU_SGNJ    5'b01010
+`define VFU_SGNJN   5'b01011
+`define VFU_SGNJX   5'b01100
+`define VFU_EQ      5'b01101
+`define VFU_LT      5'b01110
+`define VFU_LE      5'b01111
+`define VPERMUTE    5'b10000
 
 `define DPU_MMA     3'b000
 `define DPU_DOT     3'b001

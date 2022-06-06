@@ -1,0 +1,22 @@
+build_dir: 30-open-magic-antenna
+build_id: '30'
+commands:
+- cp inputs/adk/magicrc .magicrc
+- magic -noconsole -dnull run_antenna.tcl | tee outputs/antenna_check.log
+edges_i:
+  adk:
+  - f: adk
+    step: 7-skywater-130nm
+  design_merged.gds:
+  - f: design_merged.gds
+    step: 23-mentor-calibre-gdsmerge
+edges_o: {}
+inputs:
+- adk
+- design_merged.gds
+name: open-magic-antenna
+outputs:
+- antenna_check.log
+parameters:
+  design_name: accelerator
+source: /home/users/jeffreyy/ee372/skywater-digital-flow/accelerator/design/open-magic-antenna

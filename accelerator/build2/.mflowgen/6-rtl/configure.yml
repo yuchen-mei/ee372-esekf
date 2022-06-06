@@ -1,0 +1,18 @@
+build_dir: 6-rtl
+build_id: '6'
+commands:
+- cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.v
+- cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.vcs.v
+edges_i: {}
+edges_o:
+  design.v:
+  - f: design.v
+    step: 13-synopsys-dc-synthesis
+  design.vcs.v:
+  - f: design.vcs.v
+    step: 11-rtl-sim
+name: rtl
+outputs:
+- design.v
+- design.vcs.v
+source: /home/users/jeffreyy/ee372/skywater-digital-flow/accelerator/design/rtl

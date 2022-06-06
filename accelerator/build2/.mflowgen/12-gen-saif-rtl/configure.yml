@@ -1,0 +1,20 @@
+build_dir: 12-gen-saif-rtl
+build_id: '12'
+commands:
+- vcd2saif -input inputs/run.vcd -output outputs/run.saif
+edges_i:
+  run.vcd:
+  - f: run.vcd
+    step: 11-rtl-sim
+edges_o:
+  run.saif:
+  - f: run.saif
+    step: 13-synopsys-dc-synthesis
+  - f: run.saif
+    step: 26-ptpx-rtl
+inputs:
+- run.vcd
+name: gen-saif-rtl
+outputs:
+- run.saif
+source: /home/users/jeffreyy/ee372/mflowgen/steps/synopsys-vcd2saif-convert

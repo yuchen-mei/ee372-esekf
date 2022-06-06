@@ -33,10 +33,9 @@ module mvp_core #(
 );
 
     logic                                    en_q;
-    logic                                    en_pl;
     logic                                    stall;
-    logic [             3:0]                 opcode_id;
-    logic [             3:0]                 opcode_ex1;
+    logic [             4:0]                 opcode_id;
+    logic [             4:0]                 opcode_ex1;
     logic [             4:0]                 vd_addr_id;
     logic [             4:0]                 vd_addr_ex1;
     logic [             4:0]                 vd_addr_ex2;
@@ -79,14 +78,10 @@ module mvp_core #(
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex3;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_wb;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_ex3;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_wb;
 
-    assign en_pl = en & (en_q || pc != 0); // FIXME: Skip the first instruction
-
     assign data_out     = reg_wdata_wb;
-    assign data_out_vld = reg_we_wb;
+    assign data_out_vld = en && reg_we_wb;
     assign reg_wb       = vd_addr_wb;
 
     always @(posedge clk) begin
@@ -152,26 +147,27 @@ module mvp_core #(
         .stall      (stall        )
     );
 
-    regfile #(
-        .ADDR_WIDTH (REG_ADDR_WIDTH ),
-        .DEPTH      (REG_BANK_DEPTH ),
-        .DATA_WIDTH (DATA_WIDTH     )
-    ) regfile_inst (
-        .clk        (clk            ),
-        .rst_n      (rst_n          ),
-        // Write Port
-        .wen        (reg_we_wb      ),
-        .addr_w     (vd_addr_wb     ),
-        .data_w     (reg_wdata_wb[0]),
-        // Read Ports
-        .addr_r1    (vs1_addr_id    ),
-        .data_r1    (rs1_data_id    ),
-        .addr_r2    (vs2_addr_id    ),
-        .data_r2    (rs2_data_id    ),
-        .addr_r3    (vs3_addr_id    ),
-        .data_r3    (rs3_data_id    )
-    );
+    // regfile #(
+    //     .ADDR_WIDTH (REG_ADDR_WIDTH ),
+    //     .DEPTH      (REG_BANK_DEPTH ),
+    //     .DATA_WIDTH (DATA_WIDTH     )
+    // ) regfile_inst (
+    //     .clk        (clk            ),
+    //     .rst_n      (rst_n          ),
+    //     // Write Port
+    //     .wen        (reg_we_wb      ),
+    //     .addr_w     (vd_addr_wb     ),
+    //     .data_w     (reg_wdata_wb[0]),
+    //     // Read Ports
+    //     .addr_r1    (vs1_addr_id    ),
+    //     .data_r1    (rs1_data_id    ),
+    //     .addr_r2    (vs2_addr_id    ),
+    //     .data_r2    (rs2_data_id    ),
+    //     .addr_r3    (vs3_addr_id    ),
+    //     .data_r3    (rs3_data_id    )
+    // );
 
+    // FIXME: Don't write when en is low
     vrf #(
         .ADDR_WIDTH (REG_ADDR_WIDTH         ),
         .DEPTH      (REG_BANK_DEPTH         ),
@@ -193,79 +189,83 @@ module mvp_core #(
     );
 
     //=======================================================
-    // Execute Stage
+    // Execute Stages
     //=======================================================
 
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] operand_a;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] operand_b;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] operand_c;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out_ex2;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out_ex3;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out_wb;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vfpu_out_ex4;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vfpu_out_wb;
     logic [             8:0][DATA_WIDTH-1:0] mat_out_wb;
-    logic                   [DATA_WIDTH-1:0] mfu_out_ex3;
     logic                   [DATA_WIDTH-1:0] mfu_out_ex4;
     logic                   [DATA_WIDTH-1:0] mfu_out_wb;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] permute_ex2;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] permute_ex3;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] permute_ex4;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] permute_wb;
+    logic [             7:0]                 status_inst;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] stage2_forward;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] stage3_forward;
+    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] stage4_forward;
+
+    assign stage2_forward = vec_out_ex2;
+    assign stage3_forward = op_sel_ex3[3] ? mem_rdata_ex3 : vec_out_ex3;
 
     always_comb begin
-        case (op_sel_ex3)
-            4'b0001: reg_wdata_ex3 = vec_out_ex3;
-            4'b0100: reg_wdata_ex3 = mfu_out_ex3;
-            4'b1000: reg_wdata_ex3 = mem_rdata_ex3;
-            default: reg_wdata_ex3 = permute_ex3;
-        endcase
-
         case (op_sel_ex4)
-            4'b0001: reg_wdata_ex4 = vec_out_ex4;
-            4'b0100: reg_wdata_ex4 = mfu_out_ex4;
-            4'b1000: reg_wdata_ex4 = mem_rdata_ex4;
-            default: reg_wdata_ex4 = permute_ex4;
+            4'b0001: stage4_forward = vfpu_out_ex4;
+            4'b0100: stage4_forward = mfu_out_ex4;
+            4'b1000: stage4_forward = mem_rdata_ex4;
+            default: stage4_forward = vec_out_ex4;
         endcase
     end
 
-    assign operand_a = ((vs1_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && ~|op_sel_ex2)   ? permute_ex2   : 
-                       ((vs1_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && ~op_sel_ex3[1]) ? reg_wdata_ex3 :
-                       ((vs1_addr_ex1 == vd_addr_ex4) && reg_we_ex4 && ~op_sel_ex4[1]) ? reg_wdata_ex4 :
-                       ((vs1_addr_ex1 == vd_addr_wb) && reg_we_wb) ? reg_wdata_wb : vs1_data_ex1;
-    assign operand_b = ((vs2_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && ~|op_sel_ex2)   ? permute_ex2   : 
-                       ((vs2_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && ~op_sel_ex3[1]) ? reg_wdata_ex3 :
-                       ((vs2_addr_ex1 == vd_addr_ex4) && reg_we_ex4 && ~op_sel_ex4[1]) ? reg_wdata_ex4 :
-                       ((vs2_addr_ex1 == vd_addr_wb) && reg_we_wb) ? reg_wdata_wb : vs2_data_ex1;
-    assign operand_c = ((vs3_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && ~|op_sel_ex2)   ? permute_ex2   : 
-                       ((vs3_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && ~op_sel_ex3[1]) ? reg_wdata_ex3 :
-                       ((vs3_addr_ex1 == vd_addr_ex4) && reg_we_ex4 && ~op_sel_ex4[1]) ? reg_wdata_ex4 :
-                       ((vs3_addr_ex1 == vd_addr_wb) && reg_we_wb) ? reg_wdata_wb : vs3_data_ex1;
+    assign operand_a = ((vs1_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && ~|op_sel_ex2)      ? stage2_forward : 
+                       ((vs1_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && ~|op_sel_ex3[2:0]) ? stage3_forward :
+                       ((vs1_addr_ex1 == vd_addr_ex4) && reg_we_ex4 && ~op_sel_ex4[1])    ? stage4_forward :
+                       ((vs1_addr_ex1 == vd_addr_wb) && reg_we_wb)                        ? reg_wdata_wb   : vs1_data_ex1;
+    assign operand_b = ((vs2_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && ~|op_sel_ex2)      ? stage2_forward : 
+                       ((vs2_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && ~|op_sel_ex3[2:0]) ? stage3_forward :
+                       ((vs2_addr_ex1 == vd_addr_ex4) && reg_we_ex4 && ~op_sel_ex4[1])    ? stage4_forward :
+                       ((vs2_addr_ex1 == vd_addr_wb) && reg_we_wb)                        ? reg_wdata_wb   : vs2_data_ex1;
+    assign operand_c = ((vs3_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && ~|op_sel_ex2)      ? stage2_forward : 
+                       ((vs3_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && ~|op_sel_ex3[2:0]) ? stage3_forward :
+                       ((vs3_addr_ex1 == vd_addr_ex4) && reg_we_ex4 && ~op_sel_ex4[1])    ? stage4_forward :
+                       ((vs3_addr_ex1 == vd_addr_wb) && reg_we_wb)                        ? reg_wdata_wb   : vs3_data_ex1;
 
     vector_unit #(
         .SIG_WIDTH      (SIG_WIDTH      ),
         .EXP_WIDTH      (EXP_WIDTH      ),
         .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
-        .VECTOR_LANES   (VECTOR_LANES   ),
-        .NUM_STAGES     (2              )
+        .VECTOR_LANES   (VECTOR_LANES   )
     ) vector_unit_inst (
         .clk            (clk            ),
+        .en             (~|op_sel_ex1   ),
+        .vec_a          (operand_a      ),
+        .vec_b          (operand_b      ),
+        .rnd            (3'b0           ),
+        .opcode         (opcode_ex1     ),
+        .funct          (funct3_ex1     ),
+        .vec_out        (vec_out_ex2    )
+    );
+
+    vfpu #(
+        .SIG_WIDTH      (SIG_WIDTH      ),
+        .EXP_WIDTH      (EXP_WIDTH      ),
+        .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
+        .VECTOR_LANES   (VECTOR_LANES   ),
+        .NUM_STAGES     (3              )
+    ) vfpu_inst (
+        .clk            (clk            ),
+        .en             (op_sel_ex1[0]  ),
         .vec_a          (operand_a      ),
         .vec_b          (operand_b      ),
         .vec_c          (operand_c      ),
         .rnd            (3'b0           ),
         .opcode         (opcode_ex1     ),
         .funct          (funct3_ex1     ),
-        .en             (op_sel_ex1[0]  ),
-        .vec_out        (vec_out_ex3    )
-    );
-
-    vector_permute #(
-        .DATA_WIDTH     (DATA_WIDTH     ),
-        .VECTOR_LANES   (VECTOR_LANES   )
-    ) vector_permute_inst (
-        .clk            (clk            ),
-        .vec_in         (operand_a      ),
-        .funct          (funct3_ex1     ),
-        .vec_out        (permute_ex2    )
+        .vec_out        (vfpu_out_ex4   )
     );
 
     dot_product_unit #(
@@ -276,27 +276,28 @@ module mvp_core #(
         .NUM_STAGES     (4              )
     ) dp_unit_inst (
         .clk            (clk            ),
+        .en             (op_sel_ex1[1]  ),
         .vec_a          (operand_a[8:0] ),
         .vec_b          (operand_b[8:0] ),
         .vec_c          (operand_c[8:0] ),
-        .funct          (funct3_ex1     ),
         .rnd            (3'b0           ),
-        .en             (op_sel_ex1[1]  ),
+        .funct          (funct3_ex1     ),
         .vec_out        (mat_out_wb     )
     );
 
-    multifunc_unit #(
+    DW_lp_fp_multifunc_DG_inst_pipe #(
         .SIG_WIDTH      (SIG_WIDTH      ),
         .EXP_WIDTH      (EXP_WIDTH      ),
         .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
-        .NUM_STAGES     (2              )
+        .NUM_STAGES     (3              )
     ) mfu_inst (
-        .clk            (clk            ),
-        .data_in        (operand_a[0]   ),
-        .funct          (funct3_ex1     ),
-        .rnd            (3'b0           ),
-        .en             (op_sel_ex1[2]  ),
-        .data_out       (mfu_out_ex3    )
+        .inst_clk       (clk            ),
+        .inst_a         (operand_a[0]   ),
+        .inst_func      (funct3_ex1     ),
+        .inst_rnd       (3'b0           ),
+        .inst_DG_ctrl   (op_sel_ex1[2]  ),
+        .z_inst         (mfu_out_ex4    ),
+        .status_inst    (status_inst    )
     );
 
     //=======================================================
@@ -315,11 +316,11 @@ module mvp_core #(
 
     always_comb begin
         case (op_sel_wb)
-            4'b0001: reg_wdata_wb = vec_out_wb;
+            4'b0001: reg_wdata_wb = vfpu_out_wb;
             4'b0010: reg_wdata_wb = mat_out_wb;
             4'b0100: reg_wdata_wb = mfu_out_wb;
             4'b1000: reg_wdata_wb = mem_rdata_wb;
-            default: reg_wdata_wb = permute_wb;
+            default: reg_wdata_wb = vec_out_wb;
         endcase
     end
 
@@ -352,14 +353,11 @@ module mvp_core #(
             op_sel_ex4 <= '0;
             op_sel_wb  <= '0;
 
-            permute_ex3 <= '0;
-            permute_ex4 <= '0;
-            permute_wb  <= '0;
-
+            vec_out_ex3 <= '0;
             vec_out_ex4 <= '0;
             vec_out_wb  <= '0;
 
-            mfu_out_ex4 <= '0;
+            vfpu_out_wb <= '0;
             mfu_out_wb  <= '0;
 
             reg_we_ex1 <= '0;
@@ -375,7 +373,7 @@ module mvp_core #(
             mem_rdata_ex4 <= '0;
             mem_rdata_wb  <= '0;
         end
-        else if (en_pl) begin
+        else if (en && (en_q || pc != 0)) begin
             vs1_addr_ex1 <= vs1_addr_id;
             vs2_addr_ex1 <= vs2_addr_id;
             vs3_addr_ex1 <= vs3_addr_id;
@@ -399,14 +397,11 @@ module mvp_core #(
             op_sel_ex4 <= op_sel_ex3;
             op_sel_wb  <= op_sel_ex4;
 
-            permute_ex3 <= permute_ex2;
-            permute_ex4 <= permute_ex3;
-            permute_wb  <= permute_ex4;
-
+            vec_out_ex3 <= vec_out_ex2;
             vec_out_ex4 <= vec_out_ex3;
             vec_out_wb  <= vec_out_ex4;
 
-            mfu_out_ex4 <= mfu_out_ex3;
+            vfpu_out_wb <= vfpu_out_ex4;
             mfu_out_wb  <= mfu_out_ex4;
 
             reg_we_ex1 <= reg_we_id && ~stall;

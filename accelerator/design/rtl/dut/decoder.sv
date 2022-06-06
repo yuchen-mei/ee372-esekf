@@ -1,7 +1,7 @@
 module decoder (
     input  logic [31:0] instr,
 
-    output logic  [3:0] vfu_opcode,
+    output logic  [4:0] vfu_opcode,
     output logic  [4:0] vd_addr,
     output logic  [4:0] vs1_addr,
     output logic  [4:0] vs2_addr,
@@ -53,26 +53,27 @@ module decoder (
 
     always_comb begin
         case ({opcode, funct6})
-            {`OP_V, `VFADD}:   vfu_opcode = `VFU_ADD;
-            {`OP_V, `VFSUB}:   vfu_opcode = `VFU_SUB;
-            {`OP_V, `VFMIN}:   vfu_opcode = `VFU_MIN;
-            {`OP_V, `VFMAX}:   vfu_opcode = `VFU_MAX;
-            {`OP_V, `VFSGNJ}:  vfu_opcode = `VFU_SGNJ;
-            {`OP_V, `VFSGNJN}: vfu_opcode = `VFU_SGNJN;
-            {`OP_V, `VFSGNJX}: vfu_opcode = `VFU_SGNJX;
-            {`OP_V, `VMFEQ}:   vfu_opcode = `VFU_EQ;
-            {`OP_V, `VMFLE}:   vfu_opcode = `VFU_LE;
-            {`OP_V, `VMFLT}:   vfu_opcode = `VFU_LT;
-            {`OP_V, `VFMUL}:   vfu_opcode = `VFU_MUL;
-            {`OP_V, `VFMADD}:  vfu_opcode = `VFU_FMA;
-            {`OP_V, `VFNMADD}: vfu_opcode = `VFU_FNMA;
-            {`OP_V, `VFMSUB}:  vfu_opcode = `VFU_FMS;
-            {`OP_V, `VFNMSUB}: vfu_opcode = `VFU_FNMS;
-            {`OP_V, `VFMACC}:  vfu_opcode = `VFU_FMA;
-            {`OP_V, `VFNMACC}: vfu_opcode = `VFU_FNMA;
-            {`OP_V, `VFMSAC}:  vfu_opcode = `VFU_FMS;
-            {`OP_V, `VFNMSAC}: vfu_opcode = `VFU_FNMS;
-            default:           vfu_opcode = `VFU_ADD;
+            {`OP_V, `VFADD}:    vfu_opcode = `VFU_ADD;
+            {`OP_V, `VFSUB}:    vfu_opcode = `VFU_SUB;
+            {`OP_V, `VFMIN}:    vfu_opcode = `VFU_MIN;
+            {`OP_V, `VFMAX}:    vfu_opcode = `VFU_MAX;
+            {`OP_V, `VFSGNJ}:   vfu_opcode = `VFU_SGNJ;
+            {`OP_V, `VFSGNJN}:  vfu_opcode = `VFU_SGNJN;
+            {`OP_V, `VFSGNJX}:  vfu_opcode = `VFU_SGNJX;
+            {`OP_V, `VMFEQ}:    vfu_opcode = `VFU_EQ;
+            {`OP_V, `VMFLE}:    vfu_opcode = `VFU_LE;
+            {`OP_V, `VMFLT}:    vfu_opcode = `VFU_LT;
+            {`OP_V, `VFMUL}:    vfu_opcode = `VFU_MUL;
+            {`OP_V, `VFMADD}:   vfu_opcode = `VFU_FMA;
+            {`OP_V, `VFNMADD}:  vfu_opcode = `VFU_FNMA;
+            {`OP_V, `VFMSUB}:   vfu_opcode = `VFU_FMS;
+            {`OP_V, `VFNMSUB}:  vfu_opcode = `VFU_FNMS;
+            {`OP_V, `VFMACC}:   vfu_opcode = `VFU_FMA;
+            {`OP_V, `VFNMACC}:  vfu_opcode = `VFU_FNMA;
+            {`OP_V, `VFMSAC}:   vfu_opcode = `VFU_FMS;
+            {`OP_V, `VFNMSAC}:  vfu_opcode = `VFU_FNMS;
+            {`OP_V, `VFUNARY0}: vfu_opcode = `VPERMUTE;
+            default:            vfu_opcode = `VFU_ADD;
         endcase
 
         case (opcode)
@@ -83,7 +84,7 @@ module decoder (
             default:  op_sel = 4'b0000;
         endcase
 
-        if ((opcode == `OP_V) && (funct6 == `VSMUL)) begin
+        if (|vfu_opcode[4:3]) begin
             op_sel = 4'b0;
         end
     end
@@ -98,8 +99,8 @@ module decoder (
     assign stage1_dependency = (vs1_addr == vd_addr_ex1 || vs2_addr == vd_addr_ex1 || vs3_addr == vd_addr_ex1) && reg_we_ex1;
     assign stage2_dependency = (vs1_addr == vd_addr_ex2 || vs2_addr == vd_addr_ex2 || vs3_addr == vd_addr_ex2) && reg_we_ex2;
     assign stage3_dependency = (vs1_addr == vd_addr_ex3 || vs2_addr == vd_addr_ex3 || vs3_addr == vd_addr_ex3) && reg_we_ex3;
-    assign stall = (stage1_dependency && |op_sel_ex1)   ||
-                   (stage2_dependency && op_sel_ex2[1]) ||
+    assign stall = (stage1_dependency && |op_sel_ex1)      ||
+                   (stage2_dependency && |op_sel_ex2[2:0]) ||
                    (stage3_dependency && op_sel_ex3[1]);
 
 endmodule

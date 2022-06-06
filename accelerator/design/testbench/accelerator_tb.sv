@@ -172,7 +172,7 @@ module accelerator_tb;
     initial begin
         $fsdbDumpfile("outputs/run.fsdb");
         $fsdbDumpvars(0, accelerator_tb);
-        #20000;
+        #10000;
         $finish(2);
     end
 

@@ -1,0 +1,44 @@
+build_dir: 11-rtl-sim
+build_id: '11'
+commands:
+- ./run.sh
+edges_i:
+  design.args:
+  - f: design.args
+    step: 10-testbench
+  design.vcs.v:
+  - f: design.vcs.v
+    step: 6-rtl
+  input_data.txt:
+  - f: input_data.txt
+    step: 10-testbench
+  instr_data.txt:
+  - f: instr_data.txt
+    step: 10-testbench
+  sky130_sram_1kbyte_1rw1r_32x256_8.v:
+  - f: sky130_sram_1kbyte_1rw1r_32x256_8.v
+    step: 8-sram
+  testbench.sv:
+  - f: testbench.sv
+    step: 10-testbench
+edges_o:
+  run.vcd:
+  - f: run.vcd
+    step: 12-gen-saif-rtl
+inputs:
+- adk
+- design.vcs.v
+- testbench.sv
+- design.sdf
+- design.args
+- instr_data.txt
+- input_data.txt
+- sky130_sram_1kbyte_1rw1r_32x256_8.v
+name: rtl-sim
+outputs:
+- run.vcd
+parameters:
+  dut_name: accelerator_inst
+  testbench_name: accelerator_tb
+  waveform: true
+source: /home/users/jeffreyy/ee372/skywater-digital-flow/accelerator/design/synopsys-vcs-sim

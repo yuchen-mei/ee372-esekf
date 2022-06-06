@@ -1,0 +1,16 @@
+build_dir: 0-constraints
+build_id: '0'
+commands:
+- cat constraints.tcl > outputs/constraints.tcl
+edges_i: {}
+edges_o:
+  constraints.tcl:
+  - f: constraints.tcl
+    step: 13-synopsys-dc-synthesis
+name: constraints
+outputs:
+- constraints.tcl
+parameters:
+  clock_period: 20.0
+  design_name: accelerator
+source: /home/users/jeffreyy/ee372/skywater-digital-flow/accelerator/design/constraints

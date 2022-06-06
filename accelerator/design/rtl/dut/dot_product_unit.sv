@@ -3,7 +3,7 @@ module dot_product_unit #(
     parameter EXP_WIDTH       = 8,
     parameter IEEE_COMPLIANCE = 0,
     parameter VECTOR_LANES    = 16,
-    parameter NUM_STAGES      = 2,
+    parameter NUM_STAGES      = 3,
     parameter DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
 ) (
     input  logic                                    clk,
@@ -20,11 +20,8 @@ module dot_product_unit #(
     logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] dp4_dot_in;
     logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] dp4_qmul_in;
     logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] dp4_rot_in;
-    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] dp4_in;
-
-    logic [VECTOR_LANES-1:0][           7:0] status_inst;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] z_inst_pipe1, z_inst_pipe2, z_inst_pipe3, z_inst_pipe4;
-    logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] z_inst;
+    logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] inst_dp4;
+    logic [VECTOR_LANES-1:0][7:0]                 status_inst;
 
     // 3x3x3 matrix multiply-accumulate
     for (genvar i = 0; i < 3; i = i + 1) begin: col
@@ -85,46 +82,35 @@ module dot_product_unit #(
 
     always_comb begin
         case (funct)
-            3'b000:  dp4_in = dp4_mat_in;
-            3'b001:  dp4_in = dp4_dot_in;
-            3'b010:  dp4_in = dp4_qmul_in;
-            3'b011:  dp4_in = dp4_rot_in;
-            default: dp4_in = '0;
+            3'b000:  inst_dp4 = dp4_mat_in;
+            3'b001:  inst_dp4 = dp4_dot_in;
+            3'b010:  inst_dp4 = dp4_qmul_in;
+            3'b011:  inst_dp4 = dp4_rot_in;
+            default: inst_dp4 = '0;
         endcase
     end
 
     for (genvar i = 0; i < VECTOR_LANES; i = i + 1) begin
-        DW_fp_dp4 #(
-            .sig_width      (SIG_WIDTH      ),
-            .exp_width      (EXP_WIDTH      ),
-            .ieee_compliance(IEEE_COMPLIANCE),
-            .arch_type      (1              )
-        ) DW_fp_dp4_inst (
-            .a              (dp4_in[i][0]   ),
-            .b              (dp4_in[i][1]   ),
-            .c              (dp4_in[i][2]   ),
-            .d              (dp4_in[i][3]   ),
-            .e              (dp4_in[i][4]   ),
-            .f              (dp4_in[i][5]   ),
-            .g              (dp4_in[i][6]   ),
-            .h              (dp4_in[i][7]   ),
-            .rnd            (rnd            ),
-            .z              (z_inst[i]      ),
-            .status         (status_inst[i] )
+        DW_fp_dp4_inst_pipe #(
+            .SIG_WIDTH      (SIG_WIDTH      ),
+            .EXP_WIDTH      (EXP_WIDTH      ),
+            .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
+            .ARCH_TYPE      (1              ),
+            .NUM_STAGES     (NUM_STAGES     )
+        ) DW_lp_fp_dp4_inst (
+            .inst_clk       (clk            ),
+            .inst_a         (inst_dp4[i][0] ),
+            .inst_b         (inst_dp4[i][1] ),
+            .inst_c         (inst_dp4[i][2] ),
+            .inst_d         (inst_dp4[i][3] ),
+            .inst_e         (inst_dp4[i][4] ),
+            .inst_f         (inst_dp4[i][5] ),
+            .inst_g         (inst_dp4[i][6] ),
+            .inst_h         (inst_dp4[i][7] ),
+            .inst_rnd       (rnd            ),
+            .z_inst         (vec_out[i]     ),
+            .status_inst    (status_inst[i] )
         );
     end
-
-    // assign vec_out = z_inst;
-
-    always @(posedge clk) begin
-        z_inst_pipe1 <= z_inst;
-        z_inst_pipe2 <= z_inst_pipe1;
-        z_inst_pipe3 <= z_inst_pipe2;
-        z_inst_pipe4 <= z_inst_pipe3;
-    end
-
-    assign vec_out = (NUM_STAGES == 4) ? z_inst_pipe4 :
-                     (NUM_STAGES == 3) ? z_inst_pipe3 :
-                     (NUM_STAGES == 2) ? z_inst_pipe2 : z_inst_pipe1;
 
 endmodule
