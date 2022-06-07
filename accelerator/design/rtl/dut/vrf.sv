@@ -44,10 +44,7 @@ module vrf #(
             vectors[11] <= '0; // p_cov_32
             vectors[12] <= {32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000, 32'h00000000, 32'h00000000, 32'h00000000, 32'h3f800000}; // p_cov_33
 
-            // Sensor inputs
-            vectors[13] <= {32'hc11d21cc, 32'hbb151d87, 32'h3bbc24c0}; // imu_f
-            vectors[14] <= {32'h3809634f, 32'h382233c6, 32'hba1011be, 32'h3f7ffffd}; // imu_w
-            vectors[15] <= {32'hbd4a4f00, 32'hbe07b428, 32'hbcb943b7}; // gnss
+            vectors[15:13] <= '{default:0};
 
             // Constants
             vectors[16] <= 32'h348637bd; // var_imu * t^2

@@ -24,8 +24,8 @@ module dot_product_unit #(
     logic [VECTOR_LANES-1:0][7:0]                 status_inst;
 
     // 3x3x3 matrix multiply-accumulate
-    for (genvar i = 0; i < 3; i = i + 1) begin: col
-        for (genvar j = 0; j < 3; j = j + 1) begin: row
+    for (genvar i = 0; i < 3; i = i + 1) begin: mat_col
+        for (genvar j = 0; j < 3; j = j + 1) begin: mat_row
             assign dp4_mat_in[3*i+j][0] = vec_a[j];
             assign dp4_mat_in[3*i+j][1] = vec_b[3*i];
             assign dp4_mat_in[3*i+j][2] = vec_a[3+j];
@@ -73,6 +73,8 @@ module dot_product_unit #(
 
     if (VECTOR_LANES > 4) begin
         assign dp4_qmul_in[VECTOR_LANES-1:4] = '0;
+        assign dp4_dot_in[3:1] = '0;
+        assign dp4_dot_in[8:5] = '0;
     end
 
     if (VECTOR_LANES > 9) begin

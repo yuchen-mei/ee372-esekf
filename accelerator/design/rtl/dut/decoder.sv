@@ -13,7 +13,7 @@ module decoder (
     output logic        reg_we,
 
     output logic        mem_we,
-    output logic [15:0] mem_addr,
+    output logic [11:0] mem_addr,
 
     input  logic  [4:0] vd_addr_ex1,
     input  logic  [4:0] vd_addr_ex2,
@@ -77,9 +77,9 @@ module decoder (
         endcase
 
         case (opcode)
-            `OP_V:    op_sel = 4'b0001;
-            `OP_M:    op_sel = 4'b0010;
-            `OP_FP:   op_sel = 4'b0100;
+            `OP_FP:   op_sel = 4'b0001;
+            `OP_V:    op_sel = 4'b0010;
+            `OP_M:    op_sel = 4'b0100;
             `LOAD_FP: op_sel = 4'b1000;
             default:  op_sel = 4'b0000;
         endcase
@@ -90,7 +90,7 @@ module decoder (
     end
 
     // Load and Store
-    assign mem_addr = instr[31:16];
+    assign mem_addr = instr[31:20];
     assign mem_we   = (opcode == `STORE_FP);
     assign reg_we   = ~mem_we;
 
@@ -101,7 +101,7 @@ module decoder (
     assign stage3_dependency = (vs1_addr == vd_addr_ex3 || vs2_addr == vd_addr_ex3 || vs3_addr == vd_addr_ex3) && reg_we_ex3;
     assign stall = (stage1_dependency && |op_sel_ex1)      ||
                    (stage2_dependency && |op_sel_ex2[2:0]) ||
-                   (stage3_dependency && op_sel_ex3[1]);
+                   (stage3_dependency && op_sel_ex3[2]);
 
 endmodule
 
