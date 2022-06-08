@@ -178,7 +178,7 @@ module user_proj_example #(
     
     // assign io outputs to top level
     for (genvar i = 20; i < 28; i = i + 1) begin
-        assign io_out[i] = output_data_w[i];
+        assign io_out[i] = output_data_w[i-20];
     end
     assign io_out[28] = output_vld_w;
     assign io_out[29] = input_rdy_w;
