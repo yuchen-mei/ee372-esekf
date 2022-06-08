@@ -24,17 +24,6 @@ def construct():
   adk_view = 'view-standard'
 
   parameters = {
-<<<<<<< Updated upstream
-    'construct_path' : __file__,
-    'design_name'    : 'accelerator',
-    'clock_period'   : 20.0,
-    'adk'            : adk_name,
-    'adk_view'       : adk_view,
-    'topographical'  : True,
-    'testbench_name' : 'accelerator_tb',
-    'saif_instance'  : 'accelerator_tb/accelerator_inst',
-    'dut_name'       : 'accelerator_inst'
-=======
     'construct_path'      : __file__,
     'design_name'         : 'user_proj_example',
     'clock_period'        : 20.0,
@@ -46,7 +35,6 @@ def construct():
     'dut_name'            : 'user_proj_example_inst',
     'setup_target_slack'  : 1.000,
     'hold_target_slack'   : 0.005
->>>>>>> Stashed changes
   }
 
   #-----------------------------------------------------------------------
