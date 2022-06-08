@@ -100,4 +100,3 @@ write_sdf -significant_digits 6 design.sdf
 save_session $::env(design_name)_session
 
 exit
-

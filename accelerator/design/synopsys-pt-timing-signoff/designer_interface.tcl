@@ -30,4 +30,3 @@ set pt_sdc                      [lsort [glob -nocomplain inputs/*.pt.sdc]]
 set pt_spef                     [lsort [glob -nocomplain inputs/*.spef.gz]]
 
 puts "done"
-

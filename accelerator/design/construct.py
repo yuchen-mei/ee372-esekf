@@ -24,6 +24,7 @@ def construct():
   adk_view = 'view-standard'
 
   parameters = {
+<<<<<<< Updated upstream
     'construct_path' : __file__,
     'design_name'    : 'accelerator',
     'clock_period'   : 20.0,
@@ -33,6 +34,19 @@ def construct():
     'testbench_name' : 'accelerator_tb',
     'saif_instance'  : 'accelerator_tb/accelerator_inst',
     'dut_name'       : 'accelerator_inst'
+=======
+    'construct_path'      : __file__,
+    'design_name'         : 'user_proj_example',
+    'clock_period'        : 20.0,
+    'adk'                 : adk_name,
+    'adk_view'            : adk_view,
+    'topographical'       : True,
+    'testbench_name'      : 'user_proj_example_tb',
+    'saif_instance'       : 'user_proj_example_tb/user_proj_example_inst',
+    'dut_name'            : 'user_proj_example_inst',
+    'setup_target_slack'  : 1.000,
+    'hold_target_slack'   : 0.005
+>>>>>>> Stashed changes
   }
 
   #-----------------------------------------------------------------------
@@ -66,6 +80,11 @@ def construct():
   # layer
   
   power           = Step( this_dir + '/cadence-innovus-power'           ) 
+  place           = Step( this_dir + '/cadence-innovus-place'           )
+  cts             = Step( this_dir + '/cadence-innovus-cts'             )
+  postcts_hold    = Step( this_dir + '/cadence-innovus-postcts_hold'    )
+  route           = Step( this_dir + '/cadence-innovus-route'           )
+  postroute       = Step( this_dir + '/cadence-innovus-postroute'       )
 
   # Signoff is custom because it has to output def that the default step does
   # not do. This is because we use the def instead of gds for generating spice
@@ -114,11 +133,11 @@ def construct():
 
   iflow           = Step( 'cadence-innovus-flowsetup',     default=True )
   init            = Step( 'cadence-innovus-init',          default=True )
-  place           = Step( 'cadence-innovus-place',         default=True )
-  cts             = Step( 'cadence-innovus-cts',           default=True )
-  postcts_hold    = Step( 'cadence-innovus-postcts_hold',  default=True )
-  route           = Step( 'cadence-innovus-route',         default=True )
-  postroute       = Step( 'cadence-innovus-postroute',     default=True )
+  # place           = Step( 'cadence-innovus-place',         default=True )
+  # cts             = Step( 'cadence-innovus-cts',           default=True )
+  # postcts_hold    = Step( 'cadence-innovus-postcts_hold',  default=True )
+  # route           = Step( 'cadence-innovus-route',         default=True )
+  # postroute       = Step( 'cadence-innovus-postroute',     default=True )
   gdsmerge        = Step( 'mentor-calibre-gdsmerge',       default=True )
   
   gen_saif        = Step( 'synopsys-vcd2saif-convert',     default=True )
@@ -317,7 +336,7 @@ def construct():
   # Timing signoff
   g.connect( signoff.o('design.spef.gz'),   pt_timing.i('design.spef.gz' ) )
   g.connect( signoff.o('design.vcs.v'  ),   pt_timing.i('design.vcs.v'   ) )
-  g.connect( dc.o(     'design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
+  g.connect( signoff.o('design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
 
   # Gate level simulation
   g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i(      'design.vcs.v'     ) )
