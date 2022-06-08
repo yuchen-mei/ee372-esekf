@@ -6,7 +6,7 @@
 `define OUTPUT_DATA_SIZE 24
 
 `define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 74
+`define NUM_INSTRUCTIONS 76
 
 `define DATA_WIDTH 32
 `define ADDR_WIDTH 16
@@ -19,7 +19,7 @@
 module user_proj_example_tb;
 
     // design top variables
-        reg clk;
+    reg clk;
     reg rst_n;
 
     reg [`ADDR_WIDTH - 1 : 0] config_adr_r;
@@ -67,16 +67,12 @@ module user_proj_example_tb;
     // connect to io_in[19:0]
     assign io_in[19] = clk;
     assign io_in[0] = rst_n;
-    for (genvar i = 0; i < 16; i = i + 1) begin
-        assign io_in[i + 1] = input_data_r[i];
-    end
+    assign io_in[16:1] = input_data_r[15:0]; 
     assign io_in[17] = input_rdy_w & input_vld_r;
     assign io_in[18] = output_rdy_r;
 
     // connect to io_out[27:20]
-    for (genvar i = 20; i < 28; i = i + 1) begin
-        assign output_data_w[i-20] = io_out[i];
-    end
+    assign output_data_w[7:0] = io_out[27:20];
     assign output_vld_w = io_out[28];
     assign input_rdy_w = io_out[29];
 
