@@ -79,7 +79,7 @@ module mvp_core #(
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_wb;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_wb;
-    logic [  ADDR_WIDTH-1:0]                 jr_pc_id;
+    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_id;
     logic                                    jump_reg_id;
 
     assign data_out     = reg_wdata_wb;
@@ -110,42 +110,44 @@ module mvp_core #(
         // .branch_offset (branch_offset_id),
 
         .jump_reg      (jump_reg_id   ),
-        .jr_pc         (mem_addr_id   ),
+        .jr_pc         (jr_pc_id      ),
 
         .pc            (pc            )
     );
+
+    assign jr_pc_id = mem_addr_id[INSTR_MEM_ADDR_WIDTH-1:0];
 
     //=======================================================
     // Instruction Decode Stage
     //=======================================================
 
     decoder decoder_inst (
-        .instr      (instr        ),
+        .instr        (instr        ),
         // Registers and immediate
-        .vd_addr    (vd_addr_id   ),
-        .vs1_addr   (vs1_addr_id  ),
-        .vs2_addr   (vs2_addr_id  ),
-        .vs3_addr   (vs3_addr_id  ),
-        .mem_addr   (mem_addr_id  ),
+        .vd_addr      (vd_addr_id   ),
+        .vs1_addr     (vs1_addr_id  ),
+        .vs2_addr     (vs2_addr_id  ),
+        .vs3_addr     (vs3_addr_id  ),
+        .mem_addr     (mem_addr_id  ),
         // Control signals
-        .func_sel   (opcode_id    ),
-        .funct3     (funct3_id    ),
-        .wb_sel     (wb_sel_id    ),
-        .masking    (             ),
-        .mem_we     (mem_we_id    ),
-        .reg_we     (reg_we_id    ),
-        .jump       (jump_reg_id  ),
+        .func_sel     (opcode_id    ),
+        .funct3       (funct3_id    ),
+        .wb_sel       (wb_sel_id    ),
+        .masking      (             ),
+        .mem_we       (mem_we_id    ),
+        .reg_we       (reg_we_id    ),
+        .jump         (jump_reg_id  ),
         // Stalling logic
-        .vd_addr_ex1(vd_addr_ex1  ),
-        .vd_addr_ex2(vd_addr_ex2  ),
-        .vd_addr_ex3(vd_addr_ex3  ),
-        .reg_we_ex1 (reg_we_ex1   ),
-        .reg_we_ex2 (reg_we_ex2   ),
-        .reg_we_ex3 (reg_we_ex3   ),
-        .wb_sel_ex1 (wb_sel_ex1   ),
-        .wb_sel_ex2 (wb_sel_ex2   ),
-        .wb_sel_ex3 (wb_sel_ex3   ),
-        .stall      (stall        )
+        .vd_addr_ex1  (vd_addr_ex1  ),
+        .vd_addr_ex2  (vd_addr_ex2  ),
+        .vd_addr_ex3  (vd_addr_ex3  ),
+        .reg_we_ex1   (reg_we_ex1   ),
+        .reg_we_ex2   (reg_we_ex2   ),
+        .reg_we_ex3   (reg_we_ex3   ),
+        .wb_sel_ex1   (wb_sel_ex1   ),
+        .wb_sel_ex2   (wb_sel_ex2   ),
+        .wb_sel_ex3   (wb_sel_ex3   ),
+        .stall        (stall        )
     );
 
     // regfile #(
@@ -168,7 +170,6 @@ module mvp_core #(
     //     .data_r3    (rs3_data_id    )
     // );
 
-    // FIXME: Don't write when en is low
     vrf #(
         .ADDR_WIDTH (REG_ADDR_WIDTH         ),
         .DEPTH      (REG_BANK_DEPTH         ),
