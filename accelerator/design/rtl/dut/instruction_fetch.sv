@@ -4,10 +4,9 @@ module instruction_fetch #(
     input  logic clk,
     input  logic rst_n,
     input  logic en,
-    // input jump_target,
-    // input [25:0] instr_id,  // Lower 26 bits of the instruction
+    input  logic jump_target,
     // input jump_reg,
-    // input [31:0] jr_pc,
+    input  logic [ADDR_WIDTH-1:0] jr_pc,
     // input branch,
     // input [31:0] branch_offset,
     output logic [ADDR_WIDTH-1:0] pc

@@ -14,7 +14,7 @@ outputs:
   - design.args.gls
 
 commands:
-  - cp user_proj_example_tb.sv outputs/testbench.sv
+  - cp accelerator_tb.sv outputs/testbench.sv
   # - python3 generate_test_vectors.py
   - cp instr_data.txt outputs/instr_data.txt
   - cp input_data.txt outputs/input_data.txt

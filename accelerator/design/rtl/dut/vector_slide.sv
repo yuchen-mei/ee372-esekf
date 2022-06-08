@@ -24,10 +24,14 @@ module vector_slide #(
     assign slide2up = shift[1] ? {slide4up[13:0], {2{32'b0}}} : slide4up;
     assign slide1up = shift[0] ? {slide2up[14:0], {1{32'b0}}} : slide1up;
 
-    assign mask1 = shift[3] ? 16'hFF00 : 16'h1;
+    assign mask1 = shift[3] ? 16'hff00 : 16'hffff;
     assign mask2 = shift[2] ? {mask1[11:0], {4{32'b0}}} : mask1;
     assign mask3 = shift[1] ? {mask2[13:0], {2{32'b0}}} : mask2;
     assign mask4 = shift[0] ? {mask3[14:0], {1{32'b0}}} : mask3;
+
+    for (genvar i = 0; i < VECTOR_LANES; i = i + 1) begin
+        assign z_inst[i] = mask4[i] ? slide1up[i] : inst_b[i];
+    end
 
 endmodule
 

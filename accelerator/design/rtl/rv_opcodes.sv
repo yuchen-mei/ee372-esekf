@@ -1,4 +1,5 @@
 // Major Opcodes
+`define JALR     7'b1100111
 `define LOAD_FP  7'b0000111
 `define STORE_FP 7'b0100111
 `define JALR     7'b1100111

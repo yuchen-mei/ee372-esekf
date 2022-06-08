@@ -25,14 +25,14 @@ def construct():
 
   parameters = {
     'construct_path' : __file__,
-    'design_name'    : 'user_proj_example',
+    'design_name'    : 'accelerator',
     'clock_period'   : 20.0,
     'adk'            : adk_name,
     'adk_view'       : adk_view,
     'topographical'  : True,
-    'testbench_name' : 'user_proj_example_tb',
-    'saif_instance'  : 'user_proj_example_tb/user_proj_example_inst',
-    'dut_name'       : 'user_proj_example_inst'
+    'testbench_name' : 'accelerator_tb',
+    'saif_instance'  : 'accelerator_tb/accelerator_inst',
+    'dut_name'       : 'accelerator_inst'
   }
 
   #-----------------------------------------------------------------------

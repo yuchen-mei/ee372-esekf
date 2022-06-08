@@ -79,6 +79,8 @@ module mvp_core #(
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_wb;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_wb;
+    logic [  ADDR_WIDTH-1:0]                 jr_pc_id;
+    logic                                    jump_target_id;
 
     assign data_out     = reg_wdata_wb;
     assign data_out_vld = en && reg_we_wb;
@@ -99,19 +101,18 @@ module mvp_core #(
     instruction_fetch #(
         .ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH)
     ) if_stage (
-        .clk           (clk        ),
-        .rst_n         (rst_n      ),
-        .en            (en & ~stall),
-        // .jump_target   (jump_target_id),
-        // .instr_id      (instr_id[25:0]),
+        .clk           (clk           ),
+        .rst_n         (rst_n         ),
+        .en            (en & ~stall   ),
+        .jump_target   (jump_target_id),
 
         // .branch        (jump_branch_id),
         // .branch_offset (branch_offset_id),
 
-        // .jump_reg      (jump_reg_id),
-        // .jr_pc         (jr_pc_id),
+        // .jump_reg      (jump_reg_id   ),
+        .jr_pc         (jr_pc_id      ),
 
-        .pc            (pc         )
+        .pc            (pc            )
     );
 
     //=======================================================
@@ -295,7 +296,7 @@ module mvp_core #(
         .inst_a         (operand_a[0]   ),
         .inst_func      (funct3_ex1     ),
         .inst_rnd       (3'b0           ),
-        .inst_DG_ctrl   (op_sel_ex1[2]  ),
+        .inst_DG_ctrl   (op_sel_ex1[0]  ),
         .z_inst         (mfu_out_ex4    ),
         .status_inst    (status_inst    )
     );

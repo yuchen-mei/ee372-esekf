@@ -3,10 +3,10 @@
 
 `define TOTAL_INPUT_SIZE 48
 `define INPUT_DATA_SIZE 24
-`define OUTPUT_DATA_SIZE 16
+`define OUTPUT_DATA_SIZE 24
 
 `define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 72
+`define NUM_INSTRUCTIONS 74
 
 `define DATA_WIDTH 32
 `define ADDR_WIDTH 16
@@ -39,9 +39,9 @@ module accelerator_tb;
 
     assign instr_max_wadr_c  = `NUM_INSTRUCTIONS - 1;
     assign input_max_wadr_c  = `INPUT_DATA_SIZE - 1;
-    assign input_wadr_offset = 16'h7d8;
+    assign input_wadr_offset = 16'h7d0;
     assign output_max_adr_c  = `OUTPUT_DATA_SIZE - 1;
-    assign output_adr_offset = 16'h7f0;
+    assign output_adr_offset = 16'h7e8;
 
     reg [7:0] state_r;
     reg counter;

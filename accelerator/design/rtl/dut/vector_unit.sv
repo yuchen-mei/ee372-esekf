@@ -63,6 +63,7 @@ module vector_unit #(
         logic [DATA_WIDTH-1:0] sgnj;
         logic [DATA_WIDTH-1:0] sgnjn;
         logic [DATA_WIDTH-1:0] sgnjx;
+        logic [DATA_WIDTH-1:0] classify;
    
         assign inst_a = (funct == 3'b101) ? vec_a[0] : vec_a[i];
         assign inst_b = vec_b[i];
@@ -89,6 +90,21 @@ module vector_unit #(
         assign sgnj  = {inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
         assign sgnjn = {~inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
         assign sgnjx = {inst_a[DATA_WIDTH-1] ^ inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
+
+        assign zero_frac = inst_a[22:0] == 0;
+        assign zero_exp  = inst_a[30:23] == 0;
+
+        assign classify[0] = (inst_a == 32'hff800000);
+        assign classify[1] = inst_a[31] && (~zero_exp || zero_frac);
+        assign classify[2] = inst_a[31] && (zero_exp && ~zero_frac);
+        assign classify[3] = inst_a[31] && zero_exp && zero_frac;
+        assign classify[4] = ~inst_a[31] && zero_exp && zero_frac;
+        assign classify[5] = ~inst_a[31] && (zero_exp && ~zero_frac);
+        assign classify[6] = ~inst_a[31] && (~zero_exp || zero_frac);
+        assign classify[7] = (inst_a == 32'h7f800000);
+        assign classify[8] = 0; // FIXME: 
+        assign classify[9] = 0; // FIXME: 
+        assign classify[DATA_WIDTH-1:10] = '0;
 
         always @(posedge clk) begin
             case (opcode)
