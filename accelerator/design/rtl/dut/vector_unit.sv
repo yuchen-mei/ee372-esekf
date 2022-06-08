@@ -49,6 +49,9 @@ module vector_unit #(
         endcase
     end
 
+    // TODO: Pass shift amount from rs1 or immediate
+    // vector_slide (.vec_a, .vec_b, .shift(), .vector_slide);
+
     for (genvar i = 0; i < VECTOR_LANES; i = i + 1) begin
         logic [DATA_WIDTH-1:0] inst_a;
         logic [DATA_WIDTH-1:0] inst_b;
@@ -102,8 +105,8 @@ module vector_unit #(
         assign classify[5] = ~inst_a[31] && (zero_exp && ~zero_frac);
         assign classify[6] = ~inst_a[31] && (~zero_exp || zero_frac);
         assign classify[7] = (inst_a == 32'h7f800000);
-        assign classify[8] = 0; // FIXME: 
-        assign classify[9] = 0; // FIXME: 
+        assign classify[8] = 0; // TODO: 
+        assign classify[9] = 0; // TODO: 
         assign classify[DATA_WIDTH-1:10] = '0;
 
         always @(posedge clk) begin

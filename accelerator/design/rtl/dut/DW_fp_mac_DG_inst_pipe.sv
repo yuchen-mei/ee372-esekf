@@ -48,7 +48,8 @@ module DW_fp_mac_DG_inst_pipe #(
 
         //Output to be registered by only allowing 5 pipeline stages to be moved
 
-        z_inst_pipe1 <= z_inst_internal;
+        // FIXME: Implement classify instruction
+        z_inst_pipe1 <= status_inst_internal[2] ? '0 : z_inst_internal;
         z_inst_pipe2 <= z_inst_pipe1;
         z_inst_pipe3 <= z_inst_pipe2;
         z_inst_pipe4 <= z_inst_pipe3;

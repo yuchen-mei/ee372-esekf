@@ -32,9 +32,10 @@ module memory_controller #(
     input  logic [           9*DATA_WIDTH-1:0] mat_inv_in_u
 );
 
-    localparam ADDR_MASK     = 12'h800;
+    localparam DATA_MASK     = 12'h800;
     localparam DATA_ADDR     = 12'h000;
-    localparam TEXT_ADDR     = 12'h800;
+    localparam TEXT_MASK     = 12'he00;
+    localparam TEXT_ADDR     = 12'h800; //800 - 9ff
     localparam IO_ADDR       = 12'ha00;
     localparam INVMAT_ADDR   = 12'ha02;
     localparam INVMAT_L_ADDR = 12'ha03;
@@ -59,11 +60,11 @@ module memory_controller #(
         data_mem_web   = 1'b0;
         data_mem_wmask = '1;
 
-        if ((mem_addr & ADDR_MASK) == DATA_ADDR) begin
+        if ((mem_addr & DATA_MASK) == DATA_ADDR) begin
             data_mem_csb = mem_ren || mem_we;
             data_mem_web = mem_we;
         end
-        else if ((mem_addr & ADDR_MASK) == TEXT_ADDR) begin
+        else if ((mem_addr & TEXT_MASK) == TEXT_ADDR) begin
             instr_mem_csb = mem_ren || mem_we;
             instr_mem_web = mem_we;
         end
@@ -74,10 +75,10 @@ module memory_controller #(
         else if (mem_addr_r == INVMAT_U_ADDR) begin
             mem_rdata = mat_inv_in_u;
         end
-        else if ((mem_addr_r & ADDR_MASK) == DATA_ADDR) begin
+        else if ((mem_addr_r & DATA_MASK) == DATA_ADDR) begin
             mem_rdata = data_mem_rdata;
         end
-        else if ((mem_addr_r & ADDR_MASK) == TEXT_ADDR) begin
+        else if ((mem_addr_r & TEXT_MASK) == TEXT_ADDR) begin
             mem_rdata = instr_mem_rdata;
         end
     end

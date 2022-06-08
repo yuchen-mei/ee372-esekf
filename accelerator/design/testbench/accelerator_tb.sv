@@ -6,7 +6,7 @@
 `define OUTPUT_DATA_SIZE 24
 
 `define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 74
+`define NUM_INSTRUCTIONS 76
 
 `define DATA_WIDTH 32
 `define ADDR_WIDTH 16
@@ -132,7 +132,7 @@ module accelerator_tb;
 
             $display("%t: output_adr_r = %d, output_data_w = %h",
                 $time, output_adr_r, output_data_w);
-        
+
             // $display("%t: output_adr_r = %d, output_data_w = %h, expected output_data_w = %h",
             //     $time, output_adr_r, output_data_w, output_memory[output_adr_r]);
             
