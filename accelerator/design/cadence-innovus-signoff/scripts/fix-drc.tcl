@@ -14,6 +14,9 @@
 # ecoRoute
 
 # get_db base_cells -if {.num_base_pins == 1}
+setSignoffOptMode -fixGlitch true 
+signoffOptDesign -drv
+
 setAnalysisMode -analysisType onChipVariation -cppr both
 setNanoRouteMode -quiet -drouteFixAntenna 1
 setNanoRouteMode -quiet -routeInsertAntennaDiode 1
