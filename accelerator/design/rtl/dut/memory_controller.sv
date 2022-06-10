@@ -32,6 +32,8 @@ module memory_controller #(
     input  logic [           9*DATA_WIDTH-1:0] mat_inv_in_u
 );
 
+    localparam MASK_BITS = DATAPATH/32;
+
     localparam DATA_MASK     = 12'h800;
     localparam DATA_ADDR     = 12'h000;
     localparam TEXT_MASK     = 12'he00;
@@ -51,14 +53,35 @@ module memory_controller #(
     assign instr_mem_wdata = mem_wdata;
 
     assign data_mem_addr  = mem_addr[3+:DATA_MEM_ADDR_WIDTH];
-    assign data_mem_wdata = mem_wdata;
+    // assign data_mem_wdata = mem_wdata;
+    // assign data_mem_wmask = '1;
 
     always_comb begin
-        instr_mem_csb  = 1'b0;
-        instr_mem_web  = 1'b0;
-        data_mem_web   = 1'b0;
-        data_mem_web   = 1'b0;
-        data_mem_wmask = '1;
+        instr_mem_csb = 1'b0;
+        instr_mem_web = 1'b0;
+        data_mem_csb  = 1'b0;
+        data_mem_web  = 1'b0;
+
+        case (width)
+            3'b010:  data_mem_wmask = {1{1'b1}}; // 32
+            3'b011:  data_mem_wmask = {2{1'b1}}; // 64
+            3'b100:  data_mem_wmask = {4{1'b1}}; // 128
+            default: data_mem_wmask = {8{1'b1}}; // 256
+        endcase
+
+        data_mem_wmask <<= mem_addr[2:0];
+
+        unique case (mem_addr[2:0])
+            3'b000:  data_mem_wdata = mem_wdata;
+            3'b001:  data_mem_wdata = mem_wdata << 32;
+            3'b010:  data_mem_wdata = mem_wdata << 64;
+            3'b011:  data_mem_wdata = mem_wdata << 96;
+            3'b100:  data_mem_wdata = mem_wdata << 128;
+            3'b101:  data_mem_wdata = mem_wdata << 160;
+            3'b110:  data_mem_wdata = mem_wdata << 192;
+            3'b111:  data_mem_wdata = mem_wdata << 224;
+            default: data_mem_wdata = '0;
+        endcase
 
         if ((mem_addr & DATA_MASK) == DATA_ADDR) begin
             data_mem_csb = mem_ren || mem_we;
@@ -69,17 +92,17 @@ module memory_controller #(
             instr_mem_web = mem_we;
         end
 
-        if (mem_addr_r == INVMAT_L_ADDR) begin
-            mem_rdata = mat_inv_in_l;
-        end
-        else if (mem_addr_r == INVMAT_U_ADDR) begin
-            mem_rdata = mat_inv_in_u;
-        end
-        else if ((mem_addr_r & DATA_MASK) == DATA_ADDR) begin
+        if ((mem_addr_r & DATA_MASK) == DATA_ADDR) begin
             mem_rdata = data_mem_rdata;
         end
         else if ((mem_addr_r & TEXT_MASK) == TEXT_ADDR) begin
             mem_rdata = instr_mem_rdata;
+        end
+        else if (mem_addr_r == INVMAT_L_ADDR) begin
+            mem_rdata = mat_inv_in_l;
+        end
+        else if (mem_addr_r == INVMAT_U_ADDR) begin
+            mem_rdata = mat_inv_in_u;
         end
     end
 

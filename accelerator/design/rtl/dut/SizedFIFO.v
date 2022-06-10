@@ -233,50 +233,50 @@ module SizedFIFO(CLK, RST, D_IN, ENQ, FULL_N, D_OUT, DEQ, EMPTY_N, CLR);
      end // always @ (posedge CLK)
 
    // synopsys translate_off
-   always@(posedge CLK)
-     begin: error_checks
-        reg deqerror, enqerror ;
+   // always@(posedge CLK)
+   //   begin: error_checks
+   //      reg deqerror, enqerror ;
 
-        deqerror =  0;
-        enqerror = 0;
-        if (RST == ! `BSV_RESET_VALUE)
-           begin
-              if ( ! EMPTY_N && DEQ )
-                begin
-                   deqerror = 1 ;
-                   $display( "Warning: SizedFIFO: %m -- Dequeuing from empty fifo" ) ;
-                end
-              if ( ! FULL_N && ENQ && (!DEQ || guarded) )
-                begin
-                   enqerror =  1 ;
-                   $display( "Warning: SizedFIFO: %m -- Enqueuing to a full fifo" ) ;
-                end
-           end
-     end // block: error_checks
+   //      deqerror =  0;
+   //      enqerror = 0;
+   //      if (RST == ! `BSV_RESET_VALUE)
+   //         begin
+   //            if ( ! EMPTY_N && DEQ )
+   //              begin
+   //                 deqerror = 1 ;
+   //                 $display( "Warning: SizedFIFO: %m -- Dequeuing from empty fifo" ) ;
+   //              end
+   //            if ( ! FULL_N && ENQ && (!DEQ || guarded) )
+   //              begin
+   //                 enqerror =  1 ;
+   //                 $display( "Warning: SizedFIFO: %m -- Enqueuing to a full fifo" ) ;
+   //              end
+   //         end
+   //   end // block: error_checks
    // synopsys translate_on
 
    // synopsys translate_off
    // Some assertions about parameter values
-   initial
-     begin : parameter_assertions
-        integer ok ;
-        ok = 1 ;
+   // initial
+   //   begin : parameter_assertions
+   //      integer ok ;
+   //      ok = 1 ;
 
-        if ( p2depth <= 1)
-          begin
-             ok = 0;
-             $display ( "Warning SizedFIFO: %m -- depth parameter increased from %0d to 2", p2depth);
-          end
+   //      if ( p2depth <= 1)
+   //        begin
+   //           ok = 0;
+   //           $display ( "Warning SizedFIFO: %m -- depth parameter increased from %0d to 2", p2depth);
+   //        end
 
-        if ( p3cntr_width <= 0 )
-          begin
-             ok = 0;
-             $display ( "ERROR SizedFIFO: %m -- width parameter must be greater than 0" ) ;
-          end
+   //      if ( p3cntr_width <= 0 )
+   //        begin
+   //           ok = 0;
+   //           $display ( "ERROR SizedFIFO: %m -- width parameter must be greater than 0" ) ;
+   //        end
 
-        if ( ok == 0 ) $finish ;
+   //      if ( ok == 0 ) $finish ;
 
-      end // initial begin
+   //    end // initial begin
    // synopsys translate_on
 
 endmodule

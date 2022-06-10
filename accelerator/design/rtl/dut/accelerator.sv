@@ -17,14 +17,23 @@ module accelerator #(
 ) (
     input  logic                         clk,
     input  logic                         rst_n,
-
+    // GPIO
     input  logic [ INPUT_FIFO_WIDTH-1:0] input_data,
     output logic                         input_rdy,
     input  logic                         input_vld,
 
     output logic [OUTPUT_FIFO_WIDTH-1:0] output_data,
     input  logic                         output_rdy,
-    output logic                         output_vld
+    output logic                         output_vld,
+    // Wishbone
+    input  logic                         wbs_debug,
+    input  logic                         fsm_start,
+
+    input  logic                         wbs_mem_csb,
+    input  logic                         wbs_mem_web,
+    input  logic [                 11:0] wbs_mem_addr,
+    input  logic [                 31:0] wbs_mem_wdata,
+    input  logic [                 31:0] wbs_mem_rdata
 );
 
     localparam DATA_WIDTH = SIG_WIDTH + EXP_WIDTH + 1;
@@ -157,7 +166,7 @@ module accelerator #(
         .web0      (instr_wen || instr_mem_web),
         .addr0     (instr_wen ? instr_wadr : instr_mem_addr),
         .wmask0    (1'b1                 ),
-        .din0      (instr_aggregator_dout),
+        .din0      (instr_wen ? instr_aggregator_dout : instr_mem_wdata),
         .dout0     (instr_mem_rdata      ),
         .csb1      (~instr_full_n        ),
         .addr1     (pc                   ),
@@ -191,12 +200,12 @@ module accelerator #(
     ) mem_ctrl_inst (
         .clk                 (clk                 ),
         // Physical memory address
-        .mem_addr            (mvp_mem_addr        ),
-        .mem_we              (mvp_mem_we          ),
-        .mem_ren             (mvp_mem_ren         ),
-        .mem_wdata           (mvp_mem_wdata       ),
+        .mem_addr            (wbs_debug ? wbs_mem_addr : mvp_mem_addr),
+        .mem_we              (wbs_debug ? wbs_mem_csb && wbs_mem_web : mvp_mem_we),
+        .mem_ren             (wbs_debug ? wbs_mem_csb && ~wbs_mem_web : mvp_mem_ren),
+        .mem_wdata           (wbs_debug ? wbs_mem_wdata : mvp_mem_wdata),
         .mem_rdata           (mvp_mem_rdata       ),
-        .width               (width               ),
+        .width               (wbs_debug ? 3'b010 : width),
         // Instruction memory
         .instr_mem_addr      (instr_mem_addr      ),
         .instr_mem_csb       (instr_mem_csb       ),
@@ -306,6 +315,8 @@ module accelerator #(
     ) controller_inst (
         .clk                 (clk                 ),
         .rst_n               (rst_n               ),
+        .wbs_debug           (wbs_debug           ),
+        .fsm_start           (fsm_start           ),
         // Configuration data
         .params_fifo_dout    (input_fifo_dout     ),
         .params_fifo_deq     (params_fifo_deq     ),

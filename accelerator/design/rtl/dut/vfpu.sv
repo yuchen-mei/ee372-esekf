@@ -23,7 +23,6 @@ module vfpu #(
         logic [DATA_WIDTH-1:0] inst_c;
         logic [DATA_WIDTH-1:0] z_inst;
         logic [           7:0] status_inst;
-
         logic [DATA_WIDTH-1:0] b_neg;
         logic [DATA_WIDTH-1:0] c_neg;
 
@@ -34,17 +33,17 @@ module vfpu #(
 
         always_comb begin
             case (opcode)
-                `VFU_ADD, `VFU_SUB:   inst_b = 32'h3f800000;
-                `VFU_FNMA, `VFU_FNMS: inst_b = b_neg;
-                default:              inst_b = vec_b[i];
+                `FADD,   `FSUB:   inst_b = 32'h3f800000;
+                `FNMADD, `FNMSUB: inst_b = b_neg;
+                default:          inst_b = vec_b[i];
             endcase
 
             case (opcode)
-                `VFU_ADD:            inst_c = vec_b[i];
-                `VFU_SUB:            inst_c = b_neg;
-                `VFU_MUL:            inst_c = 32'b0;
-                `VFU_FMS, `VFU_FNMA: inst_c = c_neg;
-                default:             inst_c = vec_c[i];
+                `FADD:           inst_c = vec_b[i];
+                `FSUB:           inst_c = b_neg;
+                `FMUL:           inst_c = 32'b0;
+                `FMSUB, `FNMADD: inst_c = c_neg;
+                default:         inst_c = vec_c[i];
             endcase
         end
 

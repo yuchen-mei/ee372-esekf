@@ -64,7 +64,6 @@ saveNetlist -includePowerGround -excludeLeafCell $vars(results_dir)/$vars(design
 write_lef_abstract                                                       \
   -specifyTopLayer $vars(max_route_layer)                                \
   -PGPinLayers [list $ADK_POWER_MESH_BOT_LAYER $ADK_POWER_MESH_TOP_LAYER] \
-  -noCutObs                                                              \
   -stripePin                                                             \
   $vars(results_dir)/$vars(design).lef
 

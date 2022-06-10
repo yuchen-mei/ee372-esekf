@@ -39,7 +39,7 @@ module ram_sync_1rw1r #(
                 ) sram_macro (
                     .clk0   (clk                 ),
                     .csb0   (~(csb0 && (addr0[ADDR_WIDTH-1:8] == i))),
-                    .web0   (~web0 && wmask0[j]  ),
+                    .web0   (~(web0 && wmask0[j])),
                     .wmask0 (4'hF                ),
                     .addr0  (addr0[7:0]          ),
                     .din0   (din0[j*32+:32]      ),
@@ -59,21 +59,21 @@ module ram_sync_1rw1r #(
 
         for (i = 0; i < DATA_WIDTH/32; i = i + 1) begin: width_macro
             sky130_sram_1kbyte_1rw1r_32x256_8 #(
-                .DELAY  (0                 ),
-                .VERBOSE(0                 ),
-                .T_HOLD (0                 )
+                .DELAY  (0                   ),
+                .VERBOSE(0                   ),
+                .T_HOLD (0                   )
             ) sram_macro (
-                .clk0   (clk               ),
-                .csb0   (~csb0             ),
-                .web0   (~web0 && wmask0[i]),
-                .wmask0 (4'hF              ),
-                .addr0  (addr0             ),
-                .din0   (din0[32*i+:32]    ),
-                .dout0  (dout0[32*i+:32]   ),
-                .clk1   (clk               ),
-                .csb1   (~csb1             ),
-                .addr1  (addr1             ),
-                .dout1  (dout1[32*i+:32]   )
+                .clk0   (clk                 ),
+                .csb0   (~csb0               ),
+                .web0   (~(web0 && wmask0[i])),
+                .wmask0 (4'hF                ),
+                .addr0  (addr0               ),
+                .din0   (din0[32*i+:32]      ),
+                .dout0  (dout0[32*i+:32]     ),
+                .clk1   (clk                 ),
+                .csb1   (~csb1               ),
+                .addr1  (addr1               ),
+                .dout1  (dout1[32*i+:32]     )
             );
         end
 

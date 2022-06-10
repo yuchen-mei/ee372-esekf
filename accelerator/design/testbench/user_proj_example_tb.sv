@@ -6,7 +6,7 @@
 `define OUTPUT_DATA_SIZE 24
 
 `define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 76
+`define NUM_INSTRUCTIONS 125
 
 `define DATA_WIDTH 32
 `define ADDR_WIDTH 16
@@ -48,6 +48,7 @@ module user_proj_example_tb;
 
     reg [7:0] state_r;
     reg counter;
+    int file;
 
     reg [`CONFIG_WIDTH - 1 : 0] config_r [`NUM_CONFIGS - 1 : 0];
     reg [ `INSTR_WIDTH - 1 : 0] instr_memory [`NUM_INSTRUCTIONS - 1 : 0];
@@ -94,6 +95,7 @@ module user_proj_example_tb;
     initial begin
         $readmemb("inputs/instr_data.txt", instr_memory);
         $readmemh("inputs/input_data.txt", input_memory);
+        file = $fopen("outputs/output.txt", "w");
 
         clk <= 0;
         rst_n <= 0;
@@ -106,11 +108,11 @@ module user_proj_example_tb;
         output_adr_r <= 0;
         counter      <= 0;
 
-        config_r[0]  <=  instr_max_wadr_c;
-        config_r[1]  <=  input_max_wadr_c;
-        config_r[2]  <=  input_wadr_offset;
-        config_r[3]  <=  output_max_adr_c;
-        config_r[4]  <=  output_adr_offset;
+        config_r[0] <= instr_max_wadr_c;
+        config_r[1] <= input_max_wadr_c;
+        config_r[2] <= input_wadr_offset;
+        config_r[3] <= output_max_adr_c;
+        config_r[4] <= output_adr_offset;
 
         #20 rst_n <= 0;
         #20 rst_n <= 1;
@@ -156,28 +158,23 @@ module user_proj_example_tb;
         end
 
         if (output_vld_w) begin
-
-            $display("%t: output_adr_r = %d, output_data_w = %h",
-                $time, output_adr_r, output_data_w);
+            $fwrite(file, "%h\n", output_data_w);
+            // $display("%t: output_adr_r = %d, output_data_w = %h",
+            //     $time, output_adr_r, output_data_w);
         
             // $display("%t: output_adr_r = %d, output_data_w = %h, expected output_data_w = %h",
             //     $time, output_adr_r, output_data_w, output_memory[output_adr_r]);
             
             // assert(output_data_w == output_memory[output_adr_r]) else $finish;
             
-            output_adr_r <= output_adr_r + 1;
-
-            // if (output_adr_r == `OC0*`OX0*`OY0*`OC1*`OX1*`OY1 - 1) begin
-            //     $display("Done layer");
-            //     $finish;
-            // end
+            // output_adr_r <= output_adr_r + 1;
         end
     end
 
     initial begin
         $fsdbDumpfile("outputs/run.fsdb");
         $fsdbDumpvars(0, user_proj_example_tb);
-        #10000;
+        #20000;
         $finish(2);
     end
 

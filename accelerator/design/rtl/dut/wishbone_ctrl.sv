@@ -2,50 +2,34 @@ module wishbone_ctl #(
     parameter WISHBONE_BASE_ADDR = 32'h30000000
 ) (
     // wishbone input
-      input        wb_clk_i
-    , input        wb_rst_i
-    , input        wbs_stb_i
-    , input        wbs_cyc_i
-    , input        wbs_we_i
-    , input  [3:0] wbs_sel_i
-    , input [31:0] wbs_dat_i
-    , input [31:0] wbs_adr_i
+    input  logic        wb_clk_i,
+    input  logic        wb_rst_i,
+    input  logic        wbs_stb_i,
+    input  logic        wbs_cyc_i,
+    input  logic        wbs_we_i,
+    input  logic [ 3:0] wbs_sel_i,
+    input  logic [31:0] wbs_dat_i,
+    input  logic [31:0] wbs_adr_i,
     // wishbone output
-    , output        wbs_ack_o
-    , output [31:0] wbs_dat_o
-    // input from CGRA
-    , input  [31:0] CGRA_read_config_data
+    output logic        wbs_ack_o,
+    output logic [31:0] wbs_dat_o,
     // output
-    , output [31:0] CGRA_config_config_addr
-	, output [31:0] CGRA_config_config_data
-	, output        CGRA_config_read
-	, output        CGRA_config_write
-    , output  [3:0] CGRA_stall
-    , output  [1:0] message
+    output logic        wbs_debug,
+    output logic        fsm_start,
+
+    output logic        wbs_mem_csb,
+    output logic        wbs_mem_web,
+    output logic [11:0] wbs_mem_addr,
+    output logic [31:0] wbs_mem_wdata,
+    input  logic [31:0] wbs_mem_rdata
 );
 
 // ==============================================================================
 // Wishbone Memory Mapped Address
 // ==============================================================================
-    localparam WBSADDR_CFG_ADDR  = 32'h30000000;
-    localparam WBSADDR_CFG_WDATA = 32'h30000004;
-    localparam WBSADDR_CFG_RDATA = 32'h30000008;
-    localparam WBSADDR_CFG_WRITE = 32'h3000000C;
-    localparam WBSADDR_CFG_READ  = 32'h30000010;
-    localparam WBSADDR_STALL     = 32'h30000014;
-    localparam WBSADDR_MESSAGE   = 32'h30000018;
-
-
-// ==============================================================================
-// CSR
-// ==============================================================================
-    reg [31:0] reg_cfg_addr;
-    reg [31:0] reg_cfg_wdata;
-    reg [31:0] reg_cfg_rdata;
-    reg        reg_cfg_write;
-    reg        reg_cfg_read;
-    reg  [3:0] reg_stall;
-    reg  [1:0] reg_message;
+    localparam WBS_ADDR_MASK       = 32'hFFFF_0000;
+    localparam WBS_MEM_ADDR        = 32'h3000_0000;
+    localparam WBS_FSM_START_ADDR  = 32'h3001_0000;
 
 // ==============================================================================
 // Request, Acknowledgement
@@ -63,13 +47,13 @@ module wishbone_ctl #(
     localparam SR_DEPTH = 4;
     integer i;
     reg [SR_DEPTH-1:0] ack_o_shift_reg;
-    always@(posedge wb_clk_i) begin
+    always @(posedge wb_clk_i) begin
         if (wb_rst_i) begin
             ack_o_shift_reg <= {SR_DEPTH{1'b0}};
         end
         else begin
             ack_o_shift_reg[0] <= wbs_req;
-            for (i=0; i<SR_DEPTH-1; i=i+1) begin
+            for (i = 0; i < SR_DEPTH-1; i = i+1) begin
                 ack_o_shift_reg[i+1] <= ack_o_shift_reg[i];
             end
         end
@@ -81,65 +65,53 @@ module wishbone_ctl #(
 // ==============================================================================
 // Latching
 // ==============================================================================
+    // if 1, occupies all memory's control
+    // always @(posedge wb_clk_i) begin
+    //     if (wb_rst_i)
+    //         wbs_debug <= '0;
+    //     else if (wbs_valid_q & wbs_we_i_q & (wbs_adr_i_q == WBS_DEBUG_ADDR)) begin
+    //         wbs_debug <= wbs_dat_i_q[0];
+    //     end
+    // end
+
     wire wbs_req_write = (!ack_o) & wbs_req & (wbs_we_i );
     wire wbs_req_read  = (!ack_o) & wbs_req & (~wbs_we_i);
-    // WBSADDR_CFG_ADDR
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_cfg_addr <= 32'd0;
-        else if (wbs_req_write && wbs_adr_i==WBSADDR_CFG_ADDR)
-            reg_cfg_addr <= wbs_dat_i;
-    // WBSADDR_CFG_WDATA
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_cfg_wdata <= 32'd0;
-        else if (wbs_req_write && wbs_adr_i==WBSADDR_CFG_WDATA)
-            reg_cfg_wdata <= wbs_dat_i;
-    // WBSADDR_CFG_RDATA
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_cfg_rdata <= 32'd0;
-        else if (wbs_req_read && wbs_adr_i==WBSADDR_CFG_RDATA)
-            reg_cfg_rdata <= CGRA_read_config_data;
-    // WBSADDR_CFG_WRITE
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_cfg_write <= 1'b0;
-        else if (wbs_req_write && wbs_adr_i==WBSADDR_CFG_WRITE)
-            reg_cfg_write <= wbs_dat_i[0];
-        else
-            reg_cfg_write <= 1'b0; // 1-pulse
-    // WBSADDR_CFG_READ
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_cfg_read <= 1'b0;
-        else if (wbs_req_write && wbs_adr_i==WBSADDR_CFG_READ)
-            reg_cfg_read <= wbs_dat_i[0];
-        //else
-        //    reg_cfg_read <= 1'b0; // multicycle path, cannot be a pulse, need to stay
-    // WBSADDR_STALL
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_stall <= 4'b1111;
-        else if (wbs_req_write && wbs_adr_i==WBSADDR_STALL)
-            reg_stall <= wbs_dat_i[3:0];
-    // WBSADDR_MESSAGE
-    always@(posedge wb_clk_i)
-        if (wb_rst_i)
-            reg_message <= 2'b00;
-        else if (wbs_req_write && wbs_adr_i==WBSADDR_MESSAGE)
-            reg_message <= wbs_dat_i[1:0];
+    always @(posedge wb_clk_i) begin
+        if (wb_rst_i) begin
+            wbs_mem_csb   <= 0;
+            wbs_mem_web   <= 0;
+            wbs_mem_addr  <= 12'b0;
+            wbs_mem_wdata <= 32'b0;
+        end
+        else if ((wbs_adr_i & WBS_ADDR_MASK) == WBS_MEM_ADDR) begin
+            wbs_mem_addr  <= wbs_adr_i[11:0];
+            wbs_mem_csb   <= wbs_req_write || wbs_req_read;
+            wbs_mem_web   <= wbs_req_write;
+	        wbs_mem_wdata <= wbs_dat_i;
+        end
+    end
+
+    always @(posedge wb_clk_i) begin
+        if (wb_rst_i) begin
+            fsm_start <= 0;
+        end
+        else if (wbs_adr_i == WBS_FSM_START_ADDR) begin
+            fsm_start <= 1;
+        end
+    end
+
+    always @(posedge wb_clk_i) begin
+        if (wb_rst_i) begin
+            wbs_dat_o <= 32'd0;
+        end
+        else if (wbs_req_read && (wbs_adr_i & WBS_ADDR_MASK) == WBS_MEM_ADDR) begin
+            wbs_dat_o <= wbs_mem_rdata;
+        end
+    end
 
     // ==============================================================================
     // Outputs
     // ==============================================================================
-    assign wbs_ack_o               = ack_o;
-    assign wbs_dat_o               = reg_cfg_rdata;
-    assign CGRA_config_config_addr = reg_cfg_addr;
-    assign CGRA_config_config_data = reg_cfg_wdata;
-    assign CGRA_config_write       = reg_cfg_write;
-    assign CGRA_config_read        = reg_cfg_read;
-    assign CGRA_stall              = reg_stall;
-    assign message                 = reg_message;
+    assign wbs_ack_o = ack_o;
 
 endmodule
