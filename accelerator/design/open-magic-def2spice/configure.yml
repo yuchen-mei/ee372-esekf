@@ -13,6 +13,7 @@ name: open-magic-def2spice
 inputs:
   - adk
   - design.def.gz
+  - sky130_sram_1kbyte_1rw1r_32x256_8.lef
 
 outputs:
   - design_extracted.spice

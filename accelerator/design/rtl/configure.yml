@@ -5,5 +5,7 @@ outputs:
   - design.vcs.v
 
 commands:
-  - cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.v
-  - cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.vcs.v 
+  - cat rv_opcodes.v verilog/*.v > outputs/design.v
+  - cat rv_opcodes.v verilog/*.v > outputs/design.vcs.v 
+  # - cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.v
+  # - cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.vcs.v 

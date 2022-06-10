@@ -1,5 +1,8 @@
 lef read inputs/adk/rtk-tech.lef
 lef read inputs/adk/stdcells.lef
+foreach f [glob -directory inputs *.lef] {
+    lef read $f
+}
 
 def read design.def
 

@@ -13,7 +13,7 @@ name: mentor-calibre-comparison
 inputs:
   - adk
   - design_extracted.spice
-  - design.lvs.v
+  - design.flatbuslvs.v
 
 outputs:
   - lvs.report
@@ -30,4 +30,3 @@ commands:
 
 debug:
   - calibre -rve -lvs svdb
-

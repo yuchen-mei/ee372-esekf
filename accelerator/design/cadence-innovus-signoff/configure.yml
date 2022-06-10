@@ -21,6 +21,7 @@ outputs:
   - design.gds.gz
   - design-merged.gds
   - design.lvs.v
+  - design.flatbuslvs.v
   - design.vcs.v
   - design.vcs.pg.v
   - design.lef
@@ -47,6 +48,7 @@ commands:
   - ln -sf ../results/*.gds.gz            design.gds.gz
   - ln -sf ../results/*-merged.gds        design-merged.gds
   - ln -sf ../results/*.lvs.v             design.lvs.v
+  - ln -sf ../results/*.flatbuslvs.v      design.flatbuslvs.v
   - ln -sf ../results/*.vcs.v             design.vcs.v
   - ln -sf ../results/*.vcs.pg.v          design.vcs.pg.v
   - ln -sf ../results/*.lef               design.lef
@@ -54,6 +56,7 @@ commands:
   - ln -sf ../results/*.sdc               design.sdc
   - ln -sf ../results/*.sdf               design.sdf
   - ln -sf ../results/*.virtuoso.v        design.virtuoso.v
+
 
 #-------------------------------------------------------------------------
 # Parameters
@@ -63,8 +66,8 @@ parameters:
   order:
     - fill-decap.tcl
     - fix-drc.tcl
-    - addDiode.tcl
-    - processAntennas.tcl
+    # - addDiode.tcl
+    # - processAntennas.tcl
     - main.tcl
     - generate-results.tcl
     - reporting.tcl
