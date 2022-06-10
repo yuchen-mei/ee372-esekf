@@ -13,6 +13,7 @@ name: open-magic-gds2spice
 inputs:
   - adk
   - design_merged.gds
+  - sky130_sram_1kbyte_1rw1r_32x256_8.lef
 
 outputs:
   - design_extracted.spice

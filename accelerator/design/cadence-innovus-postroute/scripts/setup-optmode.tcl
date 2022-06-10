@@ -14,8 +14,8 @@ setOptMode -verbose true
 # Use this option carefully because over constraining can lead to increase
 # in buffers, which causes more congestion and power
 
-setOptMode -holdTargetSlack  $::env(hold_target_slack)
-setOptMode -setupTargetSlack $::env(setup_target_slack)
+setOptMode -holdTargetSlack  0.005
+setOptMode -setupTargetSlack 1.000
 
 # Useful skew
 #

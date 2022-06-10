@@ -26,5 +26,5 @@ parameters:
   design_name: undefined
 
 commands: 
+  - cat inputs/adk/netgen_setup.tcl blackbox.tcl > netgen_blackbox_setup.tcl
   - sh run_lvs.sh
-

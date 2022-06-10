@@ -1,4 +1,11 @@
 cif istyle sky130(vendor)
+set ::env(MAGIC_EXT_USE_GDS) 1
+foreach f [glob -directory inputs *.lef] {
+    lef read $f
+}
+gds noduplicates true
+gds order true
+
 gds flatten true
 gds read ./inputs/design_merged.gds
 load $::env(design_name)
