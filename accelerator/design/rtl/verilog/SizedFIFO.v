@@ -280,3 +280,5 @@ module SizedFIFO(CLK, RST, D_IN, ENQ, FULL_N, D_OUT, DEQ, EMPTY_N, CLR);
    // synopsys translate_on
 
 endmodule
+
+

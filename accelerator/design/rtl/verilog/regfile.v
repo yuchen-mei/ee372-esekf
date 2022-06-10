@@ -35,3 +35,5 @@ module regfile (
 		else if (wen)
 			regs[addr_w * DATA_WIDTH+:DATA_WIDTH] <= data_w;
 endmodule
+
+

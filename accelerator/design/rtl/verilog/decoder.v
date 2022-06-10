@@ -110,3 +110,5 @@ module decoder (
 	assign stage3_dependency = (((vs1_addr == vd_addr_ex3) || (vs2_addr == vd_addr_ex3)) || (vs3_addr == vd_addr_ex3)) && reg_we_ex3;
 	assign stall = ((stage1_dependency && |wb_sel_ex1) || (stage2_dependency && |wb_sel_ex2[2:0])) || (stage3_dependency && wb_sel_ex3[2]);
 endmodule
+
+

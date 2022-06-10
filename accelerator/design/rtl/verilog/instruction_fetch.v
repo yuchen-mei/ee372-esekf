@@ -28,3 +28,5 @@ module instruction_fetch (
 			pc_pipe2 <= pc_pipe1;
 		end
 endmodule
+
+

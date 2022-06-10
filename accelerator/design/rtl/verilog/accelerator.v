@@ -274,3 +274,4 @@ module accelerator (
 		.mvp_core_en(mvp_core_en)
 	);
 endmodule
+

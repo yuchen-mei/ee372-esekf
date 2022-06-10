@@ -62,3 +62,5 @@ module vrf (
 		else if (wen)
 			vectors[addr_w * DATA_WIDTH+:DATA_WIDTH] <= data_w;
 endmodule
+
+
