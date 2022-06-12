@@ -34,7 +34,16 @@ module vector_unit #(
         end
     end
 
-    assign identity = {32'h3f800000, 32'h0, 32'h0, 32'h0, 32'h3f800000, 32'h0, 32'h0, 32'h0, 32'h3f800000};
+    logic [EXP_WIDTH + SIG_WIDTH:0] one;
+    logic [EXP_WIDTH - 1:0] one_exp;
+    logic [SIG_WIDTH - 1:0] one_sig;
+
+    // integer number 1 with the FP number format
+    assign one_exp = ((1 << (EXP_WIDTH-1)) - 1);
+    assign one_sig = 0;
+    assign one = {1'b0, one_exp, one_sig}; // fp(1)
+
+    assign identity = {one, 32'h0, 32'h0, 32'h0, one, 32'h0, 32'h0, 32'h0, one};
 
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vfpu;
 
@@ -48,7 +57,7 @@ module vector_unit #(
         fpu #(
             .SIG_WIDTH      (SIG_WIDTH      ),
             .EXP_WIDTH      (EXP_WIDTH      ),
-            .IEEE_COMPLIANCE(IEEE_COMPLIANCE)
+            .IEEE_COMPLIANCE(1              )
         ) fpu_inst (
             .inst_a         (inst_a         ),
             .inst_b         (inst_b         ),

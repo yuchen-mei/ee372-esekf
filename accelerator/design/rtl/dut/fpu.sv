@@ -55,7 +55,7 @@ module fpu #(
         .isize          (DATA_WIDTH     ),
         .ieee_compliance(IEEE_COMPLIANCE)
     ) DW_fp_flt2i_inst (
-        .a              (inst_a         ),
+        .a              (inst_b         ),
         .rnd            (inst_rnd       ),
         .z              (flt2i_inst     ),
         .status         (flt2i_status   )
@@ -67,7 +67,7 @@ module fpu #(
         .isize          (DATA_WIDTH     ),
         .isign          (1              )
     ) DW_fp_i2flt_inst (
-        .a              (inst_a         ),
+        .a              (inst_b         ),
         .rnd            (inst_rnd       ),
         .z              (i2flt_inst     ),
         .status         (i2flt_status   )
@@ -77,19 +77,20 @@ module fpu #(
     assign sgnjn = {~inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
     assign sgnjx = {inst_a[DATA_WIDTH-1] ^ inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
 
-    assign zero_sig = (inst_a[SIG_WIDTH-1:0] == 0);
-    assign zero_exp = (inst_a[SIG_WIDTH+:EXP_WIDTH] == 0);
+    assign zero_sig = (inst_b[SIG_WIDTH-1:0] == 0);
+    assign zero_exp = (inst_b[SIG_WIDTH+:EXP_WIDTH] == 0);
+    assign nan_exp  = &inst_b[SIG_WIDTH+:EXP_WIDTH];
 
-    assign fclass_mask[0] = inst_a[31] && &inst_a[SIG_WIDTH+:EXP_WIDTH] && zero_sig;
-    assign fclass_mask[1] = inst_a[31] && (~zero_exp || zero_sig);
-    assign fclass_mask[2] = inst_a[31] && zero_exp && ~zero_sig;
-    assign fclass_mask[3] = inst_a[31] && zero_exp && zero_sig;
-    assign fclass_mask[4] = ~inst_a[31] && zero_exp && zero_sig;
-    assign fclass_mask[5] = ~inst_a[31] && zero_exp && ~zero_sig;
-    assign fclass_mask[6] = ~inst_a[31] && (~zero_exp || zero_sig);
-    assign fclass_mask[7] = ~inst_a[31] && &inst_a[SIG_WIDTH+:EXP_WIDTH] && zero_sig;
-    assign fclass_mask[8] = &inst_a[SIG_WIDTH+:EXP_WIDTH] && ~zero_sig && inst_a[SIG_WIDTH-1];
-    assign fclass_mask[9] = &inst_a[SIG_WIDTH+:EXP_WIDTH] && ~zero_sig && ~inst_a[SIG_WIDTH-1];
+    assign fclass_mask[0] = inst_b[31] && nan_exp && zero_sig;
+    assign fclass_mask[1] = inst_b[31] && ~nan_exp && ~zero_exp;
+    assign fclass_mask[2] = inst_b[31] && zero_exp && ~zero_sig;
+    assign fclass_mask[3] = inst_b[31] && zero_exp && zero_sig;
+    assign fclass_mask[4] = ~inst_b[31] && zero_exp && zero_sig;
+    assign fclass_mask[5] = ~inst_b[31] && zero_exp && ~zero_sig;
+    assign fclass_mask[6] = ~inst_b[31] && ~nan_exp && ~zero_exp;
+    assign fclass_mask[7] = ~inst_b[31] && nan_exp && zero_sig;
+    assign fclass_mask[8] = nan_exp && ~inst_b[SIG_WIDTH-1] && ~zero_sig;
+    assign fclass_mask[9] = nan_exp && inst_b[SIG_WIDTH-1];
     assign fclass_mask[DATA_WIDTH-1:10] = '0;
 
     always_comb begin

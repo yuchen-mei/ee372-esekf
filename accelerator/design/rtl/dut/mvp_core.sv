@@ -79,10 +79,14 @@ module mvp_core #(
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_wb;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_wb;
+    logic                                    jump_id;
     logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_id;
-    logic [        INSTR_MEM_ADDR_WIDTH-1:0] branch_offset_id;
-    logic                                    jump_reg_id;
-    logic                                    jump_branch_id;
+    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_ex1;
+    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_ex2;
+    logic                                    pc_sel;
+    logic                                    branch_id;
+    logic                                    branch_ex1;
+    logic                                    branch_ex2;
 
     assign data_out     = reg_wdata_wb;
     assign data_out_vld = en && reg_we_wb;
@@ -108,10 +112,10 @@ module mvp_core #(
         .en            (en & ~stall   ),
         // .jump_target   (jump_target_id),
 
-        .branch        (jump_branch_id),
-        .branch_offset (branch_offset_id),
+        .branch        (pc_sel        ),
+        .branch_offset (jr_pc_ex2     ),
 
-        .jump_reg      (jump_reg_id   ),
+        .jump_reg      (jump_id       ),
         .jr_pc         (jr_pc_id      ),
 
         .pc            (pc            )
@@ -138,8 +142,8 @@ module mvp_core #(
         .masking      (              ),
         .mem_we       (mem_we_id     ),
         .reg_we       (reg_we_id     ),
-        .jump         (jump_reg_id   ),
-        .branch       (jump_branch_id),
+        .jump         (jump_id       ),
+        .branch       (branch_id     ),
         // Stalling logic
         .vd_addr_ex1  (vd_addr_ex1   ),
         .vd_addr_ex2  (vd_addr_ex2   ),
@@ -226,6 +230,8 @@ module mvp_core #(
             default:  stage4_forward = '0;
         endcase
     end
+
+    assign pc_sel = branch_ex2 && vec_out_ex2[0];
 
     assign operand_a = ((vs1_addr_ex1 == vd_addr_ex2) && reg_we_ex2 && wb_sel_ex2[0])    ? stage2_forward : 
                        ((vs1_addr_ex1 == vd_addr_ex3) && reg_we_ex3 && |wb_sel_ex3[1:0]) ? stage3_forward :
@@ -370,6 +376,12 @@ module mvp_core #(
             wb_sel_ex4 <= '0;
             wb_sel_wb  <= '0;
 
+            branch_ex1 <= '0;
+            branch_ex2 <= '0;
+
+            jr_pc_ex1 <= '0;
+            jr_pc_ex2 <= '0;
+
             vec_out_ex3 <= '0;
             vec_out_ex4 <= '0;
             vec_out_wb  <= '0;
@@ -412,6 +424,12 @@ module mvp_core #(
             wb_sel_ex3 <= wb_sel_ex2;
             wb_sel_ex4 <= wb_sel_ex3;
             wb_sel_wb  <= wb_sel_ex4;
+
+            branch_ex1 <= branch_id && ~stall;
+            branch_ex2 <= branch_ex1;
+
+            jr_pc_ex1 <= jr_pc_id;
+            jr_pc_ex2 <= jr_pc_ex1;
 
             vec_out_ex3 <= vec_out_ex2;
             vec_out_ex4 <= vec_out_ex3;

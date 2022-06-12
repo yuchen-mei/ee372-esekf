@@ -90,28 +90,46 @@ module accelerator #(
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_rdata;
     logic [                     2:0]                 width;
 
-    logic [INSTR_MEM_ADDR_WIDTH-1:0]                 instr_mem_addr;
     logic                                            instr_mem_csb;
     logic                                            instr_mem_web;
+    logic [INSTR_MEM_ADDR_WIDTH-1:0]                 instr_mem_addr;
     logic [          DATA_WIDTH-1:0]                 instr_mem_wdata;
     logic [          DATA_WIDTH-1:0]                 instr_mem_rdata;
     logic [INSTR_MEM_ADDR_WIDTH-1:0]                 pc;
     logic [                    31:0]                 instr;
 
-    logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_addr;
     logic                                            data_mem_csb;
     logic                                            data_mem_web;
-    logic [         DATAPATH/32-1:0]                 data_mem_wmask0;
+    logic [         DATAPATH/32-1:0]                 data_mem_wmask;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_addr;
     logic [            DATAPATH-1:0]                 data_mem_wdata;
     logic [            DATAPATH-1:0]                 data_mem_rdata;
     logic [            DATAPATH-1:0]                 output_wb_data;
 
+    logic [          ADDR_WIDTH-1:0]                 mem_ctrl_addr;
+    logic                                            mem_ctrl_write;
+    logic                                            mem_ctrl_read;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_ctrl_wdata;
+    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_ctrl_rdata;
+
+    logic                                            instr_mem_ctrl_csb;
+    logic                                            instr_mem_ctrl_web;
+    logic [INSTR_MEM_ADDR_WIDTH-1:0]                 instr_mem_ctrl_addr;
+    logic [          DATA_WIDTH-1:0]                 instr_mem_ctrl_wdata;
+
+    logic                                            data_mem_ctrl_csb;
+    logic                                            data_mem_ctrl_web;
+    logic [         DATAPATH/32-1:0]                 data_mem_ctrl_wmask;
+    logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_ctrl_addr;
+    logic [            DATAPATH-1:0]                 data_mem_ctrl_wdata;
+
     logic                                            mat_inv_vld_out;
     logic [        9*DATA_WIDTH-1:0]                 mat_inv_out_l;
     logic [        9*DATA_WIDTH-1:0]                 mat_inv_out_u;
-    
+
+    logic [                    31:0]                 instr_aggregator_dout;
     logic [            DATAPATH-1:0]                 input_aggregator_dout;
-    logic [          DATA_WIDTH-1:0]                 instr_aggregator_dout;
+
 
     // ---------------------------------------------------------------------------
     //  MVP Core and memory
@@ -136,14 +154,12 @@ module accelerator #(
         .mem_ren             (mvp_mem_ren         ),
         .mem_wdata           (mvp_mem_wdata       ),
         .mem_rdata           (mvp_mem_rdata       ),
-        .width               (width               ),
-        // Debug signals
-        .data_out            (                    ),
-        .data_out_vld        (                    ),
-        .reg_wb              (                    )
+        .width               (width               )
     );
 
-    mat_inv mat_inv_inst (
+    mat_inv #(
+        .DATA_WIDTH   (DATA_WIDTH        )
+    ) mat_inv_inst (
         .clk          (clk               ),
         .rst_n        (rst_n             ),
         .en           (mat_inv_en        ),
@@ -155,40 +171,82 @@ module accelerator #(
         .mat_inv_out_u(mat_inv_out_u     )
     );
 
-
     ram_sync_1rw1r #(
-        .DATA_WIDTH(32                   ),
-        .ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH ),
-        .DEPTH     (INSTR_MEM_BANK_DEPTH )
+        .DATA_WIDTH(32                  ),
+        .ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
+        .DEPTH     (INSTR_MEM_BANK_DEPTH)
     ) instr_mem (
-        .clk       (clk                  ),
-        .csb0      (instr_wen || instr_mem_csb),
-        .web0      (instr_wen || instr_mem_web),
-        .addr0     (instr_wen ? instr_wadr : instr_mem_addr),
-        .wmask0    (1'b1                 ),
-        .din0      (instr_wen ? instr_aggregator_dout : instr_mem_wdata),
-        .dout0     (instr_mem_rdata      ),
-        .csb1      (~instr_full_n        ),
-        .addr1     (pc                   ),
-        .dout1     (instr                )
+        .clk       (clk                 ),
+        .csb0      (instr_mem_csb       ),
+        .web0      (instr_mem_web       ),
+        .addr0     (instr_mem_addr      ),
+        .wmask0    (1'b1                ),
+        .din0      (instr_mem_wdata     ),
+        .dout0     (instr_mem_rdata     ),
+        .csb1      (~instr_full_n       ),
+        .addr1     (pc                  ),
+        .dout1     (instr               )
     );
 
     ram_sync_1rw1r #(
-        .DATA_WIDTH(DATAPATH               ),
-        .ADDR_WIDTH(DATA_MEM_ADDR_WIDTH    ),
-        .DEPTH     (DATA_MEM_BANK_DEPTH    )
+        .DATA_WIDTH(DATAPATH           ),
+        .ADDR_WIDTH(DATA_MEM_ADDR_WIDTH),
+        .DEPTH     (DATA_MEM_BANK_DEPTH)
     ) data_mem (
-        .clk       (clk                    ),
-        .csb0      (input_wen || data_mem_csb),
-        .web0      (input_wen || data_mem_web),
-        .addr0     (input_wen ? input_wadr : data_mem_addr),
-        .wmask0    (input_wen ? 8'hFF : data_mem_wmask0),
-        .din0      (input_wen ? input_aggregator_dout : data_mem_wdata),
-        .dout0     (data_mem_rdata         ),
-        .csb1      (output_wb_ren          ),
-        .addr1     (output_wb_radr         ),
-        .dout1     (output_wb_data         )
+        .clk       (clk                ),
+        .csb0      (data_mem_csb       ),
+        .web0      (data_mem_web       ),
+        .addr0     (data_mem_addr      ),
+        .wmask0    (data_mem_wmask     ),
+        .din0      (data_mem_wdata     ),
+        .dout0     (data_mem_rdata     ),
+        .csb1      (output_wb_ren      ),
+        .addr1     (output_wb_radr     ),
+        .dout1     (output_wb_data     )
     );
+
+    always_comb begin
+        if (instr_wen) begin
+            instr_mem_csb   = instr_wen;
+            instr_mem_web   = 1'b1;
+            instr_mem_addr  = instr_wadr;
+            instr_mem_wdata = instr_aggregator_dout;
+        end
+        else begin
+            instr_mem_csb   = instr_mem_ctrl_csb;
+            instr_mem_web   = instr_mem_ctrl_web;
+            instr_mem_addr  = instr_mem_ctrl_addr;
+            instr_mem_wdata = instr_mem_ctrl_wdata;
+        end
+
+        if (input_wen) begin
+            data_mem_csb   = input_wen;
+            data_mem_web   = 1'b1;
+            data_mem_addr  = input_wadr;
+            data_mem_wmask = 8'hFF;
+            data_mem_wdata = input_aggregator_dout;
+        end
+        else begin
+            data_mem_csb   = data_mem_ctrl_csb;
+            data_mem_web   = data_mem_ctrl_web;
+            data_mem_addr  = data_mem_ctrl_addr;
+            data_mem_wmask = data_mem_ctrl_wmask;
+            data_mem_wdata = data_mem_ctrl_wdata;
+        end
+
+        if (wbs_debug) begin
+            mem_ctrl_addr  = wbs_mem_addr;
+            mem_ctrl_write = wbs_mem_csb && wbs_mem_web;
+            mem_ctrl_read  = wbs_mem_csb && ~wbs_mem_web;
+            mem_ctrl_wdata = wbs_mem_wdata;
+        end
+        else begin
+            mem_ctrl_addr  = mvp_mem_addr;
+            mem_ctrl_write = mvp_mem_we;
+            mem_ctrl_read  = mvp_mem_ren;
+            mem_ctrl_wdata = mvp_mem_wdata;
+        end
+    end
 
     memory_controller #(
         .ADDR_WIDTH          (ADDR_WIDTH          ),
@@ -200,24 +258,24 @@ module accelerator #(
     ) mem_ctrl_inst (
         .clk                 (clk                 ),
         // Physical memory address
-        .mem_addr            (wbs_debug ? wbs_mem_addr : mvp_mem_addr),
-        .mem_we              (wbs_debug ? wbs_mem_csb && wbs_mem_web : mvp_mem_we),
-        .mem_ren             (wbs_debug ? wbs_mem_csb && ~wbs_mem_web : mvp_mem_ren),
-        .mem_wdata           (wbs_debug ? wbs_mem_wdata : mvp_mem_wdata),
+        .mem_addr            (mem_ctrl_addr       ),
+        .mem_write           (mem_ctrl_write      ),
+        .mem_read            (mem_ctrl_read       ),
+        .mem_wdata           (mem_ctrl_wdata      ),
         .mem_rdata           (mvp_mem_rdata       ),
         .width               (wbs_debug ? 3'b010 : width),
         // Instruction memory
-        .instr_mem_addr      (instr_mem_addr      ),
-        .instr_mem_csb       (instr_mem_csb       ),
-        .instr_mem_web       (instr_mem_web       ),
-        .instr_mem_wdata     (instr_mem_wdata     ),
+        .instr_mem_addr      (instr_mem_ctrl_addr ),
+        .instr_mem_csb       (instr_mem_ctrl_csb  ),
+        .instr_mem_web       (instr_mem_ctrl_web  ),
+        .instr_mem_wdata     (instr_mem_ctrl_wdata),
         .instr_mem_rdata     (instr_mem_rdata     ),
         // Data memory
-        .data_mem_addr       (data_mem_addr       ),
-        .data_mem_csb        (data_mem_csb        ),
-        .data_mem_web        (data_mem_web        ),
-        .data_mem_wmask      (data_mem_wmask0     ),
-        .data_mem_wdata      (data_mem_wdata      ),
+        .data_mem_addr       (data_mem_ctrl_addr  ),
+        .data_mem_csb        (data_mem_ctrl_csb   ),
+        .data_mem_web        (data_mem_ctrl_web   ),
+        .data_mem_wmask      (data_mem_ctrl_wmask ),
+        .data_mem_wdata      (data_mem_ctrl_wdata ),
         .data_mem_rdata      (data_mem_rdata      ),
         // Matrix inversion
         .mat_inv_in_l        (mat_inv_out_l       ),

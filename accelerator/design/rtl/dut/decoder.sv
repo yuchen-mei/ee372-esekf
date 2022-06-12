@@ -46,8 +46,8 @@ module decoder (
     assign branch_offset = {instr[31:25], instr[11:7]};
 
     assign overwrite_multiplicand = ((opcode == `VFMACC)  ||
-                                     (opcode == `VFNMACC) || 
                                      (opcode == `VFMSAC)  || 
+                                     (opcode == `VFNMACC) || 
                                      (opcode == `VFNMSAC));
     assign vs1_addr = src1;
     assign vs2_addr = overwrite_multiplicand ? dest : src2;
@@ -87,8 +87,24 @@ module decoder (
 
         if (opcode == `BRANCH) begin
             case (funct3)
-                3'b000: func_sel = `FCMPEQ;
-                3'b100: func_sel = `FCMPLT;
+                3'b000:  func_sel = `FCMPEQ;
+                3'b100:  func_sel = `FCMPLT;
+                default: func_sel = '0;
+            endcase
+        end
+
+        if (opcode == `OP_V && funct6 == `VFUNARY0) begin
+            case (src1)
+                `VFCVTXF: func_sel = `FCVTWS;
+                `VFCVTFX: func_sel = `FCVTSW;
+                default:  func_sel = '0;
+            endcase
+        end
+
+        if (opcode == `OP_V && funct6 == `VFUNARY1) begin
+            case (src1)
+                `VFCLASS: func_sel = `FCLASS;
+                default:  func_sel = '0;
             endcase
         end
 
@@ -97,6 +113,7 @@ module decoder (
             `OP_V:    wb_sel = ~|func_sel[4:3] ? 5'b00100 : 5'b00001;
             `OP_FP:   wb_sel = 5'b01000;
             `OP_M:    wb_sel = 5'b10000;
+            `BRANCH:  wb_sel = 5'b00001;
             default:  wb_sel = 5'b0;
         endcase
     end

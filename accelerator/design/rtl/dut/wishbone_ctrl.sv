@@ -29,7 +29,8 @@ module wishbone_ctl #(
 // ==============================================================================
     localparam WBS_ADDR_MASK       = 32'hFFFF_0000;
     localparam WBS_MEM_ADDR        = 32'h3000_0000;
-    localparam WBS_FSM_START_ADDR  = 32'h3001_0000;
+    localparam WBS_DEBUG_ADDR      = 32'h3001_0000;
+    localparam WBS_FSM_START_ADDR  = 32'h3002_0000;
 
 // ==============================================================================
 // Request, Acknowledgement
@@ -65,17 +66,9 @@ module wishbone_ctl #(
 // ==============================================================================
 // Latching
 // ==============================================================================
-    // if 1, occupies all memory's control
-    // always @(posedge wb_clk_i) begin
-    //     if (wb_rst_i)
-    //         wbs_debug <= '0;
-    //     else if (wbs_valid_q & wbs_we_i_q & (wbs_adr_i_q == WBS_DEBUG_ADDR)) begin
-    //         wbs_debug <= wbs_dat_i_q[0];
-    //     end
-    // end
-
     wire wbs_req_write = (!ack_o) & wbs_req & (wbs_we_i );
     wire wbs_req_read  = (!ack_o) & wbs_req & (~wbs_we_i);
+
     always @(posedge wb_clk_i) begin
         if (wb_rst_i) begin
             wbs_mem_csb   <= 0;
@@ -93,19 +86,27 @@ module wishbone_ctl #(
 
     always @(posedge wb_clk_i) begin
         if (wb_rst_i) begin
-            fsm_start <= 0;
+            wbs_dat_o <= 32'd0;
         end
-        else if (wbs_adr_i == WBS_FSM_START_ADDR) begin
-            fsm_start <= 1;
+        else begin
+            wbs_dat_o <= wbs_mem_rdata;
+        end
+    end
+
+    always @(posedge wb_clk_i) begin
+        if (wb_rst_i)
+            wbs_debug <= '0;
+        else if (wbs_req_write & (wbs_adr_i == WBS_DEBUG_ADDR)) begin
+            wbs_debug <= wbs_dat_i[0];
         end
     end
 
     always @(posedge wb_clk_i) begin
         if (wb_rst_i) begin
-            wbs_dat_o <= 32'd0;
+            fsm_start <= 0;
         end
-        else if (wbs_req_read && (wbs_adr_i & WBS_ADDR_MASK) == WBS_MEM_ADDR) begin
-            wbs_dat_o <= wbs_mem_rdata;
+        else if (wbs_req_write && (wbs_adr_i == WBS_FSM_START_ADDR)) begin
+            fsm_start <= 1;
         end
     end
 

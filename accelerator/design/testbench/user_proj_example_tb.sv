@@ -1,12 +1,12 @@
 `define INPUT_WIDTH 16
 `define OUTPUT_WIDTH 8
 
-`define TOTAL_INPUT_SIZE 48
+`define TOTAL_INPUT_SIZE 120
 `define INPUT_DATA_SIZE 24
 `define OUTPUT_DATA_SIZE 24
 
 `define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 125
+`define NUM_INSTRUCTIONS 126
 
 `define DATA_WIDTH 32
 `define ADDR_WIDTH 16
@@ -24,15 +24,15 @@ module user_proj_example_tb;
 
     reg [`ADDR_WIDTH - 1 : 0] config_adr_r;
 
-    wire input_rdy_w;
-    reg input_vld_r;
-    reg [`INPUT_WIDTH - 1 : 0] input_data_r;
-    reg [`ADDR_WIDTH - 1 : 0] input_adr_r;
+    wire                        input_rdy_w;
+    reg                         input_vld_r;
+    reg  [`INPUT_WIDTH - 1 : 0] input_data_r;
+    reg  [ `ADDR_WIDTH - 1 : 0] input_adr_r;
 
+    reg                          output_rdy_r;
+    wire                         output_vld_w;
     wire [`OUTPUT_WIDTH - 1 : 0] output_data_w;
-    reg [`ADDR_WIDTH - 1 : 0] output_adr_r;
-    reg output_rdy_r;
-    wire output_vld_w;
+    reg  [  `ADDR_WIDTH - 1 : 0] output_adr_r;
 
     wire [`ADDR_WIDTH - 1 : 0] instr_max_wadr_c;
     wire [`ADDR_WIDTH - 1 : 0] input_max_wadr_c;
@@ -48,12 +48,11 @@ module user_proj_example_tb;
 
     reg [7:0] state_r;
     reg counter;
-    int file;
+    integer file;
 
-    reg [`CONFIG_WIDTH - 1 : 0] config_r [`NUM_CONFIGS - 1 : 0];
-    reg [ `INSTR_WIDTH - 1 : 0] instr_memory [`NUM_INSTRUCTIONS - 1 : 0];
-    reg [  `DATA_WIDTH - 1 : 0] input_memory [`TOTAL_INPUT_SIZE - 1 : 0];
-    reg [`OUTPUT_WIDTH - 1 : 0] output_memory [`OUTPUT_DATA_SIZE - 1 : 0];
+    reg [`CONFIG_WIDTH - 1 : 0] config_r[`NUM_CONFIGS - 1 : 0];
+    reg [ `INSTR_WIDTH - 1 : 0] instr_memory[`NUM_INSTRUCTIONS - 1 : 0];
+    reg [  `DATA_WIDTH - 1 : 0] input_memory[`TOTAL_INPUT_SIZE - 1 : 0];
 
     // caravel io variables
     wire wbs_ack_o;
@@ -63,19 +62,17 @@ module user_proj_example_tb;
     wire [`MPRJ_IO_PADS-1:0] io_in;
     wire [`MPRJ_IO_PADS-1:0] io_out;
     wire [`MPRJ_IO_PADS-1:0] io_oeb;
-    wire [2:0] user_irq;
+    wire [              2:0] user_irq;
 
-    // connect to io_in[19:0]
-    assign io_in[19] = clk;
-    assign io_in[0] = rst_n;
+    assign io_in[19]   = clk;
+    assign io_in[0]    = rst_n;
     assign io_in[16:1] = input_data_r[15:0]; 
-    assign io_in[17] = input_rdy_w & input_vld_r;
-    assign io_in[18] = output_rdy_r;
+    assign io_in[17]   = input_rdy_w & input_vld_r;
+    assign io_in[18]   = output_rdy_r;
 
-    // connect to io_out[27:20]
     assign output_data_w[7:0] = io_out[27:20];
-    assign output_vld_w = io_out[28];
-    assign input_rdy_w = io_out[29];
+    assign output_vld_w       = io_out[28];
+    assign input_rdy_w        = io_out[29];
 
     // connect to the rest of io_in pins
     assign io_in[`MPRJ_IO_PADS-1:20] = 18'd0;
@@ -83,13 +80,13 @@ module user_proj_example_tb;
     always #10 clk =~clk;
 
     user_proj_example user_proj_example_inst (
-        .wbs_ack_o(wbs_ack_o),
-        .wbs_dat_o(wbs_dat_o),
+        .wbs_ack_o  (wbs_ack_o  ),
+        .wbs_dat_o  (wbs_dat_o  ),
         .la_data_out(la_data_out),
-        .io_in(io_in),
-        .io_out(io_out),
-        .io_oeb(io_oeb),
-        .user_irq(user_irq)
+        .io_in      (io_in      ),
+        .io_out     (io_out     ),
+        .io_oeb     (io_oeb     ),
+        .irq        (user_irq   )
     );
 
     initial begin
@@ -100,13 +97,13 @@ module user_proj_example_tb;
         clk <= 0;
         rst_n <= 0;
         state_r <= 0;
+        counter <= 0;
         config_adr_r <= 0;
         input_vld_r  <= 0;
         input_adr_r  <= 0;
         input_data_r <= 0;
         output_rdy_r <= 1;
         output_adr_r <= 0;
-        counter      <= 0;
 
         config_r[0] <= instr_max_wadr_c;
         config_r[1] <= input_max_wadr_c;
@@ -155,6 +152,9 @@ module user_proj_example_tb;
                     end
                 end
             end
+            // else if (state_r == 3 && ~output_vld_w) begin
+            //     $finish(2);
+            // end
         end
 
         if (output_vld_w) begin
@@ -172,9 +172,11 @@ module user_proj_example_tb;
     end
 
     initial begin
+        // $dumpfile("user_proj_example_tb.vcd");
+		// $dumpvars(0, user_proj_example_tb);
         $fsdbDumpfile("outputs/run.fsdb");
         $fsdbDumpvars(0, user_proj_example_tb);
-        #20000;
+        #2000000;
         $finish(2);
     end
 

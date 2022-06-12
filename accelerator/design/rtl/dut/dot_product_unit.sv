@@ -23,6 +23,15 @@ module dot_product_unit #(
     logic [VECTOR_LANES-1:0][7:0][DATA_WIDTH-1:0] inst_dp4;
     logic [VECTOR_LANES-1:0][7:0]                 status_inst;
 
+    logic [EXP_WIDTH + SIG_WIDTH:0] one;
+    logic [EXP_WIDTH - 1:0] one_exp;
+    logic [SIG_WIDTH - 1:0] one_sig;
+
+    // integer number 1 with the FP number format
+    assign one_exp = ((1 << (EXP_WIDTH-1)) - 1);
+    assign one_sig = 0;
+    assign one = {1'b0, one_exp, one_sig}; // fp(1)
+
     // 3x3x3 matrix multiply-accumulate
     for (genvar i = 0; i < 3; i = i + 1) begin: mat_col
         for (genvar j = 0; j < 3; j = j + 1) begin: mat_row
@@ -33,7 +42,7 @@ module dot_product_unit #(
             assign dp4_mat_in[3*i+j][4] = vec_a[6+j];
             assign dp4_mat_in[3*i+j][5] = vec_b[3*i+2];
             assign dp4_mat_in[3*i+j][6] = vec_c[3*i+j];
-            assign dp4_mat_in[3*i+j][7] = 32'h3f800000;
+            assign dp4_mat_in[3*i+j][7] = one;
         end
     end
 

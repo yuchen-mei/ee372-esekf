@@ -102,11 +102,6 @@ module controller #(
             mat_inv_en_r <= mat_inv_en;
 
             if (state_r == `IDLE) begin
-                if (wbs_debug && fsm_start) begin
-                    state_r <= `INNER_LOOP;
-                    mvp_core_en <= 1;
-                end
-
                 if (params_fifo_empty_n) begin
                     config_r[config_adr_r] <= params_fifo_dout;
                     config_adr_r <= config_adr_r + 1;
@@ -114,6 +109,11 @@ module controller #(
                     if (config_adr_r == NUM_CONFIGS - 1) begin
                         state_r <= `INITIAL_FILL; 
                     end
+                end
+
+                if (wbs_debug && fsm_start) begin
+                    state_r <= `INNER_LOOP;
+                    mvp_core_en <= 1;
                 end
             end
             else if (state_r == `INITIAL_FILL) begin
@@ -143,11 +143,6 @@ module controller #(
                 end
             end
             else if (state_r == `RESET_INNER_LOOP) begin
-                if (wbs_debug && fsm_start) begin
-                    state_r <= `INNER_LOOP;
-                    mvp_core_en <= 1;
-                end
-
                 input_wadr_r   <= (input_wen && input_full_n) ? input_wadr_r + 8 : input_wadr_r;
                 output_wbadr_r <= (output_wb_ren && output_empty_n) ? output_wbadr_r + 8 : output_wbadr_r;
 
@@ -156,6 +151,11 @@ module controller #(
                     (output_wbadr_r >= output_radr_offset + output_max_adr_c)) begin
                     mvp_core_en <= 1;
                     state_r <= `INNER_LOOP;
+                end
+
+                if (wbs_debug && fsm_start) begin
+                    state_r <= `INNER_LOOP;
+                    mvp_core_en <= 1;
                 end
             end
         end

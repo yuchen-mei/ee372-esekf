@@ -5,7 +5,21 @@ outputs:
   - design.vcs.v
 
 commands:
-  - cat rv_opcodes.v verilog/*.v > outputs/design.v
-  - cat rv_opcodes.v verilog/*.v > outputs/design.vcs.v 
-  # - cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.v
-  # - cat rv_opcodes.sv dut/*.sv dut/*.v > outputs/design.vcs.v 
+  # - cat rv_opcodes.v verilog/*.v > outputs/design.v
+  # - cat rv_opcodes.v verilog/*.v > outputs/design.vcs.v 
+  - cat rv_opcodes.v dut/*.sv dut/*.v > outputs/design.v
+  # - cat sim_ver/DW_fp_cmp_DG.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_div_DG.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_dp4.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_flt2i.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_i2flt.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_mac_DG.v >> outputs/design.v
+  # - cat sim_ver/DW_lp_fp_multifunc_DG.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_div.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_dp2.v >> outputs/design.v
+  # - cat sim_ver/DW_fp_ifp_conv.v >> outputs/design.v
+  # - cat sim_ver/DW_ifp_addsub.v >> outputs/design.v
+  # - cat sim_ver/DW_ifp_fp_conv.v >> outputs/design.v
+  # - cat sim_ver/DW_ifp_mult.v >> outputs/design.v
+  # - cat sim_ver/DW_lp_fp_multifunc.v >> outputs/design.v
+  - cp outputs/design.v outputs/design.vcs.v

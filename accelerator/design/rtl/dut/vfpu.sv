@@ -26,6 +26,15 @@ module vfpu #(
         logic [DATA_WIDTH-1:0] b_neg;
         logic [DATA_WIDTH-1:0] c_neg;
 
+        logic [EXP_WIDTH + SIG_WIDTH:0] one;
+        logic [EXP_WIDTH - 1:0] one_exp;
+        logic [SIG_WIDTH - 1:0] one_sig;
+
+        // integer number 1 with the FP number format
+        assign one_exp = ((1 << (EXP_WIDTH-1)) - 1);
+        assign one_sig = 0;
+        assign one = {1'b0, one_exp, one_sig}; // fp(1)
+
         assign b_neg = {~vec_b[i][DATA_WIDTH-1], vec_b[i][DATA_WIDTH-2:0]};
         assign c_neg = {~vec_c[i][DATA_WIDTH-1], vec_c[i][DATA_WIDTH-2:0]};
 
@@ -33,17 +42,41 @@ module vfpu #(
 
         always_comb begin
             case (opcode)
-                `FADD,   `FSUB:   inst_b = 32'h3f800000;
-                `FNMADD, `FNMSUB: inst_b = b_neg;
-                default:          inst_b = vec_b[i];
-            endcase
-
-            case (opcode)
-                `FADD:           inst_c = vec_b[i];
-                `FSUB:           inst_c = b_neg;
-                `FMUL:           inst_c = 32'b0;
-                `FMSUB, `FNMADD: inst_c = c_neg;
-                default:         inst_c = vec_c[i];
+                `FADD:
+                begin
+                    inst_b = one;
+                    inst_c = vec_b[i];
+                end
+                `FSUB:
+                begin
+                    inst_b = one;
+                    inst_c = b_neg;
+                end
+                `FMUL:
+                begin
+                    inst_b = vec_b[i];
+                    inst_c = 32'b0;
+                end
+                `FMSUB:
+                begin
+                    inst_b = vec_b[i];
+                    inst_c = c_neg;
+                end
+                `FNMADD:
+                begin
+                    inst_b = b_neg;
+                    inst_c = c_neg;
+                end
+                `FNMSUB:
+                begin
+                    inst_b = b_neg;
+                    inst_c = vec_c[i];
+                end
+                default:
+                begin
+                    inst_b = vec_b[i];
+                    inst_c = vec_c[i];
+                end
             endcase
         end
 

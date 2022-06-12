@@ -45,6 +45,15 @@
 `define VTRANSPOSE 6'b110001
 `define VIDENTITY  6'b110010
 
+// VFUNARY0
+`define VFCVTXUF   5'b00000
+`define VFCVTXF    5'b00001
+`define VFCVTFXU   5'b00010
+`define VFCVTFX    5'b00011
+
+// VFUNARY1
+`define VFCLASS    5'b10000
+
 `define ALU_ADD    4'b0000
 `define ALU_SUB    4'b0001
 `define ALU_SLT    4'b0010
