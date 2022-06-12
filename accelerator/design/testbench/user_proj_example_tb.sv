@@ -80,6 +80,10 @@ module user_proj_example_tb;
     always #10 clk =~clk;
 
     user_proj_example user_proj_example_inst (
+    `ifdef USE_POWER_PINS
+        .vccd1      (vccd1      ),	// User area 1 1.8V supply
+        .vssd1      (vssd1      ),	// User area 1 digital ground
+    `endif
         .wbs_ack_o  (wbs_ack_o  ),
         .wbs_dat_o  (wbs_dat_o  ),
         .la_data_out(la_data_out),
@@ -179,5 +183,11 @@ module user_proj_example_tb;
         #2000000;
         $finish(2);
     end
+
+    `ifdef GL
+    initial begin
+        $sdf_annotate("inputs/design.sdf", user_proj_example_tb);
+    end
+    `endif
 
 endmodule

@@ -14,8 +14,15 @@
 # ecoRoute
 
 # get_db base_cells -if {.num_base_pins == 1}
-setSignoffOptMode -fixGlitch true 
-signoffOptDesign -drv
+
+
+# setSignoffOptMode -fixGlitch true 
+# signoffOptDesign -drv
+
+setOptMode -fixCap true -fixTran false -fixFanoutLoad false
+setOptMode -drcMargin 0.5
+setOptMode -setupTargetSlack 0.3
+optDesign -postRoute
 
 setAnalysisMode -analysisType onChipVariation -cppr both
 setNanoRouteMode -quiet -drouteFixAntenna 1
@@ -27,14 +34,13 @@ verify_drc
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# need a second fix
-verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
+# # need a second fix
+# verify_drc
+# verifyProcessAntenna
+# editDelete -regular_wire_with_drc
+# ecoRoute
 
-setOptMode -fixCap true -fixTran true -fixFanoutLoad false
-optDesign -postRoute
+# optDesign -postRoute -drv
 
 # setAnalysisMode -analysisType onChipVariation -cppr both
 # setNanoRouteMode -quiet -drouteFixAntenna 1

@@ -36,6 +36,13 @@ saveNetlist -excludeLeafCell                   \
             -phys                              \
             $vars(results_dir)/$vars(design).lvs.v
 
+saveNetlist -excludeLeafCell                   \
+            -flat                              \
+            -flattenBus                        \
+            -phys                              \
+            $vars(results_dir)/$vars(design).flatbuslvs.v
+
+
 # Write netlist for Virtuoso simulation
 #
 # This is the same as the lvs netlist but does not have decaps to speed up
@@ -61,14 +68,21 @@ saveNetlist -includePowerGround -excludeLeafCell $vars(results_dir)/$vars(design
 
 # Write LEF for hierarchical bottom-up design
 
-write_lef_abstract                                                       \
-  -specifyTopLayer $vars(max_route_layer)                                \
+#write_lef_abstract                                                       \
+#  -specifyTopLayer $vars(max_route_layer)                                \
+#  -PGPinLayers [list $ADK_POWER_MESH_BOT_LAYER $ADK_POWER_MESH_TOP_LAYER] \
+#  -noCutObs                                                              \
+#  -stripePin                                                             \
+#  $vars(results_dir)/$vars(design).lef
+
+write_lef_abstract                                                        \
+  -specifyTopLayer 5                                                      \
   -PGPinLayers [list $ADK_POWER_MESH_BOT_LAYER $ADK_POWER_MESH_TOP_LAYER] \
-  -stripePin                                                             \
+  -extractBlockObs                                                        \
+  -stripePin                                                              \
   $vars(results_dir)/$vars(design).lef
 
 # Save DEF for use in running DC again
 
 defOut -routing $vars(results_dir)/$vars(design).def.gz
-
 

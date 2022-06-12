@@ -100,8 +100,8 @@ def construct():
 
   vcs_sim         = Step( 'synopsys-vcs-sim',            default=True )
   # rtl_sim         = vcs_sim.clone()
-  # gl_sim          = vcs_sim.clone()
-  gl_sim          = Step( this_dir + '/synopsys-vcs-sim-sdf'            )
+  gl_sim          = vcs_sim.clone()
+  # gl_sim          = Step( this_dir + '/synopsys-vcs-sim-sdf'            )
   # icarus_sim          = Step( this_dir + '/open-icarus-simulation'          )
   # rtl_sim         = icarus_sim.clone()
   # gl_sim          = icarus_sim.clone()
@@ -238,6 +238,7 @@ def construct():
 
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
+  g.connect_by_name( testbench,       gl_sim          ) # testbench.sv
   g.connect_by_name( rtl_sim,         gen_saif_rtl    ) # run.vcd
 
   g.connect_by_name( sram,            rtl_sim         )
