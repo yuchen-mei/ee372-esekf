@@ -28,8 +28,8 @@ module memory_controller #(
     output logic [               DATAPATH-1:0] data_mem_wdata,
     input  logic [               DATAPATH-1:0] data_mem_rdata,
     // Matrix inversion
-    input  logic [           9*DATA_WIDTH-1:0] mat_inv_in_l,
-    input  logic [           9*DATA_WIDTH-1:0] mat_inv_in_u
+    input  logic [           9*DATA_WIDTH-1:0] mat_inv_out_l,
+    input  logic [           9*DATA_WIDTH-1:0] mat_inv_out_u
 );
 
     localparam MASK_BITS = DATAPATH/32;
@@ -99,10 +99,10 @@ module memory_controller #(
             mem_rdata = instr_mem_rdata;
         end
         else if (mem_addr_r == INVMAT_L_ADDR) begin
-            mem_rdata = mat_inv_in_l;
+            mem_rdata = mat_inv_out_l;
         end
         else if (mem_addr_r == INVMAT_U_ADDR) begin
-            mem_rdata = mat_inv_in_u;
+            mem_rdata = mat_inv_out_u;
         end
     end
 

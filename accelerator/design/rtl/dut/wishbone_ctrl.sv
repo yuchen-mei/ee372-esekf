@@ -15,22 +15,22 @@ module wishbone_ctl #(
     output logic [31:0] wbs_dat_o,
     // output
     output logic        wbs_debug,
-    output logic        fsm_start,
+    output logic        wbs_fsm_start,
 
-    output logic        wbs_mem_csb,
-    output logic        wbs_mem_web,
     output logic [11:0] wbs_mem_addr,
     output logic [31:0] wbs_mem_wdata,
-    input  logic [31:0] wbs_mem_rdata
+    input  logic [31:0] wbs_mem_rdata,
+    output logic        wbs_mem_write,
+    output logic        wbs_mem_read
 );
 
 // ==============================================================================
 // Wishbone Memory Mapped Address
 // ==============================================================================
-    localparam WBS_ADDR_MASK       = 32'hFFFF_0000;
-    localparam WBS_MEM_ADDR        = 32'h3000_0000;
-    localparam WBS_DEBUG_ADDR      = 32'h3001_0000;
-    localparam WBS_FSM_START_ADDR  = 32'h3002_0000;
+    localparam WBS_DEBUG_ADDR     = 32'h30000000;
+    localparam WBS_FSM_START_ADDR = 32'h30000004;
+    localparam WBS_MEM_MASK       = 32'hFFFF0000;
+    localparam WBS_MEM_ADDR       = 32'h30010000;
 
 // ==============================================================================
 // Request, Acknowledgement
@@ -71,42 +71,47 @@ module wishbone_ctl #(
 
     always @(posedge wb_clk_i) begin
         if (wb_rst_i) begin
-            wbs_mem_csb   <= 0;
-            wbs_mem_web   <= 0;
-            wbs_mem_addr  <= 12'b0;
-            wbs_mem_wdata <= 32'b0;
+            wbs_debug <= 0;
         end
-        else if ((wbs_adr_i & WBS_ADDR_MASK) == WBS_MEM_ADDR) begin
-            wbs_mem_addr  <= wbs_adr_i[11:0];
-            wbs_mem_csb   <= wbs_req_write || wbs_req_read;
-            wbs_mem_web   <= wbs_req_write;
-	        wbs_mem_wdata <= wbs_dat_i;
-        end
-    end
-
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i) begin
-            wbs_dat_o <= 32'd0;
-        end
-        else begin
-            wbs_dat_o <= wbs_mem_rdata;
-        end
-    end
-
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i)
-            wbs_debug <= '0;
-        else if (wbs_req_write & (wbs_adr_i == WBS_DEBUG_ADDR)) begin
+        else if (wbs_req_write && wbs_adr_i == WBS_DEBUG_ADDR) begin
             wbs_debug <= wbs_dat_i[0];
         end
     end
 
     always @(posedge wb_clk_i) begin
         if (wb_rst_i) begin
-            fsm_start <= 0;
+            wbs_fsm_start <= 0;
         end
-        else if (wbs_req_write && (wbs_adr_i == WBS_FSM_START_ADDR)) begin
-            fsm_start <= 1;
+        else if (wbs_req_write && wbs_adr_i == WBS_FSM_START_ADDR) begin
+            wbs_fsm_start <= wbs_dat_i[0];
+        end
+        else begin
+            wbs_fsm_start <= 0;
+        end
+    end
+
+    always @(posedge wb_clk_i) begin
+        if (wb_rst_i) begin
+            wbs_mem_addr  <= 12'b0;
+            wbs_mem_wdata <= '0;
+            wbs_mem_write <= 1'b0;
+        end
+        else if (wbs_req_write && ((wbs_adr_i & WBS_MEM_MASK) == WBS_MEM_ADDR)) begin
+            wbs_mem_addr  <= wbs_adr_i[13:2];
+            wbs_mem_wdata <= wbs_dat_i;
+            wbs_mem_write <= 1'b1;
+        end
+        else begin
+            wbs_mem_write <= 1'b0;
+        end
+    end
+
+    always @(posedge wb_clk_i) begin
+        if (wb_rst_i) begin
+            wbs_dat_o <= '0;
+        end
+        else begin
+            wbs_dat_o <= wbs_mem_rdata;
         end
     end
 

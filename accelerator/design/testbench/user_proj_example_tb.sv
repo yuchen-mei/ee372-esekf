@@ -21,18 +21,18 @@ module user_proj_example_tb;
     // design top variables
     reg clk;
     reg rst_n;
+    reg wbs_clk_i;
 
-    reg [`ADDR_WIDTH - 1 : 0] config_adr_r;
+    reg   [`ADDR_WIDTH - 1 : 0] input_adr_r;
 
     wire                        input_rdy_w;
     reg                         input_vld_r;
     reg  [`INPUT_WIDTH - 1 : 0] input_data_r;
-    reg  [ `ADDR_WIDTH - 1 : 0] input_adr_r;
 
     reg                          output_rdy_r;
     wire                         output_vld_w;
     wire [`OUTPUT_WIDTH - 1 : 0] output_data_w;
-    reg  [  `ADDR_WIDTH - 1 : 0] output_adr_r;
+    
 
     wire [`ADDR_WIDTH - 1 : 0] instr_max_wadr_c;
     wire [`ADDR_WIDTH - 1 : 0] input_max_wadr_c;
@@ -77,15 +77,27 @@ module user_proj_example_tb;
     // connect to the rest of io_in pins
     assign io_in[`MPRJ_IO_PADS-1:20] = 18'd0;
 
-    always #10 clk =~clk;
+    always #10 clk = ~clk;
+
+    always #100 wbs_clk_i = ~wbs_clk_i;
 
     user_proj_example user_proj_example_inst (
     `ifdef USE_POWER_PINS
         .vccd1      (vccd1      ),	// User area 1 1.8V supply
         .vssd1      (vssd1      ),	// User area 1 digital ground
     `endif
+        .wb_clk_i   (wbs_clk_i  ),
+        .wb_rst_i   (1'b1       ),
+        // .wbs_stb_i  (wbs_stb_i  ),
+        // .wbs_cyc_i  (wbs_cyc_i  ),
+        // .wbs_we_i   (wbs_we_i   ),
+        // .wbs_sel_i  (wbs_sel_i  ),
+        // .wbs_dat_i  (wbs_dat_i  ),
+        // .wbs_adr_i  (wbs_adr_i  ),
+
         .wbs_ack_o  (wbs_ack_o  ),
         .wbs_dat_o  (wbs_dat_o  ),
+
         .la_data_out(la_data_out),
         .io_in      (io_in      ),
         .io_out     (io_out     ),
@@ -98,16 +110,18 @@ module user_proj_example_tb;
         $readmemh("inputs/input_data.txt", input_memory);
         file = $fopen("outputs/output.txt", "w");
 
-        clk <= 0;
+        clk   <= 0;
         rst_n <= 0;
+
+        wbs_clk_i <= 0;
+
         state_r <= 0;
         counter <= 0;
-        config_adr_r <= 0;
-        input_vld_r  <= 0;
+
         input_adr_r  <= 0;
+        input_vld_r  <= 0;
         input_data_r <= 0;
         output_rdy_r <= 1;
-        output_adr_r <= 0;
 
         config_r[0] <= instr_max_wadr_c;
         config_r[1] <= input_max_wadr_c;
@@ -115,19 +129,19 @@ module user_proj_example_tb;
         config_r[3] <= output_max_adr_c;
         config_r[4] <= output_adr_offset;
 
-        #20 rst_n <= 0;
-        #20 rst_n <= 1;
+        #500 rst_n <= 1;
     end
 
     always @ (posedge clk) begin
         if (rst_n) begin
             if (state_r == 0) begin
                 if (input_rdy_w) begin
-                    input_data_r <= config_r[config_adr_r]; 
+                    input_data_r <= config_r[input_adr_r]; 
                     input_vld_r <= 1;
-                    config_adr_r <= config_adr_r + 1;
-                    if (config_adr_r == `NUM_CONFIGS - 1) begin
+                    input_adr_r <= input_adr_r + 1;
+                    if (input_adr_r == `NUM_CONFIGS - 1) begin
                         state_r <= 1;
+                        input_adr_r <= 0;
                     end
                 end
             end
@@ -140,8 +154,8 @@ module user_proj_example_tb;
                     if (input_adr_r == `NUM_INSTRUCTIONS) begin
                         state_r <= 2;
                         counter <= 0;
-                        input_vld_r <= 1;
                         input_adr_r <= 0;
+                        input_vld_r <= 1;
                     end
                 end
             end
@@ -156,9 +170,6 @@ module user_proj_example_tb;
                     end
                 end
             end
-            // else if (state_r == 3 && ~output_vld_w) begin
-            //     $finish(2);
-            // end
         end
 
         if (output_vld_w) begin
@@ -180,7 +191,7 @@ module user_proj_example_tb;
 		// $dumpvars(0, user_proj_example_tb);
         $fsdbDumpfile("outputs/run.fsdb");
         $fsdbDumpvars(0, user_proj_example_tb);
-        #2000000;
+        #50000;
         $finish(2);
     end
 

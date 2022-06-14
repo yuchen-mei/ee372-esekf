@@ -19,7 +19,7 @@ module controller #(
     input  logic                            clk,
     input  logic                            rst_n,
     input  logic                            wbs_debug,
-    input  logic                            fsm_start,
+    input  logic                            wbs_fsm_start,
 
     input  logic [    INPUT_FIFO_WIDTH-1:0] params_fifo_dout,
     output logic                            params_fifo_deq,
@@ -73,7 +73,6 @@ module controller #(
     reg [       ADDR_WIDTH-1:0] output_wbadr_r;
     reg                         mat_inv_en_r;
 
-    assign config_adr     = config_adr_r;
     assign instr_wadr     = instr_wadr_r;
     assign input_wadr     = input_wadr_r[3+:DATA_MEM_ADDR_WIDTH];
     assign output_wb_radr = output_wbadr_r[3+:DATA_MEM_ADDR_WIDTH];
@@ -111,7 +110,7 @@ module controller #(
                     end
                 end
 
-                if (wbs_debug && fsm_start) begin
+                if (wbs_debug && wbs_fsm_start) begin
                     state_r <= `INNER_LOOP;
                     mvp_core_en <= 1;
                 end
@@ -153,7 +152,7 @@ module controller #(
                     state_r <= `INNER_LOOP;
                 end
 
-                if (wbs_debug && fsm_start) begin
+                if (wbs_debug && wbs_fsm_start) begin
                     state_r <= `INNER_LOOP;
                     mvp_core_en <= 1;
                 end

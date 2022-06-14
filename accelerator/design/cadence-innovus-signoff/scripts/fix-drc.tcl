@@ -1,52 +1,42 @@
+# get diode cell name
+# get_db base_cells -if {.num_base_pins == 1}
+
+# setSignoffOptMode -fixGlitch true 
+# signoffOptDesign -drv
+
+# temporarily turn off antenna fixing and reduce timing optimization
 # setNanoRouteMode -drouteFixAntenna 0
 # setNanoRouteMode -routeWithTimingDriven 1
 # setNanoRouteMode -quiet -routeWithSiDriven false
 # routeDesign -globalDetail -viaOpt -wireOpt
 
-# setAnalysisMode -analysisType onChipVariation -cppr both
-# setNanoRouteMode -quiet -drouteFixAntenna 1
-# setNanoRouteMode -quiet -routeInsertAntennaDiode 1
-# setNanoRouteMode -quiet -routeAntennaCellName "sky130_fd_sc_hd__diode_2"
-# setnanoroutemode -routeInsertDiodeForClockNets true
-# setNanoRouteMode -quiet -drouteEndIteration 1000
-
-# editDelete -regular_wire_with_drc
-# ecoRoute
-
-# get_db base_cells -if {.num_base_pins == 1}
-
-
-# setSignoffOptMode -fixGlitch true 
-# signoffOptDesign -drv
-
-setOptMode -fixCap true -fixTran false -fixFanoutLoad false
-setOptMode -drcMargin 0.5
+# fix drv violations
+setOptMode -fixCap true -fixTran true -fixFanoutLoad false
+# setOptMode -drcMargin 0.4
 setOptMode -setupTargetSlack 0.3
 optDesign -postRoute
 
+# report all drc and antenna violations and reroute violated nets
 setAnalysisMode -analysisType onChipVariation -cppr both
-setNanoRouteMode -quiet -drouteFixAntenna 1
-setNanoRouteMode -quiet -routeInsertAntennaDiode 1
-setNanoRouteMode -quiet -routeInsertDiodeForClockNets 1
-setNanoRouteMode -quiet -routeAntennaCellName "sky130_fd_sc_hd__diode_2"
-setNanoRouteMode -quiet -drouteEndIteration 500
+setNanoRouteMode -drouteFixAntenna true
+setNanoRouteMode -routeInsertAntennaDiode true
+setNanoRouteMode -routeInsertDiodeForClockNets true
+setNanoRouteMode -routeAntennaCellName "sky130_fd_sc_hd__diode_2"
+setNanoRouteMode -drouteEndIteration 1000
+# 1st fixing
 verify_drc
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# # need a second fix
-# verify_drc
-# verifyProcessAntenna
-# editDelete -regular_wire_with_drc
-# ecoRoute
+# 2nd fixing
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 3rd fixing
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
 
 # optDesign -postRoute -drv
-
-# setAnalysisMode -analysisType onChipVariation -cppr both
-# setNanoRouteMode -quiet -drouteFixAntenna 1
-# setNanoRouteMode -quiet -routeInsertAntennaDiode 1
-# setNanoRouteMode -quiet -routeInsertDiodeForClockNets 1
-# setNanoRouteMode -quiet -routeAntennaCellName "sky130_fd_sc_hd__diode_2"
-# setNanoRouteMode -quiet -drouteEndIteration 500
-# editDelete -regular_wire_with_drc
-# ecoRoute

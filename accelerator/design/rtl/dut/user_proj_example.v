@@ -78,29 +78,30 @@ module user_proj_example #(
 // ==============================================================================
 
     wire        wbs_debug;
-    wire        fsm_start;
-    wire        wbs_mem_csb;
-    wire        wbs_mem_web;
+    wire        wbs_fsm_start;
+
     wire [11:0] wbs_mem_addr;
     wire [31:0] wbs_mem_wdata;
     wire [31:0] wbs_mem_rdata;
+    wire        wbs_mem_write;
+    wire        wbs_mem_read;
     // clock/reset mux
     wire ckmux_clk;
     wire ckmux_rst;
     ckmux ckmux_u0 (
-      .select  (wbs_debug)
-    , .clk0    (wb_clk_i )
-    , .clk1    (io_clk   )
-    , .out_clk (ckmux_clk)
+        .select  (wbs_debug),
+        .clk0    (io_clk   ),
+        .clk1    (wb_clk_i ),
+        .out_clk (ckmux_clk)
     );
-    assign ckmux_rst = (wbs_debug) ? io_rst_n : ~wb_rst_i;
+    assign ckmux_rst = (wbs_debug) ?  ~wb_rst_i : io_rst_n;
 
     wishbone_ctl #(
         .WISHBONE_BASE_ADDR(WISHBONE_BASE_ADDR)
     ) wbs_ctl_u0 (
         // wishbone input
-        .wb_clk_i      (ckmux_clk    ),
-        .wb_rst_i      (ckmux_rst    ),
+        .wb_clk_i      (wb_clk_i     ),
+        .wb_rst_i      (wb_rst_i     ),
         .wbs_stb_i     (wbs_stb_i    ),
         .wbs_cyc_i     (wbs_cyc_i    ),
         .wbs_we_i      (wbs_we_i     ),
@@ -112,12 +113,12 @@ module user_proj_example #(
         .wbs_dat_o     (wbs_dat_o    ),
         // output
         .wbs_debug     (wbs_debug    ),
-        .fsm_start     (fsm_start    ),
-        .wbs_mem_csb   (wbs_mem_csb  ),
-        .wbs_mem_web   (wbs_mem_web  ),
+        .wbs_fsm_start (wbs_fsm_start),
         .wbs_mem_addr  (wbs_mem_addr ),
         .wbs_mem_wdata (wbs_mem_wdata),
-        .wbs_mem_rdata (wbs_mem_rdata)
+        .wbs_mem_rdata (wbs_mem_rdata),
+        .wbs_mem_write (wbs_mem_write),
+        .wbs_mem_read  (wbs_mem_read )
     );
 
 // ==============================================================================
@@ -125,8 +126,8 @@ module user_proj_example #(
 // ==============================================================================
 
     accelerator accelerator_inst (
-        .clk           (io_clk       ),
-        .rst_n         (io_rst_n     ),
+        .clk           (ckmux_clk    ),
+        .rst_n         (ckmux_rst    ),
 
         .input_rdy     (input_rdy_w  ),
         .input_vld     (input_vld_w  ),
@@ -137,12 +138,13 @@ module user_proj_example #(
         .output_data   (output_data_w),
 
         .wbs_debug     (wbs_debug    ),
-        .fsm_start     (fsm_start    ),
-        .wbs_mem_csb   (wbs_mem_csb  ),
-        .wbs_mem_web   (wbs_mem_web  ),
+        .wbs_fsm_start (wbs_fsm_start),
+
         .wbs_mem_addr  (wbs_mem_addr ),
         .wbs_mem_wdata (wbs_mem_wdata),
-        .wbs_mem_rdata (wbs_mem_rdata)
+        .wbs_mem_rdata (wbs_mem_rdata),
+        .wbs_mem_write (wbs_mem_write),
+        .wbs_mem_read  (wbs_mem_read )
     );
 
 endmodule

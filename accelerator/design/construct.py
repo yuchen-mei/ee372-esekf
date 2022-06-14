@@ -238,7 +238,7 @@ def construct():
 
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
-  g.connect_by_name( testbench,       gl_sim          ) # testbench.sv
+  # g.connect_by_name( testbench,       gl_sim          ) # testbench.sv
   g.connect_by_name( rtl_sim,         gen_saif_rtl    ) # run.vcd
 
   g.connect_by_name( sram,            rtl_sim         )
