@@ -15,9 +15,16 @@
 set clock_net  io_in[19]
 set clock_name ideal_clock
 
+set wbclock_net  wb_clk_i
+set wbclock_name ideal_clock_wb
+
 create_clock -name ${clock_name} \
              -period ${dc_clock_period} \
              [get_ports ${clock_net}]
+
+create_clock -name ${wbclock_name} \
+             -period 100 \
+             [get_ports ${wbclock_net}]            
 
 # This constraint sets the load capacitance in picofarads of the
 # output pins of your design.
@@ -37,10 +44,12 @@ set_driving_cell -no_design_rule \
 # Make this non-zero to avoid hold buffers on input-registered designs
 
 set_input_delay -clock ${clock_name} [expr ${dc_clock_period}/2.0] [remove_from_collection [all_inputs] [get_ports $clock_net]]
+set_input_delay -clock ${wbclock_name} [expr 100 * 0.5] [remove_from_collection [all_inputs] [get_ports $wbclock_net]]
 
 # set_output_delay constraints for output ports
 
 set_output_delay -clock ${clock_name} 0 [all_outputs]
+set_output_delay -clock ${wbclock_name} [expr 100 * 0.5] [all_outputs]
 
 # Make all signals limit their fanout
 

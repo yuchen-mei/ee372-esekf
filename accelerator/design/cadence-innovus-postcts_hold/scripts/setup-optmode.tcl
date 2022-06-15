@@ -11,7 +11,7 @@
 
 setOptMode -fixHoldAllowOverlap TRUE
 setOptMode -holdTargetSlack  0.005
-setOptMode -setupTargetSlack 1.000
+setOptMode -setupTargetSlack 1
 # optDesign -postCTS -drv
 # optDesign -postCTS
 
