@@ -1,3 +1,5 @@
+`timescale 1 ns / 1 ps
+
 `define INPUT_WIDTH 16
 `define OUTPUT_WIDTH 8
 
@@ -79,7 +81,7 @@ module user_proj_example_tb;
 
     always #10 clk = ~clk;
 
-    always #100 wbs_clk_i = ~wbs_clk_i;
+    always #50 wbs_clk_i = ~wbs_clk_i;
 
     user_proj_example user_proj_example_inst (
     `ifdef USE_POWER_PINS
@@ -129,7 +131,7 @@ module user_proj_example_tb;
         config_r[3] <= output_max_adr_c;
         config_r[4] <= output_adr_offset;
 
-        #500 rst_n <= 1;
+        #350 rst_n <= 1;
     end
 
     always @ (posedge clk) begin

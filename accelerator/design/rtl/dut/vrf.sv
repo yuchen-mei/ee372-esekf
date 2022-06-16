@@ -18,7 +18,7 @@ module vrf #(
     output logic [DATA_WIDTH-1:0] data_r3
 );
 
-    reg [DATA_WIDTH-1:0] vectors [DEPTH-1:0];
+    reg [DATA_WIDTH-1:0] vectors[DEPTH-1:0];
 
     assign data_r1 = (wen & (addr_w == addr_r1)) ? data_w : vectors[addr_r1];
     assign data_r2 = (wen & (addr_w == addr_r2)) ? data_w : vectors[addr_r2];

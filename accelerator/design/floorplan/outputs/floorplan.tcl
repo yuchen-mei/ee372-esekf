@@ -274,7 +274,7 @@ setDontUse sky130_fd_sc_hd__clkdlybuf4s50_2 true
 setDontUse sky130_fd_sc_hd__and2_0 true
 
 setOptMode -drcMargin 0.3
-setOptMode -fixFanoutLoad    false
+setOptMode -fixFanoutLoad false
 setOptMode -bufferAssignNets true
 setOptMode -maxLength 800
 setOptMode -fixCap true

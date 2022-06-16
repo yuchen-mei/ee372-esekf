@@ -13,7 +13,7 @@
 # fix drv violations
 setOptMode -fixCap true -fixTran true -fixFanoutLoad false
 # setOptMode -drcMargin 0.4
-setOptMode -setupTargetSlack 0.3
+# setOptMode -setupTargetSlack 0.3
 optDesign -postRoute
 
 # report all drc and antenna violations and reroute violated nets

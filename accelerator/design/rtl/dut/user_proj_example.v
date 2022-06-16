@@ -79,22 +79,29 @@ module user_proj_example #(
 
     wire        wbs_debug;
     wire        wbs_fsm_start;
+    wire        wbs_fsm_done;
 
+    wire        wbs_debug_synced;
+    wire        wbs_fsm_start_synced;
+    wire        wbs_fsm_done_synced;
+
+    wire        wbs_mem_we;
+    wire        wbs_mem_ren;
     wire [11:0] wbs_mem_addr;
     wire [31:0] wbs_mem_wdata;
     wire [31:0] wbs_mem_rdata;
-    wire        wbs_mem_write;
-    wire        wbs_mem_read;
+
     // clock/reset mux
-    wire ckmux_clk;
-    wire ckmux_rst;
-    ckmux ckmux_u0 (
-        .select  (wbs_debug),
-        .clk0    (io_clk   ),
-        .clk1    (wb_clk_i ),
-        .out_clk (ckmux_clk)
+    wire user_proj_clk;
+    wire user_proj_rst_n;
+
+    clock_mux #(2) clk_mux (
+        .clk        ({io_clk, wb_clk_i}),
+        .clk_select (wbs_debug ? 2'b01 : 2'b10),
+        .clk_out    (user_proj_clk)
     );
-    assign ckmux_rst = (wbs_debug) ?  ~wb_rst_i : io_rst_n;
+
+    assign user_proj_rst_n = (wbs_debug) ? ~wb_rst_i : io_rst_n;
 
     wishbone_ctl #(
         .WISHBONE_BASE_ADDR(WISHBONE_BASE_ADDR)
@@ -114,37 +121,66 @@ module user_proj_example #(
         // output
         .wbs_debug     (wbs_debug    ),
         .wbs_fsm_start (wbs_fsm_start),
+        .wbs_fsm_done  (wbs_fsm_done_synced),
+
+        .wbs_mem_we    (wbs_mem_we   ),
+        .wbs_mem_ren   (wbs_mem_ren  ),
         .wbs_mem_addr  (wbs_mem_addr ),
         .wbs_mem_wdata (wbs_mem_wdata),
-        .wbs_mem_rdata (wbs_mem_rdata),
-        .wbs_mem_write (wbs_mem_write),
-        .wbs_mem_read  (wbs_mem_read )
+        .wbs_mem_rdata (wbs_mem_rdata)
     );
 
 // ==============================================================================
 // IO Logic
 // ==============================================================================
 
-    accelerator accelerator_inst (
-        .clk           (ckmux_clk    ),
-        .rst_n         (ckmux_rst    ),
+    accelerator acc_inst (
+        .clk           (user_proj_clk   ),
+        .rst_n         (user_proj_rst_n ),
 
-        .input_rdy     (input_rdy_w  ),
-        .input_vld     (input_vld_w  ),
-        .input_data    (input_data_w ),
+        .input_rdy     (input_rdy_w     ),
+        .input_vld     (input_vld_w     ),
+        .input_data    (input_data_w    ),
 
-        .output_rdy    (output_rdy_w ),
-        .output_vld    (output_vld_w ),
-        .output_data   (output_data_w),
+        .output_rdy    (output_rdy_w    ),
+        .output_vld    (output_vld_w    ),
+        .output_data   (output_data_w   ),
 
-        .wbs_debug     (wbs_debug    ),
-        .wbs_fsm_start (wbs_fsm_start),
+        .wbs_debug     (wbs_debug_synced    ),
+        .wbs_fsm_start (wbs_fsm_start_synced),
+        .wbs_fsm_done  (wbs_fsm_done    ),
 
-        .wbs_mem_addr  (wbs_mem_addr ),
-        .wbs_mem_wdata (wbs_mem_wdata),
-        .wbs_mem_rdata (wbs_mem_rdata),
-        .wbs_mem_write (wbs_mem_write),
-        .wbs_mem_read  (wbs_mem_read )
+        .wbs_mem_we    (wbs_mem_we      ),
+        .wbs_mem_ren   (wbs_mem_ren     ),
+        .wbs_mem_addr  (wbs_mem_addr    ),
+        .wbs_mem_wdata (wbs_mem_wdata   ),
+        .wbs_mem_rdata (wbs_mem_rdata   )
+    );
+
+    SyncBit wbs_debug_sync (
+        .sCLK  (wb_clk_i            ),
+        .sRST  (~wb_rst_i           ),
+        .dCLK  (io_clk              ),
+        .sEN   (1'b1                ),
+        .sD_IN (wbs_debug           ),
+        .dD_OUT(wbs_debug_synced    )
+    );
+
+    SyncPulse wbs_fsm_start_sync (
+        .sCLK  (wb_clk_i            ),
+        .sRST  (~wb_rst_i           ),
+        .dCLK  (io_clk              ),
+        .sEN   (wbs_fsm_start       ),
+        .dPulse(wbs_fsm_start_synced)
+    );
+
+    SyncBit wbs_fsm_done_sync (
+        .sCLK  (io_clk              ),
+        .sRST  (io_rst_n            ),
+        .dCLK  (wb_clk_i            ),
+        .sEN   (1'b1                ),
+        .sD_IN (wbs_fsm_done        ),
+        .dD_OUT(wbs_fsm_done_synced )
     );
 
 endmodule

@@ -64,9 +64,14 @@ module dot_product_unit #(
         assign a_neg[i] = {~vec_a[i][DATA_WIDTH-1], vec_a[i][DATA_WIDTH-2:0]};
     end
 
+    // w = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1
+    // x = w0 * x1 + x0 * w1 + y0 * z1 - z0 * y1
+    // y = w0 * y1 - x0 * z1 + y0 * w1 + z0 * x1
+    // z = w0 * z1 + x0 * y1 - y0 * x1 + z0 * w1
+
     assign dp4_qmul_in[0] = {vec_a[0], vec_b[0], a_neg[1], vec_b[1], a_neg[2], vec_b[2], a_neg[3], vec_b[3]};
     assign dp4_qmul_in[1] = {vec_a[0], vec_b[1], vec_a[1], vec_b[0], vec_a[2], vec_b[3], a_neg[3], vec_b[2]};
-    assign dp4_qmul_in[2] = {vec_a[0], vec_b[2], a_neg[1], vec_b[3], vec_a[2], vec_b[0], vec_a[3], vec_b[3]};
+    assign dp4_qmul_in[2] = {vec_a[0], vec_b[2], a_neg[1], vec_b[3], vec_a[2], vec_b[0], vec_a[3], vec_b[1]};
     assign dp4_qmul_in[3] = {vec_a[0], vec_b[3], vec_a[1], vec_b[2], a_neg[2], vec_b[1], vec_a[3], vec_b[0]};
 
     // Rotation matrix

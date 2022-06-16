@@ -8,9 +8,9 @@ module memory_controller #(
 ) (
     input  logic                               clk,
     // Physical memory address
+    input  logic                               mem_we,
+    input  logic                               mem_ren,
     input  logic [             ADDR_WIDTH-1:0] mem_addr,
-    input  logic                               mem_write,
-    input  logic                               mem_read,
     input  logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_wdata,
     output logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_rdata,
     input  logic [                        2:0] width,
@@ -84,12 +84,12 @@ module memory_controller #(
         endcase
 
         if ((mem_addr & DATA_MASK) == DATA_ADDR) begin
-            data_mem_csb = mem_read || mem_write;
-            data_mem_web = mem_write;
+            data_mem_csb = mem_ren || mem_we;
+            data_mem_web = mem_we;
         end
         else if ((mem_addr & TEXT_MASK) == TEXT_ADDR) begin
-            instr_mem_csb = mem_read || mem_write;
-            instr_mem_web = mem_write;
+            instr_mem_csb = mem_ren || mem_we;
+            instr_mem_web = mem_we;
         end
 
         if ((mem_addr_r & DATA_MASK) == DATA_ADDR) begin

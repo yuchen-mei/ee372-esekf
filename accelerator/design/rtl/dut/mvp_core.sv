@@ -4,12 +4,9 @@ module mvp_core #(
     parameter IEEE_COMPLIANCE      = 0,
     
     parameter VECTOR_LANES         = 16,
-
-    parameter ADDR_WIDTH           = 12,
     parameter DATA_WIDTH           = SIG_WIDTH + EXP_WIDTH + 1,
 
     parameter INSTR_MEM_ADDR_WIDTH = 8,
-    parameter DATA_MEM_ADDR_WIDTH  = 12,
     parameter REG_BANK_DEPTH       = 32,
     parameter REG_ADDR_WIDTH       = $clog2(REG_BANK_DEPTH)
 ) (
@@ -20,7 +17,7 @@ module mvp_core #(
     output logic [   INSTR_MEM_ADDR_WIDTH-1:0] pc,
     input  logic [                       31:0] instr,
 
-    output logic [             ADDR_WIDTH-1:0] mem_addr,
+    output logic [                       11:0] mem_addr,
     output logic                               mem_ren,
     output logic                               mem_we,
     input  logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_rdata,
@@ -73,16 +70,16 @@ module mvp_core #(
     logic                                    reg_we_wb;
     logic                                    mem_we_id;
     logic                                    mem_we_ex1;
-    logic [  ADDR_WIDTH-1:0]                 mem_addr_id;
-    logic [  ADDR_WIDTH-1:0]                 mem_addr_ex1;
+    logic [            11:0]                 mem_addr_id;
+    logic [            11:0]                 mem_addr_ex1;
+    logic [            11:0]                 mem_addr_ex2;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex3;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_wb;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_wb;
     logic                                    jump_id;
-    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_id;
-    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_ex1;
-    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jr_pc_ex2;
+    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jump_addr_id;
+    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jump_addr_ex2;
     logic                                    pc_sel;
     logic                                    branch_id;
     logic                                    branch_ex1;
@@ -91,6 +88,9 @@ module mvp_core #(
     assign data_out     = reg_wdata_wb;
     assign data_out_vld = en && reg_we_wb;
     assign reg_wb       = vd_addr_wb;
+
+    logic pipe_en;
+    assign pipe_en = en && (en_q || pc != 0);
 
     always @(posedge clk) begin
         en_q <= en;
@@ -110,18 +110,25 @@ module mvp_core #(
         .clk           (clk           ),
         .rst_n         (rst_n         ),
         .en            (en & ~stall   ),
-        // .jump_target   (jump_target_id),
 
         .branch        (pc_sel        ),
-        .branch_offset (jr_pc_ex2     ),
+        .branch_offset (jump_addr_ex2 ),
 
-        .jump_reg      (jump_id       ),
-        .jr_pc         (jr_pc_id      ),
+        .jump          (jump_id       ),
+        .jump_addr     (jump_addr_id  ),
 
         .pc            (pc            )
     );
 
-    assign jr_pc_id = mem_addr_id[INSTR_MEM_ADDR_WIDTH-1:0];
+    assign jump_addr_id  = mem_addr_id[INSTR_MEM_ADDR_WIDTH-1:0];
+    assign jump_addr_ex2 = mem_addr_ex2[INSTR_MEM_ADDR_WIDTH-1:0];
+
+    // logic [31:0] instr_r
+
+    // always @(posedge clk) begin
+    //     if (~rst_n) instr_r <= '0;
+    //     else if (en_q) instr_r <= instr;
+    // end
 
     //=======================================================
     // Instruction Decode Stage
@@ -196,6 +203,13 @@ module mvp_core #(
         .addr_r3    (vs3_addr_id            ),
         .data_r3    (vs3_data_id            )
     );
+
+    // always @(posedge clk) begin
+    //     if (~rst_n) begin
+    //     end
+    //     else if (pipe_en) begin
+    //     end
+    // end
 
     //=======================================================
     // Execute Stages
@@ -314,6 +328,23 @@ module mvp_core #(
         .vec_out        (mat_out_wb     )
     );
 
+    // always @(posedge clk) begin
+    //     if (~rst_n) begin
+    //         vec_out_ex3 <= '0;
+    //         vec_out_ex4 <= '0;
+    //         vec_out_wb  <= '0;
+    //         vfu_out_wb  <= '0;
+    //         mfu_out_wb  <= '0;
+    //     end
+    //     else if (pipe_en) begin
+    //         vec_out_ex3 <= vec_out_ex2;
+    //         vec_out_ex4 <= vec_out_ex3;
+    //         vec_out_wb  <= vec_out_ex4;
+    //         vfu_out_wb  <= vfu_out_ex4;
+    //         mfu_out_wb  <= mfu_out_ex4;
+    //     end
+    // end
+
     //=======================================================
     // Memroy Stage
     //=======================================================
@@ -345,59 +376,58 @@ module mvp_core #(
 
     always @(posedge clk) begin
         if (~rst_n) begin
-            vs1_addr_ex1 <= '0;
-            vs2_addr_ex1 <= '0;
-            vs3_addr_ex1 <= '0;
-            mem_addr_ex1 <= '0;
+            vs1_addr_ex1 <= 0;
+            vs2_addr_ex1 <= 0;
+            vs3_addr_ex1 <= 0;
+            mem_addr_ex1 <= 0;
+            mem_addr_ex2 <= 0;
 
-            vs1_data_ex1 <= '0;
-            vs2_data_ex1 <= '0;
-            vs3_data_ex1 <= '0;
+            vs1_data_ex1 <= 0;
+            vs2_data_ex1 <= 0;
+            vs3_data_ex1 <= 0;
 
-            vd_addr_ex1 <= '0;
-            vd_addr_ex2 <= '0;
-            vd_addr_ex3 <= '0;
-            vd_addr_ex4 <= '0;
-            vd_addr_wb  <= '0;
+            vd_addr_ex1 <= 0;
+            vd_addr_ex2 <= 0;
+            vd_addr_ex3 <= 0;
+            vd_addr_ex4 <= 0;
+            vd_addr_wb  <= 0;
 
-            opcode_ex1 <= '0;
-            funct3_ex1 <= '0;
-            mem_we_ex1 <= '0;
+            opcode_ex1 <= 0;
+            funct3_ex1 <= 0;
+            mem_we_ex1 <= 0;
 
-            reg_we_ex1 <= '0;
-            reg_we_ex2 <= '0;
-            reg_we_ex3 <= '0;
-            reg_we_ex4 <= '0;
-            reg_we_wb  <= '0;
+            reg_we_ex1 <= 0;
+            reg_we_ex2 <= 0;
+            reg_we_ex3 <= 0;
+            reg_we_ex4 <= 0;
+            reg_we_wb  <= 0;
 
-            wb_sel_ex1 <= '0;
-            wb_sel_ex2 <= '0;
-            wb_sel_ex3 <= '0;
-            wb_sel_ex4 <= '0;
-            wb_sel_wb  <= '0;
+            wb_sel_ex1 <= 0;
+            wb_sel_ex2 <= 0;
+            wb_sel_ex3 <= 0;
+            wb_sel_ex4 <= 0;
+            wb_sel_wb  <= 0;
 
-            branch_ex1 <= '0;
-            branch_ex2 <= '0;
+            branch_ex1 <= 0;
+            branch_ex2 <= 0;
 
-            jr_pc_ex1 <= '0;
-            jr_pc_ex2 <= '0;
+            vec_out_ex3 <= 0;
+            vec_out_ex4 <= 0;
+            vec_out_wb  <= 0;
 
-            vec_out_ex3 <= '0;
-            vec_out_ex4 <= '0;
-            vec_out_wb  <= '0;
+            vfu_out_wb <= 0;
+            mfu_out_wb <= 0;
 
-            vfu_out_wb <= '0;
-            mfu_out_wb <= '0;
-
-            mem_rdata_ex3 <= '0;
-            mem_rdata_ex4 <= '0;
-            mem_rdata_wb  <= '0;
+            mem_rdata_ex3 <= 0;
+            mem_rdata_ex4 <= 0;
+            mem_rdata_wb  <= 0;
         end
-        else if (en && (en_q || pc != 0)) begin
+        else if (pipe_en) begin
             vs1_addr_ex1 <= vs1_addr_id;
             vs2_addr_ex1 <= vs2_addr_id;
             vs3_addr_ex1 <= vs3_addr_id;
             mem_addr_ex1 <= mem_addr_id;
+            mem_addr_ex2 <= mem_addr_ex1;
 
             vs1_data_ex1 <= vs1_data_id;
             vs2_data_ex1 <= vs2_data_id;
@@ -419,7 +449,7 @@ module mvp_core #(
             reg_we_ex4 <= reg_we_ex3;
             reg_we_wb  <= reg_we_ex4;
 
-            wb_sel_ex1 <= ~stall ? wb_sel_id : '0;
+            wb_sel_ex1 <= stall ? 5'b0 : wb_sel_id;
             wb_sel_ex2 <= wb_sel_ex1;
             wb_sel_ex3 <= wb_sel_ex2;
             wb_sel_ex4 <= wb_sel_ex3;
@@ -427,9 +457,6 @@ module mvp_core #(
 
             branch_ex1 <= branch_id && ~stall;
             branch_ex2 <= branch_ex1;
-
-            jr_pc_ex1 <= jr_pc_id;
-            jr_pc_ex2 <= jr_pc_ex1;
 
             vec_out_ex3 <= vec_out_ex2;
             vec_out_ex4 <= vec_out_ex3;

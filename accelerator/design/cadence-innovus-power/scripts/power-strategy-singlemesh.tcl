@@ -49,11 +49,14 @@ selectInst accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
 setAddRingMode -ring_target default -extend_over_row 0 -ignore_rows 0 \
                -avoid_short 0 -skip_crossing_trunks none -stacked_via_top_layer met3 \
                -stacked_via_bottom_layer met3 -via_using_exact_crossover_size 1 \
-               -orthogonal_only true -skip_via_on_pin {  standardcell } -skip_via_on_wire_shape {  noshape }
+               -orthogonal_only true -skip_via_on_pin {standardcell} -skip_via_on_wire_shape {noshape}
                
 addRing -nets {vccd1 vssd1} -type block_rings -around selected -layer {top met3 bottom met3 left met4 right met4} \
         -width {top 1.8 bottom 1.8 left 1.8 right 1.8} \
-        -spacing {top 1.8 bottom 1.8 left 1.8 right 1.8} -offset {top 1.8 bottom 1.8 left 1.8 right 1.8} -center 0 -threshold 0 -jog_distance 0 -snap_wire_center_to_grid None
+        -spacing {top 1.8 bottom 1.8 left 1.8 right 1.8} \
+        -offset {top 1.8 bottom 1.8 left 1.8 right 1.8} \
+        -center 0 -threshold 0 -jog_distance 0 \
+        -snap_wire_center_to_grid None
 
 #-------------------------------------------------------------------------
 # Power mesh bottom settings (vertical)

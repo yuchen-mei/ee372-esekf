@@ -18,8 +18,10 @@ module controller #(
 ) (
     input  logic                            clk,
     input  logic                            rst_n,
+    
     input  logic                            wbs_debug,
     input  logic                            wbs_fsm_start,
+    output logic                            wbs_fsm_done,
 
     input  logic [    INPUT_FIFO_WIDTH-1:0] params_fifo_dout,
     output logic                            params_fifo_deq,
@@ -84,6 +86,8 @@ module controller #(
 
     assign mat_inv_vld = mat_inv_en && ~mat_inv_en_r;
 
+    assign wbs_fsm_done = (state_r == `RESET_INNER_LOOP);
+
     always @ (posedge clk) begin
         if (~rst_n) begin
             state_r <= `IDLE;
@@ -127,7 +131,7 @@ module controller #(
             else if (state_r == `INNER_LOOP) begin
                 // Special instruction to invoke I/O
                 if (mem_write && (mem_addr == IO_ADDR)) begin
-                    state_r <= `RESET_INNER_LOOP;
+                    state_r        <= `RESET_INNER_LOOP;
                     mvp_core_en    <= 0;
                     input_wadr_r   <= input_wadr_offset;
                     output_wbadr_r <= output_radr_offset;

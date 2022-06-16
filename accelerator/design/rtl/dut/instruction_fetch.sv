@@ -5,8 +5,8 @@ module instruction_fetch #(
     input  logic                  rst_n,
     input  logic                  en,
     // input  logic jump_target,
-    input  logic                  jump_reg,
-    input  logic [ADDR_WIDTH-1:0] jr_pc,
+    input  logic                  jump,
+    input  logic [ADDR_WIDTH-1:0] jump_addr,
     input                         branch,
     input  logic [ADDR_WIDTH-1:0] branch_offset,
     output logic [ADDR_WIDTH-1:0] pc
@@ -16,8 +16,8 @@ module instruction_fetch #(
     logic [ADDR_WIDTH-1:0] pc_next;
 
     assign pc = en ? pc_pipe1 : pc_pipe2;
-    assign pc_next = jump_reg ? jr_pc :
-                     branch   ? branch_offset : pc + 1;
+    assign pc_next = jump   ? jump_addr :
+                     branch ? branch_offset : pc + 1;
 
     always @(posedge clk) begin
         if (~rst_n) begin

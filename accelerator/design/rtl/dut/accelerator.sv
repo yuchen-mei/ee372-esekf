@@ -28,12 +28,13 @@ module accelerator #(
     // Wishbone
     input  logic                         wbs_debug,
     input  logic                         wbs_fsm_start,
+    output logic                         wbs_fsm_done,
 
+    input  logic                         wbs_mem_we,
+    input  logic                         wbs_mem_ren,
     input  logic [                 11:0] wbs_mem_addr,
     input  logic [                 31:0] wbs_mem_wdata,
-    input  logic [                 31:0] wbs_mem_rdata,
-    input  logic                         wbs_mem_write,
-    input  logic                         wbs_mem_read
+    output logic [                 31:0] wbs_mem_rdata
 );
 
     localparam DATA_WIDTH = SIG_WIDTH + EXP_WIDTH + 1;
@@ -83,11 +84,10 @@ module accelerator #(
     // Data connections between the MVP and memory.
     // ---------------------------------------------------------------------------
 
-    logic [          ADDR_WIDTH-1:0]                 mvp_mem_addr;
     logic                                            mvp_mem_we;
     logic                                            mvp_mem_ren;
+    logic [          ADDR_WIDTH-1:0]                 mvp_mem_addr;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_wdata;
-    logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_rdata;
     logic [                     2:0]                 width;
 
     logic                                            instr_mem_csb;
@@ -106,9 +106,9 @@ module accelerator #(
     logic [            DATAPATH-1:0]                 data_mem_rdata;
     logic [            DATAPATH-1:0]                 output_wb_data;
 
+    logic                                            mem_ctrl_we;
+    logic                                            mem_ctrl_ren;
     logic [          ADDR_WIDTH-1:0]                 mem_ctrl_addr;
-    logic                                            mem_ctrl_write;
-    logic                                            mem_ctrl_read;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_ctrl_wdata;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_ctrl_rdata;
     logic [                     2:0]                 mem_ctrl_width;
@@ -141,9 +141,7 @@ module accelerator #(
         .EXP_WIDTH           (EXP_WIDTH           ),
         .IEEE_COMPLIANCE     (IEEE_COMPLIANCE     ),
         .VECTOR_LANES        (VECTOR_LANES        ),
-        .ADDR_WIDTH          (ADDR_WIDTH          ),
-        .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH),
-        .DATA_MEM_ADDR_WIDTH (DATA_MEM_ADDR_WIDTH )
+        .INSTR_MEM_ADDR_WIDTH(INSTR_MEM_ADDR_WIDTH)
     ) mvp_core_inst (
         .clk                 (clk                 ),
         .rst_n               (rst_n               ),
@@ -154,7 +152,7 @@ module accelerator #(
         .mem_we              (mvp_mem_we          ),
         .mem_ren             (mvp_mem_ren         ),
         .mem_wdata           (mvp_mem_wdata       ),
-        .mem_rdata           (mvp_mem_rdata       ),
+        .mem_rdata           (mem_ctrl_rdata      ),
         .width               (width               )
     );
 
@@ -236,16 +234,16 @@ module accelerator #(
         end
 
         if (wbs_debug && ~mvp_core_en) begin
+            mem_ctrl_we    = wbs_mem_we;
+            mem_ctrl_ren   = wbs_mem_ren;
             mem_ctrl_addr  = wbs_mem_addr;
-            mem_ctrl_write = wbs_mem_write;
-            mem_ctrl_read  = wbs_mem_read;
             mem_ctrl_wdata = wbs_mem_wdata;
             mem_ctrl_width = 3'b010;
         end
         else begin
+            mem_ctrl_we    = mvp_mem_we;
+            mem_ctrl_ren   = mvp_mem_ren;
             mem_ctrl_addr  = mvp_mem_addr;
-            mem_ctrl_write = mvp_mem_we;
-            mem_ctrl_read  = mvp_mem_ren;
             mem_ctrl_wdata = mvp_mem_wdata;
             mem_ctrl_width = width;
         end
@@ -261,22 +259,22 @@ module accelerator #(
     ) mem_ctrl_inst (
         .clk                 (clk                 ),
         // Physical memory address
+        .mem_we              (mem_ctrl_we         ),
+        .mem_ren             (mem_ctrl_ren        ),
         .mem_addr            (mem_ctrl_addr       ),
-        .mem_write           (mem_ctrl_write      ),
-        .mem_read            (mem_ctrl_read       ),
         .mem_wdata           (mem_ctrl_wdata      ),
-        .mem_rdata           (mvp_mem_rdata       ),
+        .mem_rdata           (mem_ctrl_rdata       ),
         .width               (mem_ctrl_width      ),
         // Instruction memory
-        .instr_mem_addr      (instr_mem_ctrl_addr ),
         .instr_mem_csb       (instr_mem_ctrl_csb  ),
         .instr_mem_web       (instr_mem_ctrl_web  ),
+        .instr_mem_addr      (instr_mem_ctrl_addr ),
         .instr_mem_wdata     (instr_mem_ctrl_wdata),
         .instr_mem_rdata     (instr_mem_rdata     ),
         // Data memory
-        .data_mem_addr       (data_mem_ctrl_addr  ),
         .data_mem_csb        (data_mem_ctrl_csb   ),
         .data_mem_web        (data_mem_ctrl_web   ),
+        .data_mem_addr       (data_mem_ctrl_addr  ),
         .data_mem_wmask      (data_mem_ctrl_wmask ),
         .data_mem_wdata      (data_mem_ctrl_wdata ),
         .data_mem_rdata      (data_mem_rdata      ),
@@ -284,6 +282,8 @@ module accelerator #(
         .mat_inv_out_l       (mat_inv_out_l       ),
         .mat_inv_out_u       (mat_inv_out_u       )
     );
+
+    assign wbs_mem_rdata = mem_ctrl_rdata;
 
   // ---------------------------------------------------------------------------
   //  Interface fifos
@@ -378,6 +378,7 @@ module accelerator #(
         .rst_n               (rst_n               ),
         .wbs_debug           (wbs_debug           ),
         .wbs_fsm_start       (wbs_fsm_start       ),
+        .wbs_fsm_done        (wbs_fsm_done        ),
         // Configuration data
         .params_fifo_dout    (input_fifo_dout     ),
         .params_fifo_deq     (params_fifo_deq     ),
