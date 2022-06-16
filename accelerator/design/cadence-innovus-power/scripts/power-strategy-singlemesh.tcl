@@ -47,7 +47,7 @@ selectInst accelerator_inst/data_mem/genblk1_width_macro_1__sram_macro
 selectInst accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
 
 setAddRingMode -ring_target default -extend_over_row 0 -ignore_rows 0 \
-               -avoid_short 0 -skip_crossing_trunks none -stacked_via_top_layer met3 \
+               -avoid_short 0 -skip_crossing_trunks none -stacked_via_top_layer met4 \
                -stacked_via_bottom_layer met3 -via_using_exact_crossover_size 1 \
                -orthogonal_only true -skip_via_on_pin {standardcell} -skip_via_on_wire_shape {noshape}
                
@@ -87,7 +87,7 @@ setViaGenMode -ignore_DRC false
 
 setAddStripeMode -reset
 setAddStripeMode -stacked_via_bottom_layer met1 \
-                 -stacked_via_top_layer    $pmesh_top \
+                 -stacked_via_top_layer $pmesh_top \
                  -trim_antenna_back_to_shape stripe \
                  -break_at {  block_ring  }
 

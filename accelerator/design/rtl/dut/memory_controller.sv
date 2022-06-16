@@ -80,7 +80,6 @@ module memory_controller #(
             3'b101:  data_mem_wdata = mem_wdata << 160;
             3'b110:  data_mem_wdata = mem_wdata << 192;
             3'b111:  data_mem_wdata = mem_wdata << 224;
-            default: data_mem_wdata = '0;
         endcase
 
         if ((mem_addr & DATA_MASK) == DATA_ADDR) begin
@@ -92,18 +91,16 @@ module memory_controller #(
             instr_mem_web = mem_we;
         end
 
-        if ((mem_addr_r & DATA_MASK) == DATA_ADDR) begin
+        if ((mem_addr_r & DATA_MASK) == DATA_ADDR)
             mem_rdata = data_mem_rdata;
-        end
-        else if ((mem_addr_r & TEXT_MASK) == TEXT_ADDR) begin
+        else if ((mem_addr_r & TEXT_MASK) == TEXT_ADDR)
             mem_rdata = instr_mem_rdata;
-        end
-        else if (mem_addr_r == INVMAT_L_ADDR) begin
+        else if (mem_addr_r == INVMAT_L_ADDR)
             mem_rdata = mat_inv_out_l;
-        end
-        else if (mem_addr_r == INVMAT_U_ADDR) begin
+        else if (mem_addr_r == INVMAT_U_ADDR)
             mem_rdata = mat_inv_out_u;
-        end
+        else
+            mem_rdata = 0;
     end
 
 endmodule

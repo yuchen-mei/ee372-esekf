@@ -45,10 +45,9 @@ module decoder (
     assign funct6  = instr[31:26];
     assign branch_offset = {instr[31:25], instr[11:7]};
 
-    assign overwrite_multiplicand = ((opcode == `VFMACC)  ||
-                                     (opcode == `VFMSAC)  || 
-                                     (opcode == `VFNMACC) || 
-                                     (opcode == `VFNMSAC));
+    wire overwrite_multiplicand = ((opcode == `VFMACC) || (opcode == `VFMSAC) ||
+                                   (opcode == `VFNMACC) || (opcode == `VFNMSAC));
+
     assign vs1_addr = src1;
     assign vs2_addr = overwrite_multiplicand ? dest : src2;
     assign vs3_addr = (opcode == `OP_M)      ? instr[31:27] :
@@ -63,7 +62,6 @@ module decoder (
             {`OP_V, `VFMAX}:      func_sel = `FMAX;
             {`OP_V, `VFSGNJ}:     func_sel = `FSGNJ;
             {`OP_V, `VFSGNJN}:    func_sel = `FSGNJN;
-            {`OP_V, `VFSGNJX}:    func_sel = `FSGNJX;
             {`OP_V, `VFSGNJX}:    func_sel = `FSGNJX;
             {`OP_V, `VSLIDEUP}:   func_sel = `SLIDEUP;
             {`OP_V, `VSLIDEDOWN}: func_sel = `SLIDEDOWN;

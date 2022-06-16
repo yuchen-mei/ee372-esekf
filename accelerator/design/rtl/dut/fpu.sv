@@ -77,9 +77,9 @@ module fpu #(
     assign sgnjn = {~inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
     assign sgnjx = {inst_a[DATA_WIDTH-1] ^ inst_b[DATA_WIDTH-1], inst_a[DATA_WIDTH-2:0]};
 
-    assign zero_sig = (inst_b[SIG_WIDTH-1:0] == 0);
-    assign zero_exp = (inst_b[SIG_WIDTH+:EXP_WIDTH] == 0);
-    assign nan_exp  = &inst_b[SIG_WIDTH+:EXP_WIDTH];
+    wire zero_sig = (inst_b[SIG_WIDTH-1:0] == 0);
+    wire zero_exp = (inst_b[SIG_WIDTH+:EXP_WIDTH] == 0);
+    wire nan_exp  = &inst_b[SIG_WIDTH+:EXP_WIDTH];
 
     assign fclass_mask[0] = inst_b[31] && nan_exp && zero_sig;
     assign fclass_mask[1] = inst_b[31] && ~nan_exp && ~zero_exp;

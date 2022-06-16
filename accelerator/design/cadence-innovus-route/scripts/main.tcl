@@ -7,7 +7,7 @@
 # Date   : January 13, 2020
 
 setOptMode -holdTargetSlack  0.005
-setOptMode -setupTargetSlack 1
+setOptMode -setupTargetSlack 0.7
 source -verbose innovus-foundation-flow/INNOVUS/run_route.tcl
 
 
