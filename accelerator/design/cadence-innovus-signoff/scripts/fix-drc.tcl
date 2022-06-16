@@ -1,8 +1,6 @@
 # get diode cell name
 # get_db base_cells -if {.num_base_pins == 1}
 
-# setSignoffOptMode -fixGlitch true 
-# signoffOptDesign -drv
 
 # temporarily turn off antenna fixing and reduce timing optimization
 # setNanoRouteMode -drouteFixAntenna 0
@@ -11,10 +9,12 @@
 # routeDesign -globalDetail -viaOpt -wireOpt
 
 # fix drv violations
-setOptMode -fixCap true -fixTran true -fixFanoutLoad false
+
+# setOptMode -fixCap true -fixTran true -fixFanoutLoad false
 # setOptMode -drcMargin 0.4
-# setOptMode -setupTargetSlack 0.3
-optDesign -postRoute
+# setOptMode -setupTargetSlack 1
+# optDesign -postRoute
+
 
 # report all drc and antenna violations and reroute violated nets
 setAnalysisMode -analysisType onChipVariation -cppr both
@@ -39,4 +39,3 @@ verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
 
-# optDesign -postRoute -drv

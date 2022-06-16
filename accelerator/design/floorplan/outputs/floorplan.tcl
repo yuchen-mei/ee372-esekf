@@ -131,12 +131,13 @@ setInstancePlacementStatus -status fixed -name accelerator_inst/data_mem/genblk1
 placeInstance accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro 1598.6650000000 2943.5750000000 R0
 addHaloToBlock 20 20 20 20 accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name accelerator_inst/data_mem/genblk1_width_macro_0__sram_macro
-placeInstance accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 988.8850000000 2943.5750000000 R0
+placeInstance accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 988.8850000000 2446.0750000000 R0
 addHaloToBlock 20 20 20 20 accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name accelerator_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
-placeInstance accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 369.1050000000 2943.5750000000 R0
+placeInstance accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 369.1050000000 2446.0750000000 R0
 addHaloToBlock 20 20 20 20 accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name accelerator_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
+createPlaceBlockage -type partial -density 60 -name defScreenName -box {333.9600000000 1467.4400000000 1514.7800000000 2326.9600000000}
 
 selectInst accelerator_inst/data_mem/genblk1_width_macro_7__sram_macro
 set llx [dbGet selected.box_llx]
