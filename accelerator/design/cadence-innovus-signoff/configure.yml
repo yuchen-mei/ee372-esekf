@@ -65,8 +65,8 @@ commands:
 parameters:
   order:
     - fill-decap.tcl
-    - fix-drc.tcl
     - addDiode.tcl
+    - fix-drc.tcl
     # - processAntennas.tcl
     - main.tcl
     - generate-results.tcl

@@ -10,9 +10,9 @@ routeDesign -globalDetail -viaOpt -wireOpt
 
 # fix drv violations
 
-# setOptMode -fixCap true -fixTran true -fixFanoutLoad false
 # setOptMode -drcMargin 0.4
 # setOptMode -setupTargetSlack 1
+# setOptMode -fixCap true -fixTran true -fixFanoutLoad false
 # optDesign -postRoute
 
 
@@ -38,39 +38,76 @@ verify_drc
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-
-verify_drc
+# 4th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 5th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 6th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 7th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 8th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 9th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 10th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 11th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 12th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 13th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 14th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 15th fixing
+# verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+# 16th fixing
+# verify_drc
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
 
-verify_drc
+# 17th fixing
 verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
+addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
 
-verify_drc
+# 18th fixing
 verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-
-verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-
-verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-
-verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-
-verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-
+addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
