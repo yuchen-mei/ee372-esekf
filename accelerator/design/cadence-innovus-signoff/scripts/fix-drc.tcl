@@ -3,10 +3,10 @@
 
 
 # temporarily turn off antenna fixing and reduce timing optimization
-# setNanoRouteMode -drouteFixAntenna 0
-# setNanoRouteMode -routeWithTimingDriven 1
-# setNanoRouteMode -quiet -routeWithSiDriven false
-# routeDesign -globalDetail -viaOpt -wireOpt
+setNanoRouteMode -drouteFixAntenna 0
+setNanoRouteMode -routeWithTimingDriven 1
+setNanoRouteMode -quiet -routeWithSiDriven false
+routeDesign -globalDetail -viaOpt -wireOpt
 
 # fix drv violations
 
@@ -34,6 +34,41 @@ verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
 # 3rd fixing
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
+verify_drc
+verifyProcessAntenna
+editDelete -regular_wire_with_drc
+ecoRoute
+
 verify_drc
 verifyProcessAntenna
 editDelete -regular_wire_with_drc

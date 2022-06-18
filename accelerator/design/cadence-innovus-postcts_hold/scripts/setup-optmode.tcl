@@ -10,8 +10,8 @@
 # provides optimization more opportunity to fix violations.
 
 setOptMode -fixHoldAllowOverlap TRUE
-setOptMode -holdTargetSlack  0.005
-setOptMode -setupTargetSlack 0.7
+setOptMode -holdTargetSlack  2
+setOptMode -setupTargetSlack 2
 # optDesign -postCTS -drv
 # optDesign -postCTS
 

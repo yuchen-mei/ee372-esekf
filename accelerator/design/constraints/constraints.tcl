@@ -24,8 +24,11 @@ set_clock_groups -asynchronous \
                  -group [get_clocks ${io_clock_name}] \
                  -group [get_clocks ${wb_clock_name}]
 
+# set_false_path -from [get_clocks ${io_clock_name}] -to [get_clocks ${wb_clock_name}]
+# set_false_path -from [get_clocks ${wb_clock_name}] -to [get_clocks ${io_clock_name}]
+
 set_false_path -from [get_ports *in*] -to [get_ports *out*]
-set_false_path -from [get_ports *in*] -to [get_ports *oeb*]        
+set_false_path -from [get_ports *in*] -to [get_ports *oeb*]
 
 # This constraint sets the load capacitance in picofarads of the
 # output pins of your design.
@@ -45,12 +48,12 @@ set_driving_cell -no_design_rule \
 # Make this non-zero to avoid hold buffers on input-registered designs
 
 set_input_delay -clock ${io_clock_name} [expr ${clock_period}/2.0] [get_ports -regexp {(?=io_in)(?!.*19)^.*$}]
-set_input_delay -clock ${wb_clock_name} 50 [get_ports -regexp {(?=wb.*i$)(?!.*clk)^.*$}]
+set_input_delay -clock ${wb_clock_name} 50 [get_ports -regexp {(?=wb.*i)(?!.*clk)^.*$}]
 
 # set_output_delay constraints for output ports
 
-set_output_delay -clock ${io_clock_name} 0 [all_outputs]
-set_output_delay -clock ${wb_clock_name} 0 [all_outputs]
+set_output_delay -clock ${io_clock_name} [expr ${clock_period}/2.0] [all_outputs]
+set_output_delay -clock ${wb_clock_name} 50 [all_outputs]
 
 # Make all signals limit their fanout
 

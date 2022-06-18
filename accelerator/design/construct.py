@@ -86,13 +86,13 @@ def construct():
   klayout_drc     = Step( this_dir + '/klayout-drc-gds'                 )
   magic_def2spice = Step( this_dir + '/open-magic-def2spice'            )
   magic_gds2spice = Step( this_dir + '/open-magic-gds2spice'            )
-  magic_gds2spice_nobbox = Step( this_dir + '/open-magic-gds2spice-nobbox'            )
+  magic_gds2spice_nobbox = Step( this_dir + '/open-magic-gds2spice-nobbox')
   netgen_lvs_def  = Step( this_dir + '/netgen-lvs-def'       )
   magic_antenna   = Step( this_dir + '/open-magic-antenna'              )
   netgen_lvs_gds  = Step( this_dir + '/netgen-lvs-gds'                 )
 
   calibre_lvs     = Step( this_dir + '/mentor-calibre-comparison'       )
-  calibre_lvs_nobbox     = Step( this_dir + '/mentor-calibre-comparison-nobbox'       )
+  calibre_lvs_nobbox     = Step( this_dir + '/mentor-calibre-comparison-nobbox')
 
   # Need to use clone if you want to instantiate the same node more than once
   # in your graph but configure it differently, for example, RTL simulation and
@@ -329,10 +329,12 @@ def construct():
   g.connect( signoff.o('design.sdc'    ),   pt_timing.i('design.pt.sdc'  ) )
 
   # Gate level simulation
-  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i(      'design.vcs.v'     ) )
-  g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i(      'design.sdf'   ) )
-  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i(      'testbench.sv' ) )
-  g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i(      'design.args'  ) )
+  g.connect( signoff.o(   'design.vcs.pg.v'  ), gl_sim.i('design.vcs.v'   ) )
+  g.connect( pt_timing.o( 'design.sdf'       ), gl_sim.i('design.sdf'     ) )
+  g.connect( testbench.o( 'testbench.sv'     ), gl_sim.i('testbench.sv'   ) )
+  g.connect( testbench.o( 'instr_data.txt'   ), gl_sim.i('instr_data.txt' ) )
+  g.connect( testbench.o( 'input_data.txt'   ), gl_sim.i('input_data.txt' ) )
+  g.connect( testbench.o( 'design.args.gls'  ), gl_sim.i('design.args'    ) )
   g.connect_by_name( gl_sim,                    gen_saif_gl    ) # run.vcd
 
   # and power signoff

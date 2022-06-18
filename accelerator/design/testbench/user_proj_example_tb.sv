@@ -66,6 +66,9 @@ module user_proj_example_tb;
     wire [`MPRJ_IO_PADS-1:0] io_oeb;
     wire [              2:0] user_irq;
 
+    supply0 vssd1;
+    supply1 vccd1;
+
     assign io_in[19]   = clk;
     assign io_in[0]    = rst_n;
     assign io_in[16:1] = input_data_r[15:0]; 
