@@ -103,11 +103,11 @@ ecoRoute
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-
 # 17th fixing
 verifyProcessAntenna
 addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
-
 # 18th fixing
 verifyProcessAntenna
 addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
+# delete route blockage to remove drc violation
+deleteRouteBlk -name "defLayerBlkName" -layer {met5}

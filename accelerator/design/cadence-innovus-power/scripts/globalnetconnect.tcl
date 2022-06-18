@@ -8,6 +8,8 @@
 # Global net connections for PG pins
 #-------------------------------------------------------------------------
 
+globalNetConnect vccd1    -type pgpin -pin vccd1    -inst * -verbose
+globalNetConnect vssd1    -type pgpin -pin vssd1    -inst * -verbose
 globalNetConnect vccd1    -type pgpin -pin VPWR    -inst * -verbose
 globalNetConnect vssd1    -type pgpin -pin VGND    -inst * -verbose
 globalNetConnect vssd1    -type pgpin -pin VNB    -inst * -verbose
