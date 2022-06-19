@@ -9,6 +9,7 @@ def read design.def
 load $::env(design_name)
 
 # Extract for LVS
+ext2spice short resistor
 extract do local
 extract no capacitance
 extract no coupling
