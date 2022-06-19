@@ -68,34 +68,34 @@ setFlipping s
 # addHaloToBlock 20 20 20 20 acc_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
 # setInstancePlacementStatus -status fixed -name acc_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
 
-placeInstance acc_inst/data_mem/genblk1_width_macro_7__sram_macro 2178.4450000000 1451.0750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_7__sram_macro 2208.4450000000 1451.0750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_7__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_7__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_6__sram_macro 1558.6650000000 1451.0750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_6__sram_macro 1528.6650000000 1451.0750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_6__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_6__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_5__sram_macro 2178.4450000000 1948.5750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_5__sram_macro 2208.4450000000 1948.5750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_5__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_5__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_4__sram_macro 1558.6650000000 1948.5750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_4__sram_macro 1528.6650000000 1948.5750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_4__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_4__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_3__sram_macro 2178.4450000000 2446.0750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_3__sram_macro 2208.4450000000 2446.0750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_3__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_3__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_2__sram_macro 1558.6650000000 2446.0750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_2__sram_macro 1528.6650000000 2446.0750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_2__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_2__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_1__sram_macro 2178.4450000000 2943.5750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_1__sram_macro 2208.4450000000 2943.5750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_1__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_1__sram_macro
-placeInstance acc_inst/data_mem/genblk1_width_macro_0__sram_macro 1558.6650000000 2943.5750000000 R0
+placeInstance acc_inst/data_mem/genblk1_width_macro_0__sram_macro 1528.6650000000 2943.5750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/data_mem/genblk1_width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/data_mem/genblk1_width_macro_0__sram_macro
-placeInstance acc_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 918.8850000000 2943.5750000000 R0
+placeInstance acc_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro 868.8850000000 2943.5750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/instr_mem/genblk1_depth_macro_1__width_macro_0__sram_macro
-placeInstance acc_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 299.1050000000 2943.5750000000 R0
+placeInstance acc_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro 239.1050000000 2943.5750000000 R0
 addHaloToBlock 20 20 20 20 acc_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
 setInstancePlacementStatus -status fixed -name acc_inst/instr_mem/genblk1_depth_macro_0__width_macro_0__sram_macro
 

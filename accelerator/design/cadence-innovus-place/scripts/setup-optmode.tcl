@@ -27,8 +27,9 @@ if { $::env(useful_skew) } {
   setOptMode -usefulSkew      false
 }
 
-setOptMode -holdTargetSlack  0.050
-setOptMode -setupTargetSlack 1.200
+setOptMode -holdTargetSlack  0.005
+setOptMode -setupTargetSlack 1.000
+
 setOptMode -drcMargin        0.300
 setOptMode -fixCap true
 setOptMode -fixTran true
