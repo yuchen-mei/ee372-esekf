@@ -71,8 +71,7 @@ module memory_controller #(
 
         data_mem_wmask <<= mem_addr[2:0];
 
-        unique case (mem_addr[2:0])
-            3'b000:  data_mem_wdata = mem_wdata;
+       case (mem_addr[2:0])
             3'b001:  data_mem_wdata = mem_wdata << 32;
             3'b010:  data_mem_wdata = mem_wdata << 64;
             3'b011:  data_mem_wdata = mem_wdata << 96;
@@ -80,6 +79,7 @@ module memory_controller #(
             3'b101:  data_mem_wdata = mem_wdata << 160;
             3'b110:  data_mem_wdata = mem_wdata << 192;
             3'b111:  data_mem_wdata = mem_wdata << 224;
+            default: data_mem_wdata = mem_wdata;
         endcase
 
         if ((mem_addr & DATA_MASK) == DATA_ADDR) begin

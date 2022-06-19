@@ -32,9 +32,7 @@ def construct():
     'topographical'       : True,
     'testbench_name'      : 'user_proj_example_tb',
     'saif_instance'       : 'user_proj_example_tb/user_proj_example_inst',
-    'dut_name'            : 'user_proj_example_inst',
-    'setup_target_slack'  : 1.000,
-    'hold_target_slack'   : 0.005
+    'dut_name'            : 'user_proj_example_inst'
   }
 
   #-----------------------------------------------------------------------

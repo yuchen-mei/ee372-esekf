@@ -69,18 +69,15 @@ module user_proj_example_tb;
     supply0 vssd1;
     supply1 vccd1;
 
-    assign io_in[19]   = clk;
-    assign io_in[0]    = rst_n;
-    assign io_in[16:1] = input_data_r[15:0]; 
-    assign io_in[17]   = input_rdy_w & input_vld_r;
-    assign io_in[18]   = output_rdy_r;
+    assign io_in[37]   = clk;
+    assign io_in[36]   = rst_n;
+    assign io_in[15:0] = input_data_r[15:0]; 
+    assign io_in[16]   = input_rdy_w & input_vld_r;
+    assign io_in[17]   = output_rdy_r;
 
-    assign output_data_w[7:0] = io_out[27:20];
-    assign output_vld_w       = io_out[28];
-    assign input_rdy_w        = io_out[29];
-
-    // connect to the rest of io_in pins
-    assign io_in[`MPRJ_IO_PADS-1:20] = 18'd0;
+    assign output_data_w = io_out[25:18];
+    assign output_vld_w  = io_out[34];
+    assign input_rdy_w   = io_out[35];
 
     always #10 clk = ~clk;
 
@@ -107,7 +104,7 @@ module user_proj_example_tb;
         .io_in      (io_in      ),
         .io_out     (io_out     ),
         .io_oeb     (io_oeb     ),
-        .irq        (user_irq   )
+        .user_irq   (user_irq   )
     );
 
     initial begin

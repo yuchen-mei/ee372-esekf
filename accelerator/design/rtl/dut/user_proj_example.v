@@ -42,7 +42,7 @@ module user_proj_example #(
     input wire user_clock2,
 
     // User maskable interrupt signals
-    output wire [2:0] irq
+    output wire [2:0] user_irq
 );
 
     wire        io_clk;
@@ -54,22 +54,23 @@ module user_proj_example #(
     wire        output_vld_w;
     wire [ 7:0] output_data_w;
 
-    assign irq = 3'b0;
+    assign user_irq = 3'b0;
 
-    assign io_clk             = io_in[19];
-    assign io_rst_n           = io_in[0];
-    assign input_data_w[15:0] = io_in[16:1];
-    assign input_vld_w        = io_in[17];
-    assign output_rdy_w       = io_in[18];
+    assign io_clk             = io_in[37];
+    assign io_rst_n           = io_in[36];
+    assign input_data_w[15:0] = io_in[15:0];
+    assign input_vld_w        = io_in[16];
+    assign output_rdy_w       = io_in[17];
 
-    assign io_out[27:20] = output_data_w[7:0];
-    assign io_out[28]    = output_vld_w;
-    assign io_out[29]    = input_rdy_w;
+    assign io_out[17:0]  = 18'b0;
+    assign io_out[25:18] = output_data_w;
+    assign io_out[33:26] = 8'b0; // reserved for output
+    assign io_out[34]    = output_vld_w;
+    assign io_out[35]    = input_rdy_w;
+    assign io_out[37:36] = 2'b0;
 
-    assign io_out[`MPRJ_IO_PADS-1:30] = 8'b0;
-    assign io_out[19:0] = 20'b0;
-    assign io_oeb = {20'b0, {18{1'b1}}};
-    
+    assign io_oeb = {18'b0, {18{1'b1}}, 2'b0};
+
     assign la_data_out = 128'd0;
     
 
