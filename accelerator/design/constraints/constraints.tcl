@@ -11,7 +11,7 @@
 # is too large the tools will have no trouble but you will get a very
 # conservative implementation.
 
-set io_clock_net  io_in[19]
+set io_clock_net  io_in[37]
 set io_clock_name ideal_clock_io
 
 set wb_clock_net  wb_clk_i
