@@ -111,3 +111,7 @@ verifyProcessAntenna
 addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
 # delete route blockage to remove drc violation
 deleteRouteBlk -name "defLayerBlkName" -layer {met5}
+deleteRouteBlk -name "defLayerBlkName" -layer {met5}
+deleteRouteBlk -name "defLayerBlkName" -layer {met5}
+verify_drc
+verifyProcessAntenna
