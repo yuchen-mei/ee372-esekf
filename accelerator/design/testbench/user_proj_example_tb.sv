@@ -1,20 +1,16 @@
 `timescale 1 ns / 1 ps
 
-`define INPUT_WIDTH 16
-`define OUTPUT_WIDTH 8
+`define INPUT_FIFO_WIDTH 16
+`define OUTPUT_FIFO_WIDTH 16
 
-`define TOTAL_INPUT_SIZE 120
 `define INPUT_DATA_SIZE 24
 `define OUTPUT_DATA_SIZE 24
 
-`define INSTR_WIDTH 32
-`define NUM_INSTRUCTIONS 126
-
-`define DATA_WIDTH 32
-`define ADDR_WIDTH 16
-
-`define CONFIG_WIDTH 16
 `define NUM_CONFIGS 5
+`define NUM_INSTRUCTIONS 126
+`define TOTAL_INPUT_SIZE 120
+
+`define ADDR_WIDTH 16
 
 `define MPRJ_IO_PADS 38
 
@@ -25,16 +21,15 @@ module user_proj_example_tb;
     reg rst_n;
     reg wbs_clk_i;
 
-    reg   [`ADDR_WIDTH - 1 : 0] input_adr_r;
+    reg  [`ADDR_WIDTH - 1 : 0] input_adr_r;
 
-    wire                        input_rdy_w;
-    reg                         input_vld_r;
-    reg  [`INPUT_WIDTH - 1 : 0] input_data_r;
+    wire                           input_rdy_w;
+    reg                            input_vld_r;
+    reg  [`INPUT_FIFO_WIDTH - 1:0] input_data_r;
 
-    reg                          output_rdy_r;
-    wire                         output_vld_w;
-    wire [`OUTPUT_WIDTH - 1 : 0] output_data_w;
-    
+    reg                             output_rdy_r;
+    wire                            output_vld_w;
+    wire [`OUTPUT_FIFO_WIDTH - 1:0] output_data_w;
 
     wire [`ADDR_WIDTH - 1 : 0] instr_max_wadr_c;
     wire [`ADDR_WIDTH - 1 : 0] input_max_wadr_c;
@@ -49,12 +44,12 @@ module user_proj_example_tb;
     assign output_adr_offset = 16'h7e8;
 
     reg [7:0] state_r;
-    reg counter;
+    reg       counter;
     integer file;
 
-    reg [`CONFIG_WIDTH - 1 : 0] config_r[`NUM_CONFIGS - 1 : 0];
-    reg [ `INSTR_WIDTH - 1 : 0] instr_memory[`NUM_INSTRUCTIONS - 1 : 0];
-    reg [  `DATA_WIDTH - 1 : 0] input_memory[`TOTAL_INPUT_SIZE - 1 : 0];
+    reg [15:0] config_r[`NUM_CONFIGS - 1:0];
+    reg [31:0] instr_memory[`NUM_INSTRUCTIONS - 1:0];
+    reg [31:0] input_memory[`TOTAL_INPUT_SIZE - 1:0];
 
     // caravel io variables
     wire wbs_ack_o;
@@ -71,11 +66,11 @@ module user_proj_example_tb;
 
     assign io_in[37]   = clk;
     assign io_in[36]   = rst_n;
-    assign io_in[15:0] = input_data_r[15:0]; 
+    assign io_in[15:0] = input_data_r; 
     assign io_in[16]   = input_rdy_w & input_vld_r;
     assign io_in[17]   = output_rdy_r;
 
-    assign output_data_w = io_out[25:18];
+    assign output_data_w = io_out[33:18];
     assign output_vld_w  = io_out[34];
     assign input_rdy_w   = io_out[35];
 
@@ -176,15 +171,6 @@ module user_proj_example_tb;
 
         if (output_vld_w) begin
             $fwrite(file, "%h\n", output_data_w);
-            // $display("%t: output_adr_r = %d, output_data_w = %h",
-            //     $time, output_adr_r, output_data_w);
-        
-            // $display("%t: output_adr_r = %d, output_data_w = %h, expected output_data_w = %h",
-            //     $time, output_adr_r, output_data_w, output_memory[output_adr_r]);
-            
-            // assert(output_data_w == output_memory[output_adr_r]) else $finish;
-            
-            // output_adr_r <= output_adr_r + 1;
         end
     end
 

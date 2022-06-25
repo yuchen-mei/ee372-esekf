@@ -204,13 +204,6 @@ module mvp_core #(
         .data_r3    (vs3_data_id            )
     );
 
-    // always @(posedge clk) begin
-    //     if (~rst_n) begin
-    //     end
-    //     else if (pipe_en) begin
-    //     end
-    // end
-
     //=======================================================
     // Execute Stages
     //=======================================================
@@ -327,23 +320,6 @@ module mvp_core #(
         .funct          (funct3_ex1     ),
         .vec_out        (mat_out_wb     )
     );
-
-    // always @(posedge clk) begin
-    //     if (~rst_n) begin
-    //         vec_out_ex3 <= '0;
-    //         vec_out_ex4 <= '0;
-    //         vec_out_wb  <= '0;
-    //         vfu_out_wb  <= '0;
-    //         mfu_out_wb  <= '0;
-    //     end
-    //     else if (pipe_en) begin
-    //         vec_out_ex3 <= vec_out_ex2;
-    //         vec_out_ex4 <= vec_out_ex3;
-    //         vec_out_wb  <= vec_out_ex4;
-    //         vfu_out_wb  <= vfu_out_ex4;
-    //         mfu_out_wb  <= mfu_out_ex4;
-    //     end
-    // end
 
     //=======================================================
     // Memroy Stage

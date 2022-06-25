@@ -4,7 +4,7 @@ module accelerator #(
     parameter IEEE_COMPLIANCE      = 0,
 
     parameter INPUT_FIFO_WIDTH     = 16,
-    parameter OUTPUT_FIFO_WIDTH    = 8,
+    parameter OUTPUT_FIFO_WIDTH    = 16,
     parameter CONFIG_DATA_WIDTH    = 16,
 
     parameter VECTOR_LANES         = 16,
