@@ -15,7 +15,7 @@ setOptMode -verbose true
 # in buffers, which causes more congestion and power
 
 setOptMode -holdTargetSlack  0.050
-setOptMode -setupTargetSlack 1.200
+setOptMode -setupTargetSlack 0.500
 
 # Useful skew
 #

@@ -18,7 +18,7 @@ set wb_clock_net  wb_clk_i
 set wb_clock_name ideal_clock_wb
 
 create_clock -name ${io_clock_name} -period ${dc_clock_period} [get_ports ${io_clock_net}]
-create_clock -name ${wb_clock_name} -period 100 [get_ports ${wb_clock_net}] 
+create_clock -name ${wb_clock_name} -period 100 [get_ports ${wb_clock_net}]
 
 set_clock_groups -asynchronous \
                  -group [get_clocks ${io_clock_name}] \
