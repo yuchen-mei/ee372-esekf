@@ -56,7 +56,7 @@ setAddRingMode -ring_target default -extend_over_row 0 \
                -skip_via_on_pin { standardcell } \
                -skip_via_on_wire_shape { noshape }
 
-addRing -nets {vssd1 vccd1} -type block_rings -around each_block \
+addRing -nets {vssd1 vccd1} -type block_rings -around selected \
         -layer {top met3 bottom met3 left met4 right met4} \
         -width {top 1.8 bottom 1.8 left 1.8 right 1.8} \
         -spacing {top 1.8 bottom 1.8 left 1.8 right 1.8} \

@@ -352,51 +352,51 @@ module mvp_core #(
 
     always @(posedge clk) begin
         if (~rst_n) begin
-            vs1_addr_ex1 <= 0;
-            vs2_addr_ex1 <= 0;
-            vs3_addr_ex1 <= 0;
-            mem_addr_ex1 <= 0;
-            mem_addr_ex2 <= 0;
+            vs1_addr_ex1 <= '0;
+            vs2_addr_ex1 <= '0;
+            vs3_addr_ex1 <= '0;
+            mem_addr_ex1 <= '0;
+            mem_addr_ex2 <= '0;
 
-            vs1_data_ex1 <= 0;
-            vs2_data_ex1 <= 0;
-            vs3_data_ex1 <= 0;
+            vs1_data_ex1 <= '0;
+            vs2_data_ex1 <= '0;
+            vs3_data_ex1 <= '0;
 
-            vd_addr_ex1 <= 0;
-            vd_addr_ex2 <= 0;
-            vd_addr_ex3 <= 0;
-            vd_addr_ex4 <= 0;
-            vd_addr_wb  <= 0;
+            vd_addr_ex1 <= '0;
+            vd_addr_ex2 <= '0;
+            vd_addr_ex3 <= '0;
+            vd_addr_ex4 <= '0;
+            vd_addr_wb  <= '0;
 
-            opcode_ex1 <= 0;
-            funct3_ex1 <= 0;
-            mem_we_ex1 <= 0;
+            opcode_ex1 <= '0;
+            funct3_ex1 <= '0;
+            mem_we_ex1 <= '0;
 
-            reg_we_ex1 <= 0;
-            reg_we_ex2 <= 0;
-            reg_we_ex3 <= 0;
-            reg_we_ex4 <= 0;
-            reg_we_wb  <= 0;
+            reg_we_ex1 <= '0;
+            reg_we_ex2 <= '0;
+            reg_we_ex3 <= '0;
+            reg_we_ex4 <= '0;
+            reg_we_wb  <= '0;
 
-            wb_sel_ex1 <= 0;
-            wb_sel_ex2 <= 0;
-            wb_sel_ex3 <= 0;
-            wb_sel_ex4 <= 0;
-            wb_sel_wb  <= 0;
+            wb_sel_ex1 <= '0;
+            wb_sel_ex2 <= '0;
+            wb_sel_ex3 <= '0;
+            wb_sel_ex4 <= '0;
+            wb_sel_wb  <= '0;
 
-            branch_ex1 <= 0;
-            branch_ex2 <= 0;
+            branch_ex1 <= '0;
+            branch_ex2 <= '0;
 
-            vec_out_ex3 <= 0;
-            vec_out_ex4 <= 0;
-            vec_out_wb  <= 0;
+            vec_out_ex3 <= '0;
+            vec_out_ex4 <= '0;
+            vec_out_wb  <= '0;
 
-            vfu_out_wb <= 0;
-            mfu_out_wb <= 0;
+            vfu_out_wb <= '0;
+            mfu_out_wb <= '0;
 
-            mem_rdata_ex3 <= 0;
-            mem_rdata_ex4 <= 0;
-            mem_rdata_wb  <= 0;
+            mem_rdata_ex3 <= '0;
+            mem_rdata_ex4 <= '0;
+            mem_rdata_wb  <= '0;
         end
         else if (pipe_en) begin
             vs1_addr_ex1 <= vs1_addr_id;
