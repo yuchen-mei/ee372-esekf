@@ -103,7 +103,7 @@ module user_proj_example #(
         .clk_out    ( user_proj_clk             )
     );
 
-    assign user_proj_rst_n = (wbs_debug) ? ~wb_rst_i : io_rst_n;
+    assign user_proj_rst_n = (wbs_debug_synced) ? ~wb_rst_i : io_rst_n;
 
     wishbone_ctl wbs_ctl_u0 (
         // wishbone input

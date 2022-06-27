@@ -55,6 +55,13 @@ set_input_delay -clock ${wb_clock_name} 50 [get_ports -regexp {(?=wb.*i)(?!.*clk
 set_output_delay -clock ${io_clock_name} [expr ${clock_period}/2.0] [all_outputs]
 set_output_delay -clock ${wb_clock_name} 50 [all_outputs]
 
+# caravel STA constraints
+
+set_timing_derate -early [expr {1-0.05}]
+set_timing_derate -late [expr {1+0.05}]
+set_clock_uncertainty 0.25 [get_clocks "ideal_clock_io"]
+set_clock_transition 0.15 [get_clocks "ideal_clock_io"]
+
 # Make all signals limit their fanout
 
 set_max_fanout 20 $dc_design_name
