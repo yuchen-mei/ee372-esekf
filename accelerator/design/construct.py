@@ -26,7 +26,7 @@ def construct():
   parameters = {
     'construct_path'      : __file__,
     'design_name'         : 'user_proj_example',
-    'clock_period'        : 20.0,
+    'clock_period'        : 50.0,
     'adk'                 : adk_name,
     'adk_view'            : adk_view,
     'topographical'       : True,
@@ -308,8 +308,8 @@ def construct():
 
   # LVS using GDS
   g.connect_by_name( signoff,         netgen_lvs_gds  )
-  g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
-  # g.connect_by_name( magic_gds2spice_nobbox, netgen_lvs_gds  )
+  # g.connect_by_name( magic_gds2spice, netgen_lvs_gds  )
+  g.connect_by_name( magic_gds2spice_nobbox, netgen_lvs_gds  )
 
   # LVS comparision using Calibre with standard cells blackboxed
   g.connect_by_name( gdsmerge,        magic_gds2spice )

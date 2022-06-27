@@ -229,6 +229,7 @@ setDontUse sky130_fd_sc_hd__clkdlybuf4s50_1 true
 setDontUse sky130_fd_sc_hd__clkdlybuf4s50_2 true
 
 setDontUse sky130_fd_sc_hd__and2_0 true
+setDontUse sky130_fd_sc_hd__and3_1 true
 
 setOptMode -drcMargin 0.3
 setOptMode -fixFanoutLoad false
