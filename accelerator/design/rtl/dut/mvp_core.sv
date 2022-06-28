@@ -1,14 +1,14 @@
 module mvp_core #(
-    parameter SIG_WIDTH            = 23,
-    parameter EXP_WIDTH            = 8,
-    parameter IEEE_COMPLIANCE      = 0,
+    parameter  SIG_WIDTH            = 23,
+    parameter  EXP_WIDTH            = 8,
+    parameter  IEEE_COMPLIANCE      = 0,
     
-    parameter VECTOR_LANES         = 16,
-    parameter DATA_WIDTH           = SIG_WIDTH + EXP_WIDTH + 1,
+    parameter  VECTOR_LANES         = 16,
+    parameter  DATA_WIDTH           = SIG_WIDTH + EXP_WIDTH + 1,
 
-    parameter INSTR_MEM_ADDR_WIDTH = 8,
-    parameter REG_BANK_DEPTH       = 32,
-    parameter REG_ADDR_WIDTH       = $clog2(REG_BANK_DEPTH)
+    parameter  INSTR_MEM_ADDR_WIDTH = 8,
+    parameter  REG_BANK_DEPTH       = 32,
+    localparam REG_ADDR_WIDTH       = $clog2(REG_BANK_DEPTH)
 ) (
     input  logic                               clk,
     input  logic                               rst_n,

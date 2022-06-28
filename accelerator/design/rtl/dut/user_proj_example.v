@@ -45,25 +45,26 @@ module user_proj_example #(
 );
 
     wire        io_clk;
-    wire        io_rst_n;
+    reg         io_rst_n;
+
+    reg         input_vld_w;
+    reg  [15:0] input_data_w;
+    reg         output_rdy_w;
+
     wire        input_rdy_w;
-    wire        input_vld_w;
-    wire [15:0] input_data_w;
-    wire        output_rdy_w;
     wire        output_vld_w;
     wire [15:0] output_data_w;
 
     assign user_irq = 3'b0;
 
     assign io_clk       = io_in[37];
-    assign io_rst_n     = io_in[36];
+    // assign io_rst_n     = io_in[36];
     assign input_data_w = io_in[15:0];
     assign input_vld_w  = io_in[16];
     assign output_rdy_w = io_in[17];
 
     assign io_out[17:0]  = 18'b0;
     assign io_out[33:18] = output_data_w;
-    // assign io_out[33:26] = 8'b0; // reserved for output
     assign io_out[34]    = output_vld_w;
     assign io_out[35]    = input_rdy_w;
     assign io_out[37:36] = 2'b0;
@@ -93,9 +94,10 @@ module user_proj_example #(
     wire [31:0] wbs_mem_wdata;
     wire [31:0] wbs_mem_rdata;
 
-    // clock/reset mux
     wire user_proj_clk;
     wire user_proj_rst_n;
+
+    reg wb_rst_r;
 
     clock_mux #(2) clk_mux (
         .clk        ( {io_clk, wb_clk_i}        ),
@@ -103,7 +105,15 @@ module user_proj_example #(
         .clk_out    ( user_proj_clk             )
     );
 
-    assign user_proj_rst_n = (wbs_debug_synced) ? ~wb_rst_i : io_rst_n;
+    always @(posedge user_proj_clk) begin
+        io_rst_n     <= io_in[36];
+        wb_rst_r     <= wb_rst_i;
+        // input_data_w <= io_in[15:0];
+        // input_vld_w  <= io_in[16];
+        // output_rdy_w <= io_in[17];
+    end
+
+    assign user_proj_rst_n = wbs_debug_synced ? ~wb_rst_r : io_rst_n;
 
     wishbone_ctl wbs_ctl_u0 (
         // wishbone input

@@ -33,7 +33,7 @@ module fpu #(
     DW_fp_cmp_DG #(
         .sig_width      (SIG_WIDTH      ),
         .exp_width      (EXP_WIDTH      ),
-        .ieee_compliance(IEEE_COMPLIANCE)
+        .ieee_compliance(1              )
     ) DW_fp_cmp_DG_inst (
         .a              (inst_a         ),
         .b              (inst_b         ),

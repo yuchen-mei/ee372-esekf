@@ -1,9 +1,9 @@
 module vector_unit #(
-    parameter SIG_WIDTH       = 23,
-    parameter EXP_WIDTH       = 8,
-    parameter IEEE_COMPLIANCE = 0,
-    parameter VECTOR_LANES    = 16,
-    parameter DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
+    parameter  SIG_WIDTH       = 23,
+    parameter  EXP_WIDTH       = 8,
+    parameter  IEEE_COMPLIANCE = 0,
+    parameter  VECTOR_LANES    = 16,
+    localparam DATA_WIDTH      = SIG_WIDTH + EXP_WIDTH + 1
 ) (
     input  logic                                    clk,
     input  logic                                    en,
@@ -24,9 +24,9 @@ module vector_unit #(
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vslide_up;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vslide_down;
 
-    skew_symmetric #(DATA_WIDTH) skew_symmetric_inst (.vec_a(vec_a[8:0]), .vec_out(skew_mat));
-    vslide_up #(DATA_WIDTH) vslide_up_inst (.vsrc(vec_b), .vdest(vec_c), .shamt(imm), .vec_out(vslide_up));
-    vslide_down #(DATA_WIDTH) vslide_down_inst (.vsrc(vec_b), .vdest(vec_c), .shamt(imm), .vec_out(vslide_down));
+    skew_symmetric #(DATA_WIDTH) vector_skew_inst    (.vec_a(vec_a[8:0]), .vec_out(skew_mat));
+    vslide_up      #(DATA_WIDTH) vslide_up_inst      (.vsrc(vec_b), .vdest(vec_c), .shamt(imm), .vec_out(vslide_up  ));
+    vslide_down    #(DATA_WIDTH) vslide_down_inst    (.vsrc(vec_b), .vdest(vec_c), .shamt(imm), .vec_out(vslide_down));
 
     for (genvar i = 0; i < 3; i = i + 1) begin
         for (genvar j = 0; j < 3; j = j + 1) begin
@@ -57,7 +57,7 @@ module vector_unit #(
         fpu #(
             .SIG_WIDTH      (SIG_WIDTH      ),
             .EXP_WIDTH      (EXP_WIDTH      ),
-            .IEEE_COMPLIANCE(1              )
+            .IEEE_COMPLIANCE(IEEE_COMPLIANCE)
         ) fpu_inst (
             .inst_a         (inst_a         ),
             .inst_b         (inst_b         ),

@@ -7,7 +7,7 @@ module wishbone_ctl #(
     input  logic        wbs_stb_i,
     input  logic        wbs_cyc_i,
     input  logic        wbs_we_i,
-    input  logic [ 3:0] wbs_sel_i,
+    input  logic  [3:0] wbs_sel_i,
     input  logic [31:0] wbs_dat_i,
     input  logic [31:0] wbs_adr_i,
     // wishbone output
@@ -119,26 +119,13 @@ module wishbone_ctl #(
         end
     end
 
-    always_comb begin
-        if ((wbs_adr_i_q & WBS_MEM_MASK) == WBS_MEM_ADDR) begin
+    always_comb
+        if ((wbs_adr_i_q & WBS_MEM_MASK) == WBS_MEM_ADDR)
             wbs_dat_o = wbs_mem_rdata;
-        end
-        else if (wbs_adr_i_q == WBS_FSM_DONE_ADDR) begin
+        else if (wbs_adr_i_q == WBS_FSM_DONE_ADDR)
             wbs_dat_o = wbs_fsm_done;
-        end
-    end
-
-    // always @(posedge wb_clk_i) begin
-    //     if (wb_rst_i) begin
-    //         wbs_dat_o <= 0;
-    //     end
-    //     else if ((wbs_adr_i_q & WBS_MEM_MASK) == WBS_MEM_ADDR) begin
-    //         wbs_dat_o <= wbs_mem_rdata;
-    //     end
-    //     else if (wbs_adr_i_q == WBS_FSM_DONE_ADDR) begin
-    //         wbs_dat_o <= wbs_fsm_done;
-    //     end
-    // end
+        else
+            wbs_dat_o = 'X;
 
     // ==============================================================================
     // Outputs
