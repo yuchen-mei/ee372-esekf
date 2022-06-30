@@ -7,9 +7,9 @@ inputs:
 
 outputs:
   - testbench.sv
-  # - test_vectors.txt
   - instr_data.txt
   - input_data.txt
+  - output_data.txt
   - design.args
   - design.args.gls
 

@@ -14,7 +14,7 @@ module decoder (
     output logic        jump,
     output logic        branch,
 
-    output logic        mem_we,
+    output logic        mem_write,
     output logic [11:0] mem_addr,
 
     input  logic  [4:0] vd_addr_ex1,
@@ -116,11 +116,11 @@ module decoder (
         endcase
     end
 
-    assign mem_addr = branch ? branch_offset : instr[31:20];
-    assign mem_we   = (opcode == `STORE_FP);
-    assign jump     = (opcode == `JALR);
-    assign branch   = (opcode == `BRANCH);
-    assign reg_we   = ~mem_we && ~jump && ~branch;
+    assign mem_addr  = branch ? branch_offset : instr[31:20];
+    assign mem_write = (opcode == `STORE_FP);
+    assign jump      = (opcode == `JALR);
+    assign branch    = (opcode == `BRANCH);
+    assign reg_we    = ~mem_write & ~jump & ~branch;
 
     logic stage1_dependency, stage2_dependency, stage3_dependency;
 

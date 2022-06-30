@@ -79,31 +79,31 @@ module controller #(
     assign input_wadr     = input_wadr_r[3+:DATA_MEM_ADDR_WIDTH];
     assign output_wb_radr = output_wbadr_r[3+:DATA_MEM_ADDR_WIDTH];
 
-    assign params_fifo_deq = (state_r == `IDLE) && params_fifo_empty_n;
-    assign instr_full_n    = (state_r == `INITIAL_FILL) && (instr_wadr_r <= instr_max_wadr_c);
-    assign input_full_n    = (state_r == `RESET_INNER_LOOP) && (input_wadr_r <= input_wadr_offset + input_max_wadr_c);
-    assign output_empty_n  = (state_r == `RESET_INNER_LOOP) && (output_wbadr_r <= output_radr_offset + output_max_adr_c);
+    assign params_fifo_deq = ~wbs_debug & (state_r == `IDLE) & params_fifo_empty_n;
+    assign instr_full_n    = ~wbs_debug & (state_r == `INITIAL_FILL) & (instr_wadr_r <= instr_max_wadr_c);
+    assign input_full_n    = ~wbs_debug & (state_r == `RESET_INNER_LOOP) & (input_wadr_r <= input_wadr_offset + input_max_wadr_c);
+    assign output_empty_n  = ~wbs_debug & (state_r == `RESET_INNER_LOOP) & (output_wbadr_r <= output_radr_offset + output_max_adr_c);
 
     assign mat_inv_vld = mat_inv_en && ~mat_inv_en_r;
 
+    always_ff @(posedge clk)
+        if (!rst_n) mat_inv_en_r <= 0;
+        else mat_inv_en_r <= mat_inv_en;
+
     assign wbs_fsm_done = (state_r == `RESET_INNER_LOOP);
 
-    always @ (posedge clk) begin
+    always @(posedge clk) begin
         if (~rst_n) begin
-            state_r <= `IDLE;
-
+            state_r        <= `IDLE;
             config_adr_r   <= 0;
             instr_wadr_r   <= 0;
             input_wadr_r   <= 0;
             output_wbadr_r <= 0;
 
-            mat_inv_en   <= 0;
-            mat_inv_en_r <= 0;
-            mvp_core_en  <= 0;
+            mat_inv_en     <= 0;
+            mvp_core_en    <= 0;
         end
         else begin
-            mat_inv_en_r <= mat_inv_en;
-
             if (state_r == `IDLE) begin
                 if (params_fifo_empty_n) begin
                     config_r[config_adr_r] <= params_fifo_dout;
@@ -129,7 +129,6 @@ module controller #(
                 end
             end
             else if (state_r == `INNER_LOOP) begin
-                // Special instruction to invoke I/O
                 if (mem_write && (mem_addr == IO_ADDR)) begin
                     state_r        <= `RESET_INNER_LOOP;
                     mvp_core_en    <= 0;
@@ -149,7 +148,6 @@ module controller #(
                 input_wadr_r   <= (input_wen && input_full_n) ? input_wadr_r + 8 : input_wadr_r;
                 output_wbadr_r <= (output_wb_ren && output_empty_n) ? output_wbadr_r + 8 : output_wbadr_r;
 
-                // Enable MVP Core after complete reading inputs and sending out outputs
                 if ((input_wadr_r >= input_wadr_offset + input_max_wadr_c) && 
                     (output_wbadr_r >= output_radr_offset + output_max_adr_c)) begin
                     mvp_core_en <= 1;

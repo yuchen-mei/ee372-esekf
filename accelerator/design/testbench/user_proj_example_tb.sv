@@ -21,11 +21,11 @@ module user_proj_example_tb;
     reg rst_n;
     reg wbs_clk_i;
 
-    reg  [`ADDR_WIDTH - 1 : 0] input_adr_r;
+    reg       [`ADDR_WIDTH - 1 : 0] input_adr_r;
 
-    wire                           input_rdy_w;
-    reg                            input_vld_r;
-    reg  [`INPUT_FIFO_WIDTH - 1:0] input_data_r;
+    wire                            input_rdy_w;
+    reg                             input_vld_r;
+    reg   [`INPUT_FIFO_WIDTH - 1:0] input_data_r;
 
     reg                             output_rdy_r;
     wire                            output_vld_w;
@@ -45,20 +45,21 @@ module user_proj_example_tb;
 
     reg [7:0] state_r;
     reg       counter;
-    integer file;
+    integer   file;
 
     reg [15:0] config_r[`NUM_CONFIGS - 1:0];
     reg [31:0] instr_memory[`NUM_INSTRUCTIONS - 1:0];
     reg [31:0] input_memory[`TOTAL_INPUT_SIZE - 1:0];
 
     // caravel io variables
-    wire wbs_ack_o;
-    wire [31:0] wbs_dat_o;
+    wire         wbs_ack_o;
+    wire  [31:0] wbs_dat_o;
     wire [127:0] la_data_out;
 
     wire [`MPRJ_IO_PADS-1:0] io_in;
     wire [`MPRJ_IO_PADS-1:0] io_out;
     wire [`MPRJ_IO_PADS-1:0] io_oeb;
+
     wire [              2:0] user_irq;
 
     supply0 vssd1;

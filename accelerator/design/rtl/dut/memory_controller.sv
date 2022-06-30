@@ -9,7 +9,7 @@ module memory_controller #(
     input  logic                               clk,
     // Physical memory address
     input  logic                               mem_we,
-    input  logic                               mem_ren,
+    input  logic                               mem_re,
     input  logic [             ADDR_WIDTH-1:0] mem_addr,
     input  logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_wdata,
     output logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_rdata,
@@ -32,8 +32,6 @@ module memory_controller #(
     input  logic [           9*DATA_WIDTH-1:0] mat_inv_out_u
 );
 
-    localparam MASK_BITS = DATAPATH/32;
-
     localparam DATA_MASK     = 12'h800;
     localparam DATA_ADDR     = 12'h000;
     localparam TEXT_MASK     = 12'he00;
@@ -44,6 +42,8 @@ module memory_controller #(
     localparam INVMAT_U_ADDR = 12'ha04;
 
     logic [ADDR_WIDTH-1:0] mem_addr_r;
+    logic [ADDR_WIDTH-1:0] mem_write_mask;
+    logic [ADDR_WIDTH-1:0] mem_read_data;
 
     always @(posedge clk) begin
         mem_addr_r <= mem_addr;
@@ -52,9 +52,9 @@ module memory_controller #(
     assign instr_mem_addr  = mem_addr[INSTR_MEM_ADDR_WIDTH-1:0];
     assign instr_mem_wdata = mem_wdata;
 
-    assign data_mem_addr  = mem_addr[3+:DATA_MEM_ADDR_WIDTH];
-    // assign data_mem_wdata = mem_wdata;
-    // assign data_mem_wmask = '1;
+    assign data_mem_addr   = mem_addr[3+:DATA_MEM_ADDR_WIDTH];
+    assign data_mem_wmask  = mem_write_mask << mem_addr[2:0];
+    assign data_mem_wdata  = mem_wdata << {mem_addr[2:0], 5'b0};
 
     always_comb begin
         instr_mem_csb = 1'b0;
@@ -62,37 +62,28 @@ module memory_controller #(
         data_mem_csb  = 1'b0;
         data_mem_web  = 1'b0;
 
-        case (width)
-            3'b010:  data_mem_wmask = {1{1'b1}}; // 32
-            3'b011:  data_mem_wmask = {2{1'b1}}; // 64
-            3'b100:  data_mem_wmask = {4{1'b1}}; // 128
-            default: data_mem_wmask = {8{1'b1}}; // 256
-        endcase
-
-        data_mem_wmask <<= mem_addr[2:0];
-
-       case (mem_addr[2:0])
-            3'b001:  data_mem_wdata = mem_wdata << 32;
-            3'b010:  data_mem_wdata = mem_wdata << 64;
-            3'b011:  data_mem_wdata = mem_wdata << 96;
-            3'b100:  data_mem_wdata = mem_wdata << 128;
-            3'b101:  data_mem_wdata = mem_wdata << 160;
-            3'b110:  data_mem_wdata = mem_wdata << 192;
-            3'b111:  data_mem_wdata = mem_wdata << 224;
-            default: data_mem_wdata = mem_wdata;
-        endcase
-
         if ((mem_addr & DATA_MASK) == DATA_ADDR) begin
-            data_mem_csb = mem_ren || mem_we;
+            data_mem_csb = mem_re || mem_we;
             data_mem_web = mem_we;
         end
         else if ((mem_addr & TEXT_MASK) == TEXT_ADDR) begin
-            instr_mem_csb = mem_ren || mem_we;
+            instr_mem_csb = mem_re || mem_we;
             instr_mem_web = mem_we;
         end
+    end
 
+    always_comb begin
+        case (width)
+            3'b010:  mem_write_mask = {1{1'b1}}; // 32
+            3'b011:  mem_write_mask = {2{1'b1}}; // 64
+            3'b100:  mem_write_mask = {4{1'b1}}; // 128
+            default: mem_write_mask = {8{1'b1}}; // 256
+        endcase
+    end
+
+    always_comb begin
         if ((mem_addr_r & DATA_MASK) == DATA_ADDR)
-            mem_rdata = data_mem_rdata;
+            mem_rdata = data_mem_rdata >> {mem_addr[2:0], 5'b0};
         else if ((mem_addr_r & TEXT_MASK) == TEXT_ADDR)
             mem_rdata = instr_mem_rdata;
         else if (mem_addr_r == INVMAT_L_ADDR)
@@ -100,7 +91,7 @@ module memory_controller #(
         else if (mem_addr_r == INVMAT_U_ADDR)
             mem_rdata = mat_inv_out_u;
         else
-            mem_rdata = 0;
+            mem_rdata = 'X;
     end
 
 endmodule

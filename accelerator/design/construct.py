@@ -182,8 +182,8 @@ def construct():
   
   # Dynamically add edges
 
-  rtl_sim.extend_inputs(['instr_data.txt', 'input_data.txt'])
-  gl_sim.extend_inputs(['instr_data.txt', 'input_data.txt'])
+  rtl_sim.extend_inputs(['instr_data.txt', 'input_data.txt', 'output_data.txt'])
+  gl_sim.extend_inputs(['instr_data.txt', 'input_data.txt', 'output_data.txt'])
 
   rtl_sim.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.v'])
   gl_sim.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.v'])

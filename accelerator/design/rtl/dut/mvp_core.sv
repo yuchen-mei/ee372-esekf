@@ -18,8 +18,8 @@ module mvp_core #(
     input  logic [                       31:0] instr,
 
     output logic [                       11:0] mem_addr,
-    output logic                               mem_ren,
-    output logic                               mem_we,
+    output logic                               mem_read,
+    output logic                               mem_write,
     input  logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_rdata,
     output logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_wdata,
     output logic [                        2:0] width,
@@ -135,33 +135,33 @@ module mvp_core #(
     //=======================================================
 
     decoder decoder_inst (
-        .instr        (instr         ),
+        .instr        ( instr       ),
         // Registers and immediate
-        .vd_addr      (vd_addr_id    ),
-        .vs1_addr     (vs1_addr_id   ),
-        .vs2_addr     (vs2_addr_id   ),
-        .vs3_addr     (vs3_addr_id   ),
-        .mem_addr     (mem_addr_id   ),
+        .vd_addr      ( vd_addr_id  ),
+        .vs1_addr     ( vs1_addr_id ),
+        .vs2_addr     ( vs2_addr_id ),
+        .vs3_addr     ( vs3_addr_id ),
+        .mem_addr     ( mem_addr_id ),
         // Control signals
-        .func_sel     (opcode_id     ),
-        .funct3       (funct3_id     ),
-        .wb_sel       (wb_sel_id     ),
-        .masking      (              ),
-        .mem_we       (mem_we_id     ),
-        .reg_we       (reg_we_id     ),
-        .jump         (jump_id       ),
-        .branch       (branch_id     ),
+        .func_sel     ( opcode_id   ),
+        .funct3       ( funct3_id   ),
+        .wb_sel       ( wb_sel_id   ),
+        .masking      (             ),
+        .mem_write    ( mem_we_id   ),
+        .reg_we       ( reg_we_id   ),
+        .jump         ( jump_id     ),
+        .branch       ( branch_id   ),
         // Stalling logic
-        .vd_addr_ex1  (vd_addr_ex1   ),
-        .vd_addr_ex2  (vd_addr_ex2   ),
-        .vd_addr_ex3  (vd_addr_ex3   ),
-        .reg_we_ex1   (reg_we_ex1    ),
-        .reg_we_ex2   (reg_we_ex2    ),
-        .reg_we_ex3   (reg_we_ex3    ),
-        .wb_sel_ex1   (wb_sel_ex1    ),
-        .wb_sel_ex2   (wb_sel_ex2    ),
-        .wb_sel_ex3   (wb_sel_ex3    ),
-        .stall        (stall         )
+        .vd_addr_ex1  ( vd_addr_ex1 ),
+        .vd_addr_ex2  ( vd_addr_ex2 ),
+        .vd_addr_ex3  ( vd_addr_ex3 ),
+        .reg_we_ex1   ( reg_we_ex1  ),
+        .reg_we_ex2   ( reg_we_ex2  ),
+        .reg_we_ex3   ( reg_we_ex3  ),
+        .wb_sel_ex1   ( wb_sel_ex1  ),
+        .wb_sel_ex2   ( wb_sel_ex2  ),
+        .wb_sel_ex3   ( wb_sel_ex3  ),
+        .stall        ( stall       )
     );
 
     // regfile #(
@@ -326,8 +326,8 @@ module mvp_core #(
     //=======================================================
 
     assign mem_addr  = mem_addr_ex1;
-    assign mem_we    = mem_we_ex1 && en;
-    assign mem_ren   = wb_sel_ex1[1] && en;
+    assign mem_write = mem_we_ex1 && en;
+    assign mem_read  = wb_sel_ex1[1] && en;
     assign mem_wdata = operand_c;
     assign width     = funct3_ex1;
 

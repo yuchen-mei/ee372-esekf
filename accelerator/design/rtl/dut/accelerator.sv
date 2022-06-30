@@ -31,7 +31,7 @@ module accelerator #(
     output logic                         wbs_fsm_done,
 
     input  logic                         wbs_mem_we,
-    input  logic                         wbs_mem_ren,
+    input  logic                         wbs_mem_re,
     input  logic [                 11:0] wbs_mem_addr,
     input  logic [                 31:0] wbs_mem_wdata,
     output logic [                 31:0] wbs_mem_rdata
@@ -85,7 +85,7 @@ module accelerator #(
     // ---------------------------------------------------------------------------
 
     logic                                            mvp_mem_we;
-    logic                                            mvp_mem_ren;
+    logic                                            mvp_mem_re;
     logic [          ADDR_WIDTH-1:0]                 mvp_mem_addr;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mvp_mem_wdata;
     logic [                     2:0]                 width;
@@ -107,7 +107,7 @@ module accelerator #(
     logic [            DATAPATH-1:0]                 output_wb_data;
 
     logic                                            mem_ctrl_we;
-    logic                                            mem_ctrl_ren;
+    logic                                            mem_ctrl_re;
     logic [          ADDR_WIDTH-1:0]                 mem_ctrl_addr;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_ctrl_wdata;
     logic [        VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_ctrl_rdata;
@@ -149,8 +149,8 @@ module accelerator #(
         .pc                  (pc                  ),
         .instr               (instr               ),
         .mem_addr            (mvp_mem_addr        ),
-        .mem_we              (mvp_mem_we          ),
-        .mem_ren             (mvp_mem_ren         ),
+        .mem_write           (mvp_mem_we          ),
+        .mem_read            (mvp_mem_re          ),
         .mem_wdata           (mvp_mem_wdata       ),
         .mem_rdata           (mem_ctrl_rdata      ),
         .width               (width               )
@@ -217,7 +217,9 @@ module accelerator #(
             instr_mem_addr  = instr_mem_ctrl_addr;
             instr_mem_wdata = instr_mem_ctrl_wdata;
         end
+    end
 
+    always_comb begin
         if (input_wen) begin
             data_mem_csb   = input_wen;
             data_mem_web   = 1'b1;
@@ -232,17 +234,19 @@ module accelerator #(
             data_mem_wmask = data_mem_ctrl_wmask;
             data_mem_wdata = data_mem_ctrl_wdata;
         end
+    end
 
+    always_comb begin
         if (wbs_debug && ~mvp_core_en) begin
             mem_ctrl_we    = wbs_mem_we;
-            mem_ctrl_ren   = wbs_mem_ren;
+            mem_ctrl_re    = wbs_mem_re;
             mem_ctrl_addr  = wbs_mem_addr;
             mem_ctrl_wdata = wbs_mem_wdata;
             mem_ctrl_width = 3'b010;
         end
         else begin
             mem_ctrl_we    = mvp_mem_we;
-            mem_ctrl_ren   = mvp_mem_ren;
+            mem_ctrl_re    = mvp_mem_re;
             mem_ctrl_addr  = mvp_mem_addr;
             mem_ctrl_wdata = mvp_mem_wdata;
             mem_ctrl_width = width;
@@ -260,10 +264,10 @@ module accelerator #(
         .clk                 (clk                 ),
         // Physical memory address
         .mem_we              (mem_ctrl_we         ),
-        .mem_ren             (mem_ctrl_ren        ),
+        .mem_re              (mem_ctrl_re         ),
         .mem_addr            (mem_ctrl_addr       ),
         .mem_wdata           (mem_ctrl_wdata      ),
-        .mem_rdata           (mem_ctrl_rdata       ),
+        .mem_rdata           (mem_ctrl_rdata      ),
         .width               (mem_ctrl_width      ),
         // Instruction memory
         .instr_mem_csb       (instr_mem_ctrl_csb  ),
@@ -397,7 +401,7 @@ module accelerator #(
         .output_wb_ren       (output_wb_ren       ),
         // MMIO
         .mem_addr            (mvp_mem_addr        ),
-        .mem_read            (mvp_mem_ren         ),
+        .mem_read            (mvp_mem_re          ),
         .mem_write           (mvp_mem_we          ),
         // Matrix inversion
         .mat_inv_en          (mat_inv_en          ),

@@ -19,7 +19,7 @@ module wishbone_ctl #(
     input  logic        wbs_fsm_done,
 
     output logic        wbs_mem_we,
-    output logic        wbs_mem_ren,
+    output logic        wbs_mem_re,
     output logic [11:0] wbs_mem_addr,
     output logic [31:0] wbs_mem_wdata,
     input  logic [31:0] wbs_mem_rdata
@@ -35,101 +35,105 @@ module wishbone_ctl #(
     localparam WBS_MEM_ADDR       = 32'h30010000;
 
 // ==============================================================================
-// Request, Acknowledgement
+// FSM Handling Memory Read/Write
 // ==============================================================================
-    wire wbs_req = wbs_stb_i & wbs_cyc_i;
-    wire ack_o;
 
-    // ack
-    // always@(posedge wb_clk_i) begin
-    //     if (wb_rst_i) ack_o <= 1'b0;
-    //     else          ack_o <= wbs_req; // assume we can always process request immediately;
-    // end
+    typedef enum logic [2:0] {
+        STANDBY   = 3'd0,
+        MEM_READ1 = 3'd1,
+        MEM_READ2 = 3'd2,
+        MEM_READ3 = 3'd3,
+        MEM_WRITE = 3'd4
+    } wb_ctrl_state_t;
 
-    // shift reg for ack_o
-    localparam SR_DEPTH = 4;
-    integer i;
-    reg [SR_DEPTH-1:0] ack_o_shift_reg;
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i) begin
-            ack_o_shift_reg <= {SR_DEPTH{1'b0}};
-        end
-        else begin
-            ack_o_shift_reg[0] <= wbs_req;
-            for (i = 0; i < SR_DEPTH-1; i = i+1) begin
-                ack_o_shift_reg[i+1] <= ack_o_shift_reg[i];
+    wb_ctrl_state_t state;
+    wb_ctrl_state_t next_state;
+
+    logic [31:0] wbs_adr_r1;
+    logic [31:0] wbs_adr_r2;
+    logic [31:0] wbs_dat_r;
+    logic        wbs_req;
+
+    assign wbs_req = wbs_stb_i & wbs_cyc_i;
+
+    always_ff @(posedge wb_clk_i) begin
+        if (wb_rst_i) state <= STANDBY;
+        else          state <= next_state;
+    end
+
+    always_comb begin
+        next_state = state;
+        wbs_mem_we = 0;
+        wbs_mem_re = 0;
+        wbs_ack_o  = 0;
+        wbs_dat_o  = 'X;
+
+        unique case (state)
+            STANDBY: begin
+                if (wbs_req & wbs_we_i)
+                    next_state = MEM_WRITE;
+
+                if (wbs_req & ~wbs_we_i) begin
+                    if ((wbs_adr_i & WBS_MEM_MASK) == WBS_MEM_ADDR)
+                        next_state = MEM_READ1;
+                    else
+                        next_state = MEM_READ2;
+                end
             end
-        end
+            MEM_READ1: begin
+                next_state = MEM_READ2;
+                wbs_mem_re = 1;
+            end
+            MEM_READ2: begin
+                next_state = STANDBY;
+                wbs_ack_o  = 1'b1;
+
+                if (wbs_adr_r1 == WBS_FSM_DONE_ADDR)
+                    wbs_dat_o = wbs_fsm_done;
+                else if ((wbs_adr_r2 & WBS_MEM_MASK) == WBS_MEM_ADDR)
+                    wbs_dat_o = wbs_mem_rdata;
+            end
+            MEM_WRITE: begin
+                next_state = STANDBY;
+                wbs_mem_we = ((wbs_adr_r1 & WBS_MEM_MASK) == WBS_MEM_ADDR);
+                wbs_ack_o  = 1'b1;
+            end
+        endcase
     end
 
-    assign ack_o = ack_o_shift_reg[0]; // assume we can always process request immediately;
-    // assign ack_o = ack_o_shift_reg[3]; // delay N cycles for the ack, see how the wishbone behaves
-
-// ==============================================================================
-// Latching
-// ==============================================================================
-    wire wbs_req_write = (!ack_o) & wbs_req & (wbs_we_i );
-    wire wbs_req_read  = (!ack_o) & wbs_req & (~wbs_we_i);
-
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i) begin
+    always_ff @(posedge wb_clk_i) begin
+        if (wb_rst_i)
             wbs_debug <= 0;
-        end
-        else if (wbs_req_write && wbs_adr_i == WBS_DEBUG_ADDR) begin
+        else if (wbs_req & wbs_we_i & (wbs_adr_i == WBS_DEBUG_ADDR))
             wbs_debug <= wbs_dat_i[0];
-        end
     end
 
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i) begin
+    always_ff @(posedge wb_clk_i) begin
+        if (wb_rst_i)
             wbs_fsm_start <= 0;
-        end
-        else if (wbs_req_write && wbs_adr_i == WBS_FSM_START_ADDR) begin
+        else if (wbs_req & wbs_we_i & (wbs_adr_i == WBS_FSM_START_ADDR))
             wbs_fsm_start <= wbs_dat_i[0];
-        end
-        else begin
-            wbs_fsm_start <= 0;
-        end
-    end
-
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i) begin
-            wbs_mem_we    <= 1'b0;
-            wbs_mem_addr  <= 12'b0;
-            wbs_mem_wdata <= 0;
-        end
-        else if (wbs_req_write && ((wbs_adr_i & WBS_MEM_MASK) == WBS_MEM_ADDR)) begin
-            wbs_mem_we    <= 1'b1;
-            wbs_mem_addr  <= wbs_adr_i[13:2];
-            wbs_mem_wdata <= wbs_dat_i;
-        end
-        else begin
-            wbs_mem_we <= 1'b0;
-        end
-    end
-
-    logic [31:0] wbs_adr_i_q;
-
-    always @(posedge wb_clk_i) begin
-        if (wb_rst_i) begin
-            wbs_adr_i_q <= 0;
-        end
-        else begin
-            wbs_adr_i_q <= wbs_adr_i;
-        end
-    end
-
-    always_comb
-        if ((wbs_adr_i_q & WBS_MEM_MASK) == WBS_MEM_ADDR)
-            wbs_dat_o = wbs_mem_rdata;
-        else if (wbs_adr_i_q == WBS_FSM_DONE_ADDR)
-            wbs_dat_o = wbs_fsm_done;
         else
-            wbs_dat_o = 'X;
+            wbs_fsm_start <= 0;
+    end
 
-    // ==============================================================================
-    // Outputs
-    // ==============================================================================
-    assign wbs_ack_o = ack_o;
+    always_ff @(posedge wb_clk_i) begin
+        if (wb_rst_i)
+            wbs_mem_wdata <= 32'b0;
+        else if (wbs_req && ((wbs_adr_i & WBS_MEM_MASK) == WBS_MEM_ADDR))
+            wbs_mem_wdata <= wbs_dat_i;
+    end
+
+    always_ff @(posedge wb_clk_i) begin
+        if (wb_rst_i) begin
+            wbs_adr_r1 <= 0;
+            wbs_adr_r2 <= 0;
+        end else begin
+            wbs_adr_r1 <= wbs_adr_i;
+            wbs_adr_r2 <= wbs_adr_r1;
+        end
+    end
+
+    assign wbs_mem_addr = wbs_adr_r1[13:2];
 
 endmodule

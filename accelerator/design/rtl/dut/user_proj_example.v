@@ -46,27 +46,25 @@ module user_proj_example #(
 
     wire        io_clk;
     reg         io_rst_n;
-
-    reg         input_vld_w;
-    reg  [15:0] input_data_w;
-    reg         output_rdy_w;
-
-    wire        input_rdy_w;
-    wire        output_vld_w;
-    wire [15:0] output_data_w;
+    wire        input_rdy_o;
+    wire        input_vld_i;
+    wire [15:0] input_data_i;
+    wire        output_rdy_i;
+    wire        output_vld_o;
+    wire [15:0] output_data_o;
 
     assign user_irq = 3'b0;
 
-    assign io_clk       = io_in[37];
-    // assign io_rst_n     = io_in[36];
-    assign input_data_w = io_in[15:0];
-    assign input_vld_w  = io_in[16];
-    assign output_rdy_w = io_in[17];
+    assign io_clk        = io_in[37];
+    // assign io_rst_n      = io_in[36];
+    assign input_data_i  = io_in[15:0];
+    assign input_vld_i   = io_in[16];
+    assign output_rdy_i  = io_in[17];
 
     assign io_out[17:0]  = 18'b0;
-    assign io_out[33:18] = output_data_w;
-    assign io_out[34]    = output_vld_w;
-    assign io_out[35]    = input_rdy_w;
+    assign io_out[33:18] = output_data_o;
+    assign io_out[34]    = output_vld_o;
+    assign io_out[35]    = input_rdy_o;
     assign io_out[37:36] = 2'b0;
 
     // input - 1 output - 0
@@ -89,7 +87,7 @@ module user_proj_example #(
     wire        wbs_fsm_done_synced;
 
     wire        wbs_mem_we;
-    wire        wbs_mem_ren;
+    wire        wbs_mem_re;
     wire [11:0] wbs_mem_addr;
     wire [31:0] wbs_mem_wdata;
     wire [31:0] wbs_mem_rdata;
@@ -108,9 +106,9 @@ module user_proj_example #(
     always @(posedge user_proj_clk) begin
         io_rst_n     <= io_in[36];
         wb_rst_r     <= wb_rst_i;
-        // input_data_w <= io_in[15:0];
-        // input_vld_w  <= io_in[16];
-        // output_rdy_w <= io_in[17];
+        // input_data_i <= io_in[15:0];
+        // input_vld_i  <= io_in[16];
+        // output_rdy_i <= io_in[17];
     end
 
     assign user_proj_rst_n = wbs_debug_synced ? ~wb_rst_r : io_rst_n;
@@ -134,7 +132,7 @@ module user_proj_example #(
         .wbs_fsm_done  (wbs_fsm_done_synced ),
 
         .wbs_mem_we    (wbs_mem_we          ),
-        .wbs_mem_ren   (wbs_mem_ren         ),
+        .wbs_mem_re    (wbs_mem_re          ),
         .wbs_mem_addr  (wbs_mem_addr        ),
         .wbs_mem_wdata (wbs_mem_wdata       ),
         .wbs_mem_rdata (wbs_mem_rdata       )
@@ -148,20 +146,20 @@ module user_proj_example #(
         .clk           (user_proj_clk       ),
         .rst_n         (user_proj_rst_n     ),
 
-        .input_rdy     (input_rdy_w         ),
-        .input_vld     (input_vld_w         ),
-        .input_data    (input_data_w        ),
+        .input_rdy     (input_rdy_o         ),
+        .input_vld     (input_vld_i         ),
+        .input_data    (input_data_i        ),
 
-        .output_rdy    (output_rdy_w        ),
-        .output_vld    (output_vld_w        ),
-        .output_data   (output_data_w       ),
+        .output_rdy    (output_rdy_i        ),
+        .output_vld    (output_vld_o        ),
+        .output_data   (output_data_o       ),
 
         .wbs_debug     (wbs_debug_synced    ),
         .wbs_fsm_start (wbs_fsm_start_synced),
         .wbs_fsm_done  (wbs_fsm_done        ),
 
         .wbs_mem_we    (wbs_mem_we          ),
-        .wbs_mem_ren   (wbs_mem_ren         ),
+        .wbs_mem_re    (wbs_mem_re          ),
         .wbs_mem_addr  (wbs_mem_addr        ),
         .wbs_mem_wdata (wbs_mem_wdata       ),
         .wbs_mem_rdata (wbs_mem_rdata       )
@@ -170,7 +168,7 @@ module user_proj_example #(
     SyncBit wbs_debug_sync (
         .sCLK          (wb_clk_i            ),
         .sRST          (~wb_rst_i           ),
-        .dCLK          (io_clk              ),
+        .dCLK          (user_proj_clk       ),
         .sEN           (1'b1                ),
         .sD_IN         (wbs_debug           ),
         .dD_OUT        (wbs_debug_synced    )
@@ -179,7 +177,7 @@ module user_proj_example #(
     SyncPulse wbs_fsm_start_sync (
         .sCLK          (wb_clk_i            ),
         .sRST          (~wb_rst_i           ),
-        .dCLK          (io_clk              ),
+        .dCLK          (user_proj_clk       ),
         .sEN           (wbs_fsm_start       ),
         .dPulse        (wbs_fsm_start_synced)
     );
