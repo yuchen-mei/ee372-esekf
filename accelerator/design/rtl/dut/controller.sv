@@ -52,6 +52,13 @@ module controller #(
     localparam IO_ADDR     = 12'ha00;
     localparam INVMAT_ADDR = 12'ha02;
 
+    //  typedef enum logic [1:0] {
+    //     IDLE             = 2'd0,
+    //     INITIAL_FILL     = 2'd1,
+    //     INNER_LOOP       = 2'd2,
+    //     RESET_INNER_LOOP = 2'd3,
+    // } ctrl_state_t;
+
     // ---------------------------------------------------------------------------
     // Configuration registers
     // ---------------------------------------------------------------------------

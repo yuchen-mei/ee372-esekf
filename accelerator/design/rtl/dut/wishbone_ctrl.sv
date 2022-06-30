@@ -51,7 +51,7 @@ module wishbone_ctl #(
 
     logic [31:0] wbs_adr_r1;
     logic [31:0] wbs_adr_r2;
-    logic [31:0] wbs_dat_r;
+    logic [31:0] wbs_read_data;
     logic        wbs_req;
 
     assign wbs_req = wbs_stb_i & wbs_cyc_i;
@@ -66,7 +66,6 @@ module wishbone_ctl #(
         wbs_mem_we = 0;
         wbs_mem_re = 0;
         wbs_ack_o  = 0;
-        wbs_dat_o  = 'X;
 
         unique case (state)
             STANDBY: begin
@@ -85,13 +84,16 @@ module wishbone_ctl #(
                 wbs_mem_re = 1;
             end
             MEM_READ2: begin
-                next_state = STANDBY;
-                wbs_ack_o  = 1'b1;
+                next_state = MEM_READ3;
 
                 if (wbs_adr_r1 == WBS_FSM_DONE_ADDR)
-                    wbs_dat_o = wbs_fsm_done;
+                    wbs_read_data = wbs_fsm_done;
                 else if ((wbs_adr_r2 & WBS_MEM_MASK) == WBS_MEM_ADDR)
-                    wbs_dat_o = wbs_mem_rdata;
+                    wbs_read_data = wbs_mem_rdata;
+            end
+            MEM_READ3: begin
+                next_state = STANDBY;
+                wbs_ack_o  = 1'b1;
             end
             MEM_WRITE: begin
                 next_state = STANDBY;
@@ -128,9 +130,11 @@ module wishbone_ctl #(
         if (wb_rst_i) begin
             wbs_adr_r1 <= 0;
             wbs_adr_r2 <= 0;
+            wbs_dat_o  <= 32'b0;
         end else begin
             wbs_adr_r1 <= wbs_adr_i;
             wbs_adr_r2 <= wbs_adr_r1;
+            wbs_dat_o  <= wbs_read_data;
         end
     end
 

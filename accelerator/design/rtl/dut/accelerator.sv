@@ -304,7 +304,7 @@ module accelerator #(
         .enq          (input_rdy_w && input_vld),
         .full_n       (input_rdy_w             ),
         .dout         (input_fifo_dout         ),
-        .deq          (params_fifo_deq || instr_fifo_deq || input_fifo_deq),
+        .deq          (params_fifo_deq | instr_fifo_deq | input_fifo_deq),
         .empty_n      (input_fifo_empty_n      ),
         .clr          (1'b0                    )
     );
