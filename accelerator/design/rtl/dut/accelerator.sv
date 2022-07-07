@@ -17,6 +17,8 @@ module accelerator #(
 ) (
     input  logic                         clk,
     input  logic                         rst_n,
+    input  logic                         wb_clk_i,
+    input  logic                         wb_rst_i,
     // GPIO
     input  logic [ INPUT_FIFO_WIDTH-1:0] input_data,
     output logic                         input_rdy,
@@ -77,7 +79,7 @@ module accelerator #(
     logic [ DATA_MEM_ADDR_WIDTH-1:0] output_wb_radr;
 
     logic                            mat_inv_en;
-    logic                            mat_inv_vld;
+    logic                            mat_inv_vld_i;
     logic                            mvp_core_en;
 
     // ---------------------------------------------------------------------------
@@ -124,9 +126,13 @@ module accelerator #(
     logic [ DATA_MEM_ADDR_WIDTH-1:0]                 data_mem_ctrl_addr;
     logic [            DATAPATH-1:0]                 data_mem_ctrl_wdata;
 
-    logic                                            mat_inv_vld_out;
-    logic [        9*DATA_WIDTH-1:0]                 mat_inv_out_l;
-    logic [        9*DATA_WIDTH-1:0]                 mat_inv_out_u;
+    logic                                            mat_inv_vld_o;
+    logic [        9*DATA_WIDTH-1:0]                 mat_inv_l_o;
+    logic [        9*DATA_WIDTH-1:0]                 mat_inv_u_o;
+
+    logic                                            mat_inv_out_vld;
+    logic [        9*DATA_WIDTH-1:0]                 mat_inv_l_sync;
+    logic [        9*DATA_WIDTH-1:0]                 mat_inv_u_sync;
 
     logic [                    31:0]                 instr_aggregator_dout;
     logic [            DATAPATH-1:0]                 input_aggregator_dout;
@@ -156,18 +162,111 @@ module accelerator #(
         .width               (width               )
     );
 
+    logic                    wbs_rst_n;
+    logic [9*DATA_WIDTH-1:0] mem_wdata_flatten;
+    logic [9*DATA_WIDTH-1:0] mat_inv_in;
+    logic                    mat_inv_en_sync;
+    logic                    mat_inv_in_enq;
+    logic                    mat_inv_in_vld;
+    logic                    mat_inv_out_enq;
+    logic                    mat_inv_l_vld;
+    logic                    mat_inv_u_vld;
+
+    assign mem_wdata_flatten = mvp_mem_wdata[8:0];
+
+    SyncBit mat_inv_rst_syncbit (
+        .sCLK         ( clk             ),
+        .sRST         ( rst_n           ),
+        .dCLK         ( wb_clk_i        ),
+        .sEN          ( 1'b1            ),
+        .sD_IN        ( rst_n           ),
+        .dD_OUT       ( wbs_rst_n       )
+    );
+
+    SyncBit mat_inv_en_syncbit (
+        .sCLK         ( clk             ),
+        .sRST         ( rst_n           ),
+        .dCLK         ( wb_clk_i        ),
+        .sEN          ( 1'b1            ),
+        .sD_IN        ( mat_inv_en      ),
+        .dD_OUT       ( mat_inv_en_sync )
+    );
+
+    edge_detector mat_inv_in_enq_inst (.clk(clk), .sig(mat_inv_en), .pe(mat_inv_in_enq));
+
+    SyncFIFO #(
+        .dataWidth ( 9*32              ),
+        .depth     ( 2                 ),
+        .indxWidth ( 1                 )
+    ) mat_inv_in_fifo (
+        // input clock domain
+        .sCLK      ( clk               ),
+        .sRST      ( rst_n             ),
+        .sENQ      ( mat_inv_in_enq    ),
+        .sD_IN     ( mem_wdata_flatten ),
+        .sFULL_N   ( /* unused */      ),
+        // destination clock domain
+        .dCLK      ( wb_clk_i          ),
+        .dDEQ      ( mat_inv_out_enq   ),
+        .dEMPTY_N  ( mat_inv_in_vld    ),
+        .dD_OUT    ( mat_inv_in        )
+    );
+
+    edge_detector mat_inv_in_vld_inst  (.clk(wb_clk_i), .sig(mat_inv_in_vld), .pe(mat_inv_vld_i));
+    edge_detector mat_inv_out_enq_inst (.clk(wb_clk_i), .sig(mat_inv_vld_o),  .pe(mat_inv_out_enq));
+
+    SyncFIFO #(
+        .dataWidth ( 9*32              ),
+        .depth     ( 2                 ),
+        .indxWidth ( 1                 )
+    ) mat_inv_l_fifo (
+        // input clock domain
+        .sCLK      ( wb_clk_i          ),
+        .sRST      ( wbs_rst_n         ),
+        .sENQ      ( mat_inv_out_enq   ),
+        .sD_IN     ( mat_inv_l_o       ),
+        .sFULL_N   ( /* unused */      ),
+        // destination clock domain
+        .dCLK      ( clk               ),
+        .dDEQ      ( mat_inv_in_enq    ),
+        .dEMPTY_N  ( mat_inv_l_vld     ),
+        .dD_OUT    ( mat_inv_l_sync    )
+    );
+
+    SyncFIFO #(
+        .dataWidth ( 9*32              ),
+        .depth     ( 2                 ),
+        .indxWidth ( 1                 )
+    ) mat_inv_u_fifo (
+        // input clock domain
+        .sCLK      ( wb_clk_i          ),
+        .sRST      ( wbs_rst_n         ),
+        .sENQ      ( mat_inv_out_enq   ),
+        .sD_IN     ( mat_inv_u_o       ),
+        .sFULL_N   ( /* unused */      ),
+        // destination clock domain
+        .dCLK      ( clk               ),
+        .dDEQ      ( mat_inv_in_enq    ),
+        .dEMPTY_N  ( mat_inv_u_vld     ),
+        .dD_OUT    ( mat_inv_u_sync    )
+    );
+    
+    // assign mat_inv_out_vld = mat_inv_l_vld & mat_inv_u_vld;
+
+    edge_detector mat_inv_out_vld_inst (.clk(clk), .sig(mat_inv_l_vld & mat_inv_u_vld), .pe(mat_inv_out_vld));
+
     mat_inv #(
-        .DATA_WIDTH   (DATA_WIDTH        )
+        .DATA_WIDTH       ( DATA_WIDTH        )
     ) mat_inv_inst (
-        .clk          (clk               ),
-        .rst_n        (rst_n             ),
-        .en           (mat_inv_en        ),
-        .vld          (mat_inv_vld       ),
-        .mat_in       (mvp_mem_wdata[8:0]),
-        .rdy          (                  ),
-        .vld_out      (mat_inv_vld_out   ),
-        .mat_inv_out_l(mat_inv_out_l     ),
-        .mat_inv_out_u(mat_inv_out_u     )
+        .clk              ( wb_clk_i          ),
+        .rst_n            ( wbs_rst_n         ),
+        .en               ( mat_inv_en_sync   ),
+        .vld              ( mat_inv_vld_i     ),
+        .mat_in           ( mat_inv_in        ),
+        .rdy              ( /* unused */      ),
+        .vld_out          ( mat_inv_vld_o     ),
+        .mat_inv_out_l    ( mat_inv_l_o       ),
+        .mat_inv_out_u    ( mat_inv_u_o       )
     );
 
     ram_sync_1rw1r #(
@@ -210,8 +309,7 @@ module accelerator #(
             instr_mem_web   = 1'b1;
             instr_mem_addr  = instr_wadr;
             instr_mem_wdata = instr_aggregator_dout;
-        end
-        else begin
+        end else begin
             instr_mem_csb   = instr_mem_ctrl_csb;
             instr_mem_web   = instr_mem_ctrl_web;
             instr_mem_addr  = instr_mem_ctrl_addr;
@@ -226,8 +324,7 @@ module accelerator #(
             data_mem_addr  = input_wadr;
             data_mem_wmask = 8'hFF;
             data_mem_wdata = input_aggregator_dout;
-        end
-        else begin
+        end else begin
             data_mem_csb   = data_mem_ctrl_csb;
             data_mem_web   = data_mem_ctrl_web;
             data_mem_addr  = data_mem_ctrl_addr;
@@ -243,8 +340,7 @@ module accelerator #(
             mem_ctrl_addr  = wbs_mem_addr;
             mem_ctrl_wdata = wbs_mem_wdata;
             mem_ctrl_width = 3'b010;
-        end
-        else begin
+        end else begin
             mem_ctrl_we    = mvp_mem_we;
             mem_ctrl_re    = mvp_mem_re;
             mem_ctrl_addr  = mvp_mem_addr;
@@ -283,8 +379,8 @@ module accelerator #(
         .data_mem_wdata      (data_mem_ctrl_wdata ),
         .data_mem_rdata      (data_mem_rdata      ),
         // Matrix inversion
-        .mat_inv_out_l       (mat_inv_out_l       ),
-        .mat_inv_out_u       (mat_inv_out_u       )
+        .mat_inv_out_l       (mat_inv_l_sync      ),
+        .mat_inv_out_u       (mat_inv_u_sync      )
     );
 
     assign wbs_mem_rdata = mem_ctrl_rdata;
@@ -405,8 +501,7 @@ module accelerator #(
         .mem_write           (mvp_mem_we          ),
         // Matrix inversion
         .mat_inv_en          (mat_inv_en          ),
-        .mat_inv_vld         (mat_inv_vld         ),
-        .mat_inv_vld_out     (mat_inv_vld_out     ),
+        .mat_inv_out_vld     (mat_inv_out_vld     ),
         .mvp_core_en         (mvp_core_en         )
     );
 

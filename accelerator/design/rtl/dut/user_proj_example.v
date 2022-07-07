@@ -145,6 +145,8 @@ module user_proj_example #(
     accelerator acc_inst (
         .clk           (user_proj_clk       ),
         .rst_n         (user_proj_rst_n     ),
+        .wb_clk_i      (wb_clk_i            ),
+        .wb_rst_i      (wb_rst_i            ),
 
         .input_rdy     (input_rdy_o         ),
         .input_vld     (input_vld_i         ),

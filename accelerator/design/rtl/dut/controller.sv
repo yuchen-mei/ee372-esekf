@@ -44,8 +44,7 @@ module controller #(
     input  logic                            mem_write,
 
     output logic                            mat_inv_en,
-    output logic                            mat_inv_vld,
-    input  logic                            mat_inv_vld_out,
+    input  logic                            mat_inv_out_vld,
     output logic                            mvp_core_en
 );
 
@@ -80,7 +79,6 @@ module controller #(
     reg [       ADDR_WIDTH-1:0] instr_wadr_r;
     reg [       ADDR_WIDTH-1:0] input_wadr_r;
     reg [       ADDR_WIDTH-1:0] output_wbadr_r;
-    reg                         mat_inv_en_r;
 
     assign instr_wadr     = instr_wadr_r;
     assign input_wadr     = input_wadr_r[3+:DATA_MEM_ADDR_WIDTH];
@@ -90,12 +88,6 @@ module controller #(
     assign instr_full_n    = ~wbs_debug & (state_r == `INITIAL_FILL) & (instr_wadr_r <= instr_max_wadr_c);
     assign input_full_n    = ~wbs_debug & (state_r == `RESET_INNER_LOOP) & (input_wadr_r <= input_wadr_offset + input_max_wadr_c);
     assign output_empty_n  = ~wbs_debug & (state_r == `RESET_INNER_LOOP) & (output_wbadr_r <= output_radr_offset + output_max_adr_c);
-
-    assign mat_inv_vld = mat_inv_en && ~mat_inv_en_r;
-
-    always_ff @(posedge clk)
-        if (!rst_n) mat_inv_en_r <= 0;
-        else mat_inv_en_r <= mat_inv_en;
 
     assign wbs_fsm_done = (state_r == `RESET_INNER_LOOP);
 
@@ -146,7 +138,7 @@ module controller #(
                     mvp_core_en <= 0;
                     mat_inv_en  <= 1;
                 end
-                else if (mat_inv_en_r && mat_inv_vld_out) begin
+                else if (mat_inv_en && mat_inv_out_vld) begin
                     mvp_core_en <= 1;
                     mat_inv_en  <= 0;
                 end

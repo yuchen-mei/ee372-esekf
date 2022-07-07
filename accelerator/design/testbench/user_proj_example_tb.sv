@@ -19,7 +19,8 @@ module user_proj_example_tb;
     // design top variables
     reg clk;
     reg rst_n;
-    reg wbs_clk_i;
+    reg wb_clk_i;
+    reg wb_rst_i;
 
     reg       [`ADDR_WIDTH - 1 : 0] input_adr_r;
 
@@ -77,15 +78,15 @@ module user_proj_example_tb;
 
     always #10 clk = ~clk;
 
-    always #50 wbs_clk_i = ~wbs_clk_i;
+    always #50 wb_clk_i = ~wb_clk_i;
 
     user_proj_example user_proj_example_inst (
     `ifdef USE_POWER_PINS
         .vccd1      (vccd1      ),	// User area 1 1.8V supply
         .vssd1      (vssd1      ),	// User area 1 digital ground
     `endif
-        .wb_clk_i   (wbs_clk_i  ),
-        .wb_rst_i   (1'b1       ),
+        .wb_clk_i   (wb_clk_i   ),
+        .wb_rst_i   (wb_rst_i   ),
         // .wbs_stb_i  (wbs_stb_i  ),
         // .wbs_cyc_i  (wbs_cyc_i  ),
         // .wbs_we_i   (wbs_we_i   ),
@@ -111,7 +112,8 @@ module user_proj_example_tb;
         clk   <= 0;
         rst_n <= 0;
 
-        wbs_clk_i <= 0;
+        wb_clk_i <= 0;
+        wb_rst_i <= 1;
 
         state_r <= 0;
         counter <= 0;
@@ -128,6 +130,7 @@ module user_proj_example_tb;
         config_r[4] <= output_adr_offset;
 
         #350 rst_n <= 1;
+        wb_rst_i <= 0;
     end
 
     always @ (posedge clk) begin
