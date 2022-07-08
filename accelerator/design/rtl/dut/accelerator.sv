@@ -20,7 +20,7 @@ module accelerator #(
     input  logic                         wb_clk_i,
     input  logic                         wb_rst_i,
     // GPIO
-    input  logic [ INPUT_FIFO_WIDTH-1:0] input_data,
+    input  logic  [INPUT_FIFO_WIDTH-1:0] input_data,
     output logic                         input_rdy,
     input  logic                         input_vld,
 
@@ -34,9 +34,9 @@ module accelerator #(
 
     input  logic                         wbs_mem_we,
     input  logic                         wbs_mem_re,
-    input  logic [                 11:0] wbs_mem_addr,
-    input  logic [                 31:0] wbs_mem_wdata,
-    output logic [                 31:0] wbs_mem_rdata
+    input  logic                  [11:0] wbs_mem_addr,
+    input  logic          [DATAPATH-1:0] wbs_mem_wdata,
+    output logic          [DATAPATH-1:0] wbs_mem_rdata
 );
 
     localparam DATA_WIDTH = SIG_WIDTH + EXP_WIDTH + 1;

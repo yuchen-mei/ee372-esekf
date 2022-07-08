@@ -10,26 +10,26 @@ module memory_controller #(
     // Physical memory address
     input  logic                               mem_we,
     input  logic                               mem_re,
-    input  logic [             ADDR_WIDTH-1:0] mem_addr,
+    input  logic              [ADDR_WIDTH-1:0] mem_addr,
     input  logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_wdata,
     output logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_rdata,
-    input  logic [                        2:0] width,
+    input  logic                         [2:0] width,
     // Instruction Memory
-    output logic [   INSTR_MEM_ADDR_WIDTH-1:0] instr_mem_addr,
+    output logic    [INSTR_MEM_ADDR_WIDTH-1:0] instr_mem_addr,
     output logic                               instr_mem_csb,
     output logic                               instr_mem_web,
-    output logic [                       31:0] instr_mem_wdata,
-    input  logic [                       31:0] instr_mem_rdata,
+    output logic                        [31:0] instr_mem_wdata,
+    input  logic                        [31:0] instr_mem_rdata,
     // Data Memory
-    output logic [    DATA_MEM_ADDR_WIDTH-1:0] data_mem_addr,
+    output logic     [DATA_MEM_ADDR_WIDTH-1:0] data_mem_addr,
     output logic                               data_mem_csb,
     output logic                               data_mem_web,
-    output logic [            DATAPATH/32-1:0] data_mem_wmask,
-    output logic [               DATAPATH-1:0] data_mem_wdata,
-    input  logic [               DATAPATH-1:0] data_mem_rdata,
+    output logic             [DATAPATH/32-1:0] data_mem_wmask,
+    output logic                [DATAPATH-1:0] data_mem_wdata,
+    input  logic                [DATAPATH-1:0] data_mem_rdata,
     // Matrix inversion
-    input  logic [           9*DATA_WIDTH-1:0] mat_inv_out_l,
-    input  logic [           9*DATA_WIDTH-1:0] mat_inv_out_u
+    input  logic            [9*DATA_WIDTH-1:0] mat_inv_out_l,
+    input  logic            [9*DATA_WIDTH-1:0] mat_inv_out_u
 );
 
     localparam DATA_MASK     = 12'h800;
@@ -54,7 +54,7 @@ module memory_controller #(
 
     assign data_mem_addr   = mem_addr[3+:DATA_MEM_ADDR_WIDTH];
     assign data_mem_wmask  = mem_write_mask << mem_addr[2:0];
-    assign data_mem_wdata  = mem_wdata << {mem_addr[2:0], 5'b0};
+    assign data_mem_wdata  = mem_wdata;
 
     always_comb begin
         instr_mem_csb = 1'b0;
@@ -83,7 +83,7 @@ module memory_controller #(
 
     always_comb begin
         if ((mem_addr_r & DATA_MASK) == DATA_ADDR)
-            mem_rdata = data_mem_rdata >> {mem_addr[2:0], 5'b0};
+            mem_rdata = data_mem_rdata;
         else if ((mem_addr_r & TEXT_MASK) == TEXT_ADDR)
             mem_rdata = instr_mem_rdata;
         else if (mem_addr_r == INVMAT_L_ADDR)

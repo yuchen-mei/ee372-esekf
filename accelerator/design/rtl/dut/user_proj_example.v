@@ -78,19 +78,19 @@ module user_proj_example #(
 // Wishbone control
 // ==============================================================================
 
-    wire        wbs_debug;
-    wire        wbs_fsm_start;
-    wire        wbs_fsm_done;
+    wire         wbs_debug;
+    wire         wbs_fsm_start;
+    wire         wbs_fsm_done;
 
-    wire        wbs_debug_synced;
-    wire        wbs_fsm_start_synced;
-    wire        wbs_fsm_done_synced;
+    wire         wbs_debug_synced;
+    wire         wbs_fsm_start_synced;
+    wire         wbs_fsm_done_synced;
 
-    wire        wbs_mem_we;
-    wire        wbs_mem_re;
-    wire [11:0] wbs_mem_addr;
-    wire [31:0] wbs_mem_wdata;
-    wire [31:0] wbs_mem_rdata;
+    wire         wbs_mem_we;
+    wire         wbs_mem_re;
+    wire  [11:0] wbs_mem_addr;
+    wire [255:0] wbs_mem_wdata;
+    wire [255:0] wbs_mem_rdata;
 
     wire user_proj_clk;
     wire user_proj_rst_n;
