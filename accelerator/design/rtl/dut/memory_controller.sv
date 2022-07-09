@@ -45,9 +45,7 @@ module memory_controller #(
     logic [ADDR_WIDTH-1:0] mem_write_mask;
     logic [ADDR_WIDTH-1:0] mem_read_data;
 
-    always @(posedge clk) begin
-        mem_addr_r <= mem_addr;
-    end
+    always @(posedge clk) mem_addr_r <= mem_addr;
 
     assign instr_mem_addr  = mem_addr[INSTR_MEM_ADDR_WIDTH-1:0];
     assign instr_mem_wdata = mem_wdata;

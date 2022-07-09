@@ -4,64 +4,66 @@ module mvp_core #(
     parameter  IEEE_COMPLIANCE      = 0,
     
     parameter  VECTOR_LANES         = 16,
-    parameter  DATA_WIDTH           = SIG_WIDTH + EXP_WIDTH + 1,
+    parameter  DATAPATH             = 256,
 
     parameter  INSTR_MEM_ADDR_WIDTH = 8,
     parameter  REG_BANK_DEPTH       = 32,
-    localparam REG_ADDR_WIDTH       = $clog2(REG_BANK_DEPTH)
+    localparam REG_ADDR_WIDTH       = $clog2(REG_BANK_DEPTH),
+
+    localparam DATA_WIDTH           = SIG_WIDTH + EXP_WIDTH + 1
 ) (
     input  logic                               clk,
     input  logic                               rst_n,
     input  logic                               en,
 
-    output logic [   INSTR_MEM_ADDR_WIDTH-1:0] pc,
-    input  logic [                       31:0] instr,
+    output logic    [INSTR_MEM_ADDR_WIDTH-1:0] pc,
+    input  logic                        [31:0] instr,
 
-    output logic [                       11:0] mem_addr,
+    output logic                        [11:0] mem_addr,
     output logic                               mem_read,
     output logic                               mem_write,
     input  logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_rdata,
     output logic [VECTOR_LANES*DATA_WIDTH-1:0] mem_wdata,
-    output logic [                        2:0] width,
+    output logic                         [2:0] width,
 
     output logic                               data_out_vld,
     output logic [VECTOR_LANES*DATA_WIDTH-1:0] data_out,
-    output logic [                        4:0] reg_wb
+    output logic                         [4:0] reg_wb
 );
 
     logic                                    en_q;
     logic                                    stall;
-    logic [             4:0]                 vd_addr_id;
-    logic [             4:0]                 vd_addr_ex1;
-    logic [             4:0]                 vd_addr_ex2;
-    logic [             4:0]                 vd_addr_ex3;
-    logic [             4:0]                 vd_addr_ex4;
-    logic [             4:0]                 vd_addr_wb;
-    logic [             4:0]                 vs1_addr_id;
-    logic [             4:0]                 vs1_addr_ex1;
-    logic [             4:0]                 vs2_addr_id;
-    logic [             4:0]                 vs2_addr_ex1;
-    logic [             4:0]                 vs3_addr_id;
-    logic [             4:0]                 vs3_addr_ex1;
+    logic              [4:0]                 vd_addr_id;
+    logic              [4:0]                 vd_addr_ex1;
+    logic              [4:0]                 vd_addr_ex2;
+    logic              [4:0]                 vd_addr_ex3;
+    logic              [4:0]                 vd_addr_ex4;
+    logic              [4:0]                 vd_addr_wb;
+    logic              [4:0]                 vs1_addr_id;
+    logic              [4:0]                 vs1_addr_ex1;
+    logic              [4:0]                 vs2_addr_id;
+    logic              [4:0]                 vs2_addr_ex1;
+    logic              [4:0]                 vs3_addr_id;
+    logic              [4:0]                 vs3_addr_ex1;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vs1_data_id;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vs1_data_ex1;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vs2_data_id;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vs2_data_ex1;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vs3_data_id;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vs3_data_ex1;
-    logic [  DATA_WIDTH-1:0]                 rs1_data_id;
-    logic [  DATA_WIDTH-1:0]                 rs2_data_id;
-    logic [  DATA_WIDTH-1:0]                 rs3_data_id;
-    logic [             4:0]                 opcode_id;
-    logic [             4:0]                 opcode_ex1;
-    logic [             2:0]                 funct3_id;
-    logic [             2:0]                 funct3_ex1;
-    logic [             4:0]                 wb_sel_id;
-    logic [             4:0]                 wb_sel_ex1;
-    logic [             4:0]                 wb_sel_ex2;
-    logic [             4:0]                 wb_sel_ex3;
-    logic [             4:0]                 wb_sel_ex4;
-    logic [             4:0]                 wb_sel_wb;
+    logic   [DATA_WIDTH-1:0]                 rs1_data_id;
+    logic   [DATA_WIDTH-1:0]                 rs2_data_id;
+    logic   [DATA_WIDTH-1:0]                 rs3_data_id;
+    logic              [4:0]                 opcode_id;
+    logic              [4:0]                 opcode_ex1;
+    logic              [2:0]                 funct3_id;
+    logic              [2:0]                 funct3_ex1;
+    logic              [4:0]                 wb_sel_id;
+    logic              [4:0]                 wb_sel_ex1;
+    logic              [4:0]                 wb_sel_ex2;
+    logic              [4:0]                 wb_sel_ex3;
+    logic              [4:0]                 wb_sel_ex4;
+    logic              [4:0]                 wb_sel_wb;
     logic                                    reg_we_id;
     logic                                    reg_we_ex1;
     logic                                    reg_we_ex2;
@@ -70,16 +72,16 @@ module mvp_core #(
     logic                                    reg_we_wb;
     logic                                    mem_we_id;
     logic                                    mem_we_ex1;
-    logic [            11:0]                 mem_addr_id;
-    logic [            11:0]                 mem_addr_ex1;
-    logic [            11:0]                 mem_addr_ex2;
+    logic             [11:0]                 mem_addr_id;
+    logic             [11:0]                 mem_addr_ex1;
+    logic             [11:0]                 mem_addr_ex2;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex3;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_ex4;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] mem_rdata_wb;
     logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] reg_wdata_wb;
     logic                                    jump_id;
-    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jump_addr_id;
-    logic [        INSTR_MEM_ADDR_WIDTH-1:0] jump_addr_ex2;
+    logic         [INSTR_MEM_ADDR_WIDTH-1:0] jump_addr_id;
+    logic         [INSTR_MEM_ADDR_WIDTH-1:0] jump_addr_ex2;
     logic                                    pc_sel;
     logic                                    branch_id;
     logic                                    branch_ex1;
