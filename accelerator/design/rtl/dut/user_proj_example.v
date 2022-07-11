@@ -10,21 +10,21 @@ module user_proj_example #(
 `endif
 
     // Wishbone Slave ports (WB MI A)
-    input wire wb_clk_i,
-    input wire wb_rst_i,
-    input wire wbs_stb_i,
-    input wire wbs_cyc_i,
-    input wire wbs_we_i,
-    input wire [3:0] wbs_sel_i,
-    input wire [31:0] wbs_dat_i,
-    input wire [31:0] wbs_adr_i,
-    output wire wbs_ack_o,
-    output wire [31:0] wbs_dat_o,
+    input  wire                     wb_clk_i,
+    input  wire                     wb_rst_i,
+    input  wire                     wbs_stb_i,
+    input  wire                     wbs_cyc_i,
+    input  wire                     wbs_we_i,
+    input  wire               [3:0] wbs_sel_i,
+    input  wire              [31:0] wbs_dat_i,
+    input  wire              [31:0] wbs_adr_i,
+    output wire                     wbs_ack_o,
+    output wire              [31:0] wbs_dat_o,
 
     // Logic Analyzer Signals
-    input  wire [127:0] la_data_in,
-    output wire [127:0] la_data_out,
-    input  wire [127:0] la_oenb,
+    input  wire             [127:0] la_data_in,
+    output wire             [127:0] la_data_out,
+    input  wire             [127:0] la_oenb,
 
     // IOs
     input  wire [`MPRJ_IO_PADS-1:0] io_in,
@@ -38,22 +38,39 @@ module user_proj_example #(
     inout wire [`MPRJ_IO_PADS-10:0] analog_io,
 
     // Independent clock (on independent integer divider)
-    input wire user_clock2,
+    input wire                      user_clock2,
 
     // User maskable interrupt signals
-    output wire [2:0] user_irq
+    output wire               [2:0] user_irq
 );
 
-    wire        io_clk;
-    reg         io_rst_n;
-    wire        input_rdy_o;
-    wire        input_vld_i;
-    wire [15:0] input_data_i;
-    wire        output_rdy_i;
-    wire        output_vld_o;
-    wire [15:0] output_data_o;
+    wire         io_clk;
+    reg          io_rst_n;
+    reg          wb_rst_r;
+    wire         user_proj_clk;
+    wire         user_proj_rst_n;
 
-    assign user_irq = 3'b0;
+    wire         input_rdy_o;
+    wire         input_vld_i;
+    wire  [15:0] input_data_i;
+
+    wire         output_rdy_i;
+    wire         output_vld_o;
+    wire  [15:0] output_data_o;
+
+    wire         wbs_debug;
+    wire         wbs_fsm_start;
+    wire         wbs_fsm_done;
+
+    wire         sync_wbs_debug;
+    wire         sync_wbs_fsm_start;
+    wire         sync_wbs_fsm_done;
+
+    wire         wbs_mem_we;
+    wire         wbs_mem_re;
+    wire  [11:0] wbs_mem_addr;
+    wire [255:0] wbs_mem_wdata;
+    wire [255:0] wbs_mem_rdata;
 
     assign io_clk        = io_in[37];
     // assign io_rst_n      = io_in[36];
@@ -72,30 +89,12 @@ module user_proj_example #(
     assign io_oeb[35:18] = 18'b0;
     assign io_oeb[37:36] = {2{1'b1}};
 
-    assign la_data_out = 128'd0;
+    assign la_data_out   = 128'd0;
+    assign user_irq      = 3'b0;
 
 // ==============================================================================
-// Wishbone control
+// Clock mux and reset signal
 // ==============================================================================
-
-    wire         wbs_debug;
-    wire         wbs_fsm_start;
-    wire         wbs_fsm_done;
-
-    wire         sync_wbs_debug;
-    wire         sync_wbs_fsm_start;
-    wire         sync_wbs_fsm_done;
-
-    wire         wbs_mem_we;
-    wire         wbs_mem_re;
-    wire  [11:0] wbs_mem_addr;
-    wire [255:0] wbs_mem_wdata;
-    wire [255:0] wbs_mem_rdata;
-
-    wire user_proj_clk;
-    wire user_proj_rst_n;
-
-    reg wb_rst_r;
 
     clock_mux #(2) clk_mux (
         .clk        ( {io_clk, wb_clk_i}        ),
@@ -104,14 +103,15 @@ module user_proj_example #(
     );
 
     always @(posedge user_proj_clk) begin
-        io_rst_n     <= io_in[36];
-        wb_rst_r     <= wb_rst_i;
-        // input_data_i <= io_in[15:0];
-        // input_vld_i  <= io_in[16];
-        // output_rdy_i <= io_in[17];
+        io_rst_n <= io_in[36];
+        wb_rst_r <= wb_rst_i;
     end
 
     assign user_proj_rst_n = sync_wbs_debug ? ~wb_rst_r : io_rst_n;
+
+// ==============================================================================
+// Wishbone control
+// ==============================================================================
 
     wishbone_ctl wbs_ctl_u0 (
         // wishbone input
@@ -143,10 +143,10 @@ module user_proj_example #(
 // ==============================================================================
 
     accelerator acc_inst (
-        .clk           (user_proj_clk       ),
-        .rst_n         (user_proj_rst_n     ),
-        .wb_clk_i      (wb_clk_i            ),
-        .wb_rst_i      (wb_rst_i            ),
+        .clk           ( user_proj_clk      ),
+        .rst_n         ( user_proj_rst_n    ),
+        .wb_clk_i      ( wb_clk_i           ),
+        .wb_rst_i      ( wb_rst_i           ),
 
         .input_rdy     ( input_rdy_o        ),
         .input_vld     ( input_vld_i        ),
