@@ -23,7 +23,7 @@ module controller #(
     input  logic                            wbs_fsm_start,
     output logic                            wbs_fsm_done,
 
-    input  logic [    INPUT_FIFO_WIDTH-1:0] params_fifo_dout,
+    input  logic     [INPUT_FIFO_WIDTH-1:0] params_fifo_dout,
     output logic                            params_fifo_deq,
     input  logic                            params_fifo_empty_n,
 
@@ -36,10 +36,10 @@ module controller #(
     output logic                            output_empty_n,
 
     output logic [INSTR_MEM_ADDR_WIDTH-1:0] instr_wadr,
-    output logic [ DATA_MEM_ADDR_WIDTH-1:0] input_wadr,
-    output logic [ DATA_MEM_ADDR_WIDTH-1:0] output_wb_radr,
+    output logic  [DATA_MEM_ADDR_WIDTH-1:0] input_wadr,
+    output logic  [DATA_MEM_ADDR_WIDTH-1:0] output_wb_radr,
 
-    input  logic [          ADDR_WIDTH-1:0] mem_addr,
+    input  logic           [ADDR_WIDTH-1:0] mem_addr,
     input  logic                            mem_read,
     input  logic                            mem_write,
 

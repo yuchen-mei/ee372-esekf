@@ -24,9 +24,6 @@ set_clock_groups -asynchronous \
                  -group [get_clocks ${io_clock_name}] \
                  -group [get_clocks ${wb_clock_name}]
 
-# set_false_path -from [get_clocks ${io_clock_name}] -to [get_clocks ${wb_clock_name}]
-# set_false_path -from [get_clocks ${wb_clock_name}] -to [get_clocks ${io_clock_name}]
-
 set_false_path -from [get_ports *in*] -to [get_ports *out*]
 set_false_path -from [get_ports *in*] -to [get_ports *oeb*]
 
@@ -47,20 +44,22 @@ set_driving_cell -no_design_rule \
 # set_input_delay constraints for input ports
 # Make this non-zero to avoid hold buffers on input-registered designs
 
-set_input_delay -clock ${io_clock_name} [expr ${clock_period}/2.0] [get_ports -regexp {(?=io_in)(?!.*37)^.*$}]
-set_input_delay -clock ${wb_clock_name} 50 [get_ports -regexp {(?=wb.*i)(?!.*clk)^.*$}]
+set_input_delay -clock ${io_clock_name} 10 [get_ports -regexp {(?=io_in)(?!.*37)^.*$}]
+set_input_delay -clock ${wb_clock_name} 20 [get_ports -regexp {(?=wb.*i)(?!.*clk)^.*$}]
 
 # set_output_delay constraints for output ports
 
-set_output_delay -clock ${io_clock_name} [expr ${clock_period}/2.0] [all_outputs]
-set_output_delay -clock ${wb_clock_name} 50 [all_outputs]
-
-# caravel STA constraints
+set_output_delay -clock ${io_clock_name} 10 [get_ports "io_o*"]
+set_output_delay -clock ${wb_clock_name} 20 [get_ports "wb*_o"]
 
 set_timing_derate -early [expr {1-0.05}]
 set_timing_derate -late [expr {1+0.05}]
-set_clock_uncertainty 0.25 [get_clocks "ideal_clock_io"]
-set_clock_transition 0.15 [get_clocks "ideal_clock_io"]
+
+set_clock_uncertainty 0.25 [get_clocks ${io_clock_name}]
+set_clock_uncertainty 0.25 [get_clocks ${wb_clock_name}]
+
+set_clock_transition 0.15 [get_clocks ${io_clock_name}]
+set_clock_transition 0.15 [get_clocks ${wb_clock_name}]
 
 # Make all signals limit their fanout
 
@@ -96,7 +95,6 @@ set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd_
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_16]
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow*]
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinv_16]
-
 
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s15_1]
 set_dont_use [get_lib_cell -quiet sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s15_2]

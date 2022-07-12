@@ -13,7 +13,7 @@ routeDesign -globalDetail -viaOpt -wireOpt
 # setOptMode -drcMargin 0.4
 # setOptMode -setupTargetSlack 1
 # setOptMode -fixCap true -fixTran true -fixFanoutLoad false
-# optDesign -postRoute
+# optDesign -postRoute -setup -hold
 
 
 # report all drc and antenna violations and reroute violated nets

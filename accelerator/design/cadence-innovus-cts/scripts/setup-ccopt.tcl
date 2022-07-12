@@ -40,6 +40,6 @@ if { $::env(useful_skew) } {
   setOptMode -usefulSkew      false
 }
 
-setOptMode -holdTargetSlack  0.005
-setOptMode -setupTargetSlack 1
+setOptMode -holdTargetSlack  $::env(hold_target_slack)
+setOptMode -setupTargetSlack $::env(setup_target_slack)
 

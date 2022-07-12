@@ -26,13 +26,15 @@ def construct():
   parameters = {
     'construct_path'      : __file__,
     'design_name'         : 'user_proj_example',
-    'clock_period'        : 20.0,
+    'clock_period'        : 14.0,
     'adk'                 : adk_name,
     'adk_view'            : adk_view,
     'topographical'       : True,
     'testbench_name'      : 'user_proj_example_tb',
     'saif_instance'       : 'user_proj_example_tb/user_proj_example_inst',
-    'dut_name'            : 'user_proj_example_inst'
+    'dut_name'            : 'user_proj_example_inst',
+    'hold_target_slack'   : 0.9,
+    'setup_target_slack'  : 1.7
   }
 
   #-----------------------------------------------------------------------

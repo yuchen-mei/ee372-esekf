@@ -6,8 +6,8 @@
 # Author : Christopher Torng
 # Date   : January 13, 2020
 
-setOptMode -holdTargetSlack  0.005
-setOptMode -setupTargetSlack 1.000
+setOptMode -holdTargetSlack  $::env(hold_target_slack)
+setOptMode -setupTargetSlack $::env(setup_target_slack)
 
 source -verbose innovus-foundation-flow/INNOVUS/run_route.tcl
 
