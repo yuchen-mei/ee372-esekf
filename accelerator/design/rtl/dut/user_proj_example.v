@@ -129,7 +129,7 @@ module user_proj_example #(
         // output
         .wbs_debug     ( wbs_debug          ),
         .wbs_fsm_start ( wbs_fsm_start      ),
-        .wbs_fsm_done  ( sync_wbs_fsm_done  ),
+        .wbs_fsm_done  ( wbs_fsm_done       ),
 
         .wbs_mem_we    ( wbs_mem_we         ),
         .wbs_mem_re    ( wbs_mem_re         ),
@@ -157,7 +157,7 @@ module user_proj_example #(
         .output_data   ( output_data_o      ),
 
         .wbs_debug     ( sync_wbs_debug     ),
-        .wbs_fsm_start ( sync_wbs_fsm_start ),
+        .wbs_fsm_start ( wbs_fsm_start      ),
         .wbs_fsm_done  ( wbs_fsm_done       ),
 
         .wbs_mem_we    ( wbs_mem_we         ),
@@ -176,22 +176,22 @@ module user_proj_example #(
         .dD_OUT        ( sync_wbs_debug     )
     );
 
-    SyncPulse wbs_fsm_start_inst (
-        .sCLK          ( wb_clk_i           ),
-        .sRST          ( ~wb_rst_i          ),
-        .dCLK          ( user_proj_clk      ),
-        .sEN           ( wbs_fsm_start      ),
-        .dPulse        ( sync_wbs_fsm_start )
-    );
+    // SyncPulse wbs_fsm_start_inst (
+    //     .sCLK          ( wb_clk_i           ),
+    //     .sRST          ( ~wb_rst_i          ),
+    //     .dCLK          ( user_proj_clk      ),
+    //     .sEN           ( wbs_fsm_start      ),
+    //     .dPulse        ( sync_wbs_fsm_start )
+    // );
 
-    SyncBit wbs_fsm_done_inst (
-        .sCLK          ( user_proj_clk      ),
-        .sRST          ( user_proj_rst_n    ),
-        .dCLK          ( wb_clk_i           ),
-        .sEN           ( 1'b1               ),
-        .sD_IN         ( wbs_fsm_done       ),
-        .dD_OUT        ( sync_wbs_fsm_done  )
-    );
+    // SyncBit wbs_fsm_done_inst (
+    //     .sCLK          ( user_proj_clk      ),
+    //     .sRST          ( user_proj_rst_n    ),
+    //     .dCLK          ( wb_clk_i           ),
+    //     .sEN           ( 1'b1               ),
+    //     .sD_IN         ( wbs_fsm_done       ),
+    //     .dD_OUT        ( sync_wbs_fsm_done  )
+    // );
 
 endmodule
 

@@ -51,7 +51,8 @@ module wishbone_ctl #(
         MEM_READ3  = 3'd3,
         MEM_READ4  = 3'd4,
         MEM_WRITE1 = 3'd5,
-        MEM_WRITE2 = 3'd6
+        MEM_WRITE2 = 3'd6,
+        MEM_WRITE3 = 3'd7
     } wb_ctrl_state_t;
 
     wb_ctrl_state_t state;
@@ -62,7 +63,7 @@ module wishbone_ctl #(
     logic                wbs_mem_read;
     logic                mem_rdata_shift;
     logic                mem_wdata_shift;
-    logic                fsm_status_rd;
+    logic                wbs_fsm_done_rd;
     logic         [31:0] wbs_adr_r1;
     logic         [31:0] wbs_adr_r2;
     logic [DATAPATH-1:0] mem_write_data;
@@ -70,10 +71,10 @@ module wishbone_ctl #(
     logic [DATAPATH-1:0] mem_read_data;
     logic [DATAPATH-1:0] mem_read_data_shifted;
 
-    assign wbs_req       = wbs_stb_i & wbs_cyc_i;
-    assign wbs_mem_write = wbs_req & wbs_we_i;
-    assign wbs_mem_read  = wbs_req & !wbs_we_i;
-    assign fsm_status_rd = wbs_mem_read & (wbs_adr_i == WBS_FSM_DONE_ADDR);
+    assign wbs_req         = wbs_stb_i & wbs_cyc_i;
+    assign wbs_mem_write   = wbs_req & wbs_we_i;
+    assign wbs_mem_read    = wbs_req & !wbs_we_i;
+    assign wbs_fsm_done_rd = (wbs_adr_r1 == WBS_FSM_DONE_ADDR);
 
     always_ff @(posedge wb_clk_i) begin
         if (wb_rst_i) state <= STANDBY;
@@ -92,24 +93,24 @@ module wishbone_ctl #(
         case (state)
             STANDBY: begin
                 if (wbs_mem_write & ((wbs_adr_i & WBS_MEM_MASK) == WBS_MEM_ADDR))
-                    next_state = MEM_WRITE1;
+                    next_state  = MEM_WRITE1;
                 else if (wbs_mem_write)
-                    wbs_ack_o = 1;
+                    next_state  = MEM_WRITE3;
 
                 if (wbs_mem_read & ((wbs_adr_i & WBS_MEM_MASK) == WBS_MEM_ADDR))
-                    next_state = MEM_READ1;
+                    next_state  = MEM_READ1;
                 else if (wbs_mem_read)
-                    wbs_ack_o = 1;
+                    next_state  = MEM_READ4;
             end
             MEM_READ1: begin
                 // send read signal to accelerator
-                next_state   = MEM_READ2;
-                wbs_mem_re   = 1;
-                wbs_mem_addr = wbs_adr_r1[13:2];
+                next_state      = MEM_READ2;
+                wbs_mem_re      = 1;
+                wbs_mem_addr    = wbs_adr_r1[13:2];
             end
             MEM_READ2: begin
                 // register memory read data
-                next_state = MEM_READ3;
+                next_state      = MEM_READ3;
             end
             MEM_READ3: begin
                 // shift read data if it comes from data memory
@@ -118,8 +119,8 @@ module wishbone_ctl #(
             end
             MEM_READ4: begin
                 // output read data and ack
-                next_state = STANDBY;
-                wbs_ack_o  = 1'b1;
+                next_state      = STANDBY;
+                wbs_ack_o       = 1'b1;
             end
             MEM_WRITE1: begin
                 // shift input write data
@@ -128,10 +129,15 @@ module wishbone_ctl #(
             end
             MEM_WRITE2: begin
                 // send write signal to accelerator
-                next_state   = STANDBY;
-                wbs_mem_we   = 1;
-                wbs_mem_addr = wbs_adr_r2[13:2];
-                wbs_ack_o    = 1'b1;
+                next_state      = STANDBY;
+                wbs_mem_we      = 1;
+                wbs_mem_addr    = wbs_adr_r2[13:2];
+                wbs_ack_o       = 1'b1;
+            end
+            MEM_WRITE3: begin
+                // ack write
+                next_state      = STANDBY;
+                wbs_ack_o       = 1'b1;
             end
         endcase
     end
@@ -195,6 +201,6 @@ module wishbone_ctl #(
     end
 
     assign wbs_mem_wdata = mem_write_data_shifted;
-    assign wbs_dat_o     = fsm_status_rd ? wbs_fsm_done : mem_read_data_shifted;
+    assign wbs_dat_o     = wbs_fsm_done_rd ? wbs_fsm_done : mem_read_data_shifted;
 
 endmodule

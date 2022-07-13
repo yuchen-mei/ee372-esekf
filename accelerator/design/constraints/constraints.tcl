@@ -45,12 +45,12 @@ set_driving_cell -no_design_rule \
 # Make this non-zero to avoid hold buffers on input-registered designs
 
 set_input_delay -clock ${io_clock_name} 10 [get_ports -regexp {(?=io_in)(?!.*37)^.*$}]
-set_input_delay -clock ${wb_clock_name} 20 [get_ports -regexp {(?=wb.*i)(?!.*clk)^.*$}]
+set_input_delay -clock ${wb_clock_name} 50 [get_ports -regexp {(?=wb.*i)(?!.*clk)^.*$}]
 
 # set_output_delay constraints for output ports
 
 set_output_delay -clock ${io_clock_name} 10 [get_ports "io_o*"]
-set_output_delay -clock ${wb_clock_name} 20 [get_ports "wb*_o"]
+set_output_delay -clock ${wb_clock_name} 50 [get_ports "wb*_o"]
 
 set_timing_derate -early [expr {1-0.05}]
 set_timing_derate -late [expr {1+0.05}]
