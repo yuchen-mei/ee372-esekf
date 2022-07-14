@@ -46,7 +46,8 @@ module user_proj_example #(
 
     wire         io_clk;
     reg          io_rst_n;
-    reg          wb_rst_r;
+    reg          wb_rst_n;
+    wire         rst_n_mux;
     wire         user_proj_clk;
     wire         user_proj_rst_n;
 
@@ -102,12 +103,15 @@ module user_proj_example #(
         .clk_out    ( user_proj_clk             )
     );
 
-    always @(posedge user_proj_clk) begin
-        io_rst_n <= io_in[36];
-        wb_rst_r <= wb_rst_i;
-    end
+    // always @(posedge io_clk)   io_rst_n <= io_in[36];
+    // always @(posedge wb_clk_i) wb_rst_n <= ~wb_rst_i;
 
-    assign user_proj_rst_n = sync_wbs_debug ? ~wb_rst_r : io_rst_n;
+    // assign user_proj_rst_n = sync_wbs_debug ? wb_rst_n : io_rst_n;
+
+    assign rst_n_mux = wbs_debug ? io_in[36] : ~wb_rst_i;
+
+    SyncResetA usr_rst_synca_inst (.CLK(user_proj_clk), .IN_RST(rst_n_mux), .OUT_RST(user_proj_rst_n));
+    SyncResetA wb_rst_synca_inst  (.CLK(wb_clk_i     ), .IN_RST(~wb_rst_i), .OUT_RST(wb_rst_n       ));
 
 // ==============================================================================
 // Wishbone control
@@ -129,7 +133,7 @@ module user_proj_example #(
         // output
         .wbs_debug     ( wbs_debug          ),
         .wbs_fsm_start ( wbs_fsm_start      ),
-        .wbs_fsm_done  ( wbs_fsm_done       ),
+        .wbs_fsm_done  ( sync_wbs_fsm_done  ),
 
         .wbs_mem_we    ( wbs_mem_we         ),
         .wbs_mem_re    ( wbs_mem_re         ),
@@ -146,7 +150,6 @@ module user_proj_example #(
         .clk           ( user_proj_clk      ),
         .rst_n         ( user_proj_rst_n    ),
         .wb_clk_i      ( wb_clk_i           ),
-        .wb_rst_i      ( wb_rst_i           ),
 
         .input_rdy     ( input_rdy_o        ),
         .input_vld     ( input_vld_i        ),
@@ -157,7 +160,7 @@ module user_proj_example #(
         .output_data   ( output_data_o      ),
 
         .wbs_debug     ( sync_wbs_debug     ),
-        .wbs_fsm_start ( wbs_fsm_start      ),
+        .wbs_fsm_start ( sync_wbs_fsm_start ),
         .wbs_fsm_done  ( wbs_fsm_done       ),
 
         .wbs_mem_we    ( wbs_mem_we         ),
@@ -169,29 +172,29 @@ module user_proj_example #(
 
     SyncBit wbs_debug_inst (
         .sCLK          ( wb_clk_i           ),
-        .sRST          ( ~wb_rst_i          ),
+        .sRST          ( wb_rst_n           ),
         .dCLK          ( user_proj_clk      ),
         .sEN           ( 1'b1               ),
         .sD_IN         ( wbs_debug          ),
         .dD_OUT        ( sync_wbs_debug     )
     );
 
-    // SyncPulse wbs_fsm_start_inst (
-    //     .sCLK          ( wb_clk_i           ),
-    //     .sRST          ( ~wb_rst_i          ),
-    //     .dCLK          ( user_proj_clk      ),
-    //     .sEN           ( wbs_fsm_start      ),
-    //     .dPulse        ( sync_wbs_fsm_start )
-    // );
+    SyncPulse wbs_fsm_start_inst (
+        .sCLK          ( wb_clk_i           ),
+        .sRST          ( wb_rst_n           ),
+        .dCLK          ( user_proj_clk      ),
+        .sEN           ( wbs_fsm_start      ),
+        .dPulse        ( sync_wbs_fsm_start )
+    );
 
-    // SyncBit wbs_fsm_done_inst (
-    //     .sCLK          ( user_proj_clk      ),
-    //     .sRST          ( user_proj_rst_n    ),
-    //     .dCLK          ( wb_clk_i           ),
-    //     .sEN           ( 1'b1               ),
-    //     .sD_IN         ( wbs_fsm_done       ),
-    //     .dD_OUT        ( sync_wbs_fsm_done  )
-    // );
+    SyncBit wbs_fsm_done_inst (
+        .sCLK          ( user_proj_clk      ),
+        .sRST          ( user_proj_rst_n    ),
+        .dCLK          ( wb_clk_i           ),
+        .sEN           ( 1'b1               ),
+        .sD_IN         ( wbs_fsm_done       ),
+        .dD_OUT        ( sync_wbs_fsm_done  )
+    );
 
 endmodule
 

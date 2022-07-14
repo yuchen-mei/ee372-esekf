@@ -18,7 +18,6 @@ module accelerator #(
     input  logic                         clk,
     input  logic                         rst_n,
     input  logic                         wb_clk_i,
-    input  logic                         wb_rst_i,
 
     input  logic  [INPUT_FIFO_WIDTH-1:0] input_data,
     output logic                         input_rdy,
