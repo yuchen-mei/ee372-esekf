@@ -253,8 +253,6 @@ module accelerator #(
     //     .dD_OUT    ( mat_inv_u_sync    )
     // );
 
-    assign mat_inv_out_vld = 1'b1;
-
     // edge_detector mat_inv_out_vld_inst (.clk(clk), .sig(mat_inv_l_vld & mat_inv_u_vld), .pe(mat_inv_out_vld));
 
     // mat_inv #(
@@ -270,6 +268,10 @@ module accelerator #(
     //     .mat_inv_out_l    ( mat_inv_l_o       ),
     //     .mat_inv_out_u    ( mat_inv_u_o       )
     // );
+
+    assign mat_inv_out_vld = 1'b1;
+    assign mat_inv_u_sync  = 'b0;
+    assign mat_inv_l_sync  = 'b0;
 
     ram_sync_1rw1r #(
         .DATA_WIDTH( 32                   ),
@@ -502,7 +504,7 @@ module accelerator #(
         .mem_addr            ( mvp_mem_addr          ),
         .mem_read            ( mvp_mem_re            ),
         .mem_write           ( mvp_mem_we            ),
-        // MVP and MI ontrol signal
+        // MVP and MI control signal
         .mat_inv_en          ( mat_inv_en            ),
         .mat_inv_out_vld     ( mat_inv_out_vld       ),
         .mvp_core_en         ( mvp_core_en           )

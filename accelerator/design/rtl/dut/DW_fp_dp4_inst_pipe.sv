@@ -5,53 +5,53 @@ module DW_fp_dp4_inst_pipe #(
     parameter ARCH_TYPE       = 1,
 	parameter NUM_STAGES      = 4
 ) (
-	input  logic                           inst_clk,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_a,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_b,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_c,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_d,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_e,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_f,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_g,
-	input  logic [SIG_WIDTH+EXP_WIDTH : 0] inst_h,
-	input  logic [                  2 : 0] inst_rnd,
-	output logic [SIG_WIDTH+EXP_WIDTH : 0] z_inst,
-	output logic [                  7 : 0] status_inst
+	input  logic                         inst_clk,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_a,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_b,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_c,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_d,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_e,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_f,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_g,
+	input  logic [SIG_WIDTH+EXP_WIDTH:0] inst_h,
+	input  logic                   [2:0] inst_rnd,
+	output logic [SIG_WIDTH+EXP_WIDTH:0] z_inst,
+	output logic                   [7:0] status_inst
 );
 
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_a_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_b_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_c_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_d_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_e_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_f_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_g_reg;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] inst_h_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_a_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_b_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_c_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_d_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_e_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_f_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_g_reg;
+	logic [SIG_WIDTH+EXP_WIDTH:0] inst_h_reg;
 
-	logic [SIG_WIDTH+EXP_WIDTH : 0] z_inst_pipe1, z_inst_pipe2, z_inst_pipe3, z_inst_pipe4;
-	logic [SIG_WIDTH+EXP_WIDTH : 0] z_inst_internal;
+	logic [SIG_WIDTH+EXP_WIDTH:0] z_inst_pipe1, z_inst_pipe2, z_inst_pipe3, z_inst_pipe4;
+	logic [SIG_WIDTH+EXP_WIDTH:0] z_inst_internal;
 
-	logic [7 : 0] status_inst_pipe1, status_inst_pipe2, status_inst_pipe3, status_inst_pipe4;
-	logic [7 : 0] status_inst_internal;
+	logic [7:0] status_inst_pipe1, status_inst_pipe2, status_inst_pipe3, status_inst_pipe4;
+	logic [7:0] status_inst_internal;
 
     // Instance of DW_fp_dp4
     DW_fp_dp4 #(
-		.sig_width      (SIG_WIDTH           ),
-		.exp_width      (EXP_WIDTH           ),
-		.ieee_compliance(IEEE_COMPLIANCE     ),
-		.arch_type      (ARCH_TYPE           )
+		.sig_width      ( SIG_WIDTH            ),
+		.exp_width      ( EXP_WIDTH            ),
+		.ieee_compliance( IEEE_COMPLIANCE      ),
+		.arch_type      ( ARCH_TYPE            )
 	) U1 (
-		.a              (inst_a_reg          ),
-		.b              (inst_b_reg          ),
-		.c              (inst_c_reg          ),
-		.d              (inst_d_reg          ),
-		.e              (inst_e_reg          ),
-		.f              (inst_f_reg          ),
-		.g              (inst_g_reg          ),
-		.h              (inst_h_reg          ),
-		.rnd            (inst_rnd            ),
-		.z              (z_inst_internal     ),
-		.status         (status_inst_internal)
+		.a              ( inst_a_reg           ),
+		.b              ( inst_b_reg           ),
+		.c              ( inst_c_reg           ),
+		.d              ( inst_d_reg           ),
+		.e              ( inst_e_reg           ),
+		.f              ( inst_f_reg           ),
+		.g              ( inst_g_reg           ),
+		.h              ( inst_h_reg           ),
+		.rnd            ( inst_rnd             ),
+		.z              ( z_inst_internal      ),
+		.status         ( status_inst_internal )
 	);
 
 	always @(posedge inst_clk) begin

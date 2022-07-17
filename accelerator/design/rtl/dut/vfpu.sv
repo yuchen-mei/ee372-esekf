@@ -11,9 +11,9 @@ module vfpu #(
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_a,
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_b,
     input  logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_c,
-    input  logic [             4:0]                 opcode,
-    input  logic [             2:0]                 funct,
-    input  logic [             2:0]                 rnd,
+    input  logic              [4:0]                 opcode,
+    input  logic              [2:0]                 funct,
+    input  logic              [2:0]                 rnd,
     output logic [VECTOR_LANES-1:0][DATA_WIDTH-1:0] vec_out
 );
 
@@ -22,13 +22,13 @@ module vfpu #(
         logic [DATA_WIDTH-1:0] inst_b;
         logic [DATA_WIDTH-1:0] inst_c;
         logic [DATA_WIDTH-1:0] z_inst;
-        logic [           7:0] status_inst;
+        logic            [7:0] status_inst;
         logic [DATA_WIDTH-1:0] b_neg;
         logic [DATA_WIDTH-1:0] c_neg;
 
-        logic [EXP_WIDTH + SIG_WIDTH:0] one;
-        logic [EXP_WIDTH - 1:0] one_exp;
-        logic [SIG_WIDTH - 1:0] one_sig;
+        logic [DATA_WIDTH-1:0] one;
+        logic  [EXP_WIDTH-1:0] one_exp;
+        logic  [SIG_WIDTH-1:0] one_sig;
 
         // integer number 1 with the FP number format
         assign one_exp = ((1 << (EXP_WIDTH-1)) - 1);
@@ -81,19 +81,19 @@ module vfpu #(
         end
 
         DW_fp_mac_DG_inst_pipe #(
-            .SIG_WIDTH      (SIG_WIDTH      ),
-            .EXP_WIDTH      (EXP_WIDTH      ),
-            .IEEE_COMPLIANCE(IEEE_COMPLIANCE),
-            .NUM_STAGES     (NUM_STAGES     )
+            .SIG_WIDTH      ( SIG_WIDTH       ),
+            .EXP_WIDTH      ( EXP_WIDTH       ),
+            .IEEE_COMPLIANCE( IEEE_COMPLIANCE ),
+            .NUM_STAGES     ( NUM_STAGES      )
         ) U1 (
-            .inst_clk       (clk            ),
-            .inst_a         (inst_a         ),
-            .inst_b         (inst_b         ),
-            .inst_c         (inst_c         ),
-            .inst_rnd       (rnd            ),
-            .inst_DG_ctrl   (en             ),
-            .z_inst         (vec_out[i]     ),
-            .status_inst    (status_inst    )
+            .inst_clk       ( clk             ),
+            .inst_a         ( inst_a          ),
+            .inst_b         ( inst_b          ),
+            .inst_c         ( inst_c          ),
+            .inst_rnd       ( rnd             ),
+            .inst_DG_ctrl   ( en              ),
+            .z_inst         ( vec_out[i]      ),
+            .status_inst    ( status_inst     )
         );
     end
 

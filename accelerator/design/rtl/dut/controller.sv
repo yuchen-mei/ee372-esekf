@@ -62,23 +62,22 @@ module controller #(
     // Configuration registers
     // ---------------------------------------------------------------------------
 
-    logic [CONFIG_DATA_WIDTH-1:0] config_r [NUM_CONFIGS-1:0];
-
-    logic [ADDR_WIDTH-1:0] instr_max_wadr_c;
-    logic [ADDR_WIDTH-1:0] input_max_wadr_c;
-    logic [ADDR_WIDTH-1:0] input_wadr_offset;
-    logic [ADDR_WIDTH-1:0] output_max_adr_c;
-    logic [ADDR_WIDTH-1:0] output_radr_offset;
+    logic [CONFIG_DATA_WIDTH-1:0] config_r[NUM_CONFIGS-1:0];
+    logic        [ADDR_WIDTH-1:0] instr_max_wadr_c;
+    logic        [ADDR_WIDTH-1:0] input_max_wadr_c;
+    logic        [ADDR_WIDTH-1:0] input_wadr_offset;
+    logic        [ADDR_WIDTH-1:0] output_max_adr_c;
+    logic        [ADDR_WIDTH-1:0] output_radr_offset;
 
     // ---------------------------------------------------------------------------
     // Registers for keeping track of the state of the accelerator
     // ---------------------------------------------------------------------------
 
-    reg [     `STATE_WIDTH-1:0] state_r;
-    reg [CONFIG_ADDR_WIDTH-1:0] config_adr_r;
-    reg [       ADDR_WIDTH-1:0] instr_wadr_r;
-    reg [       ADDR_WIDTH-1:0] input_wadr_r;
-    reg [       ADDR_WIDTH-1:0] output_wbadr_r;
+    logic      [`STATE_WIDTH-1:0] state_r;
+    logic [CONFIG_ADDR_WIDTH-1:0] config_adr_r;
+    logic        [ADDR_WIDTH-1:0] instr_wadr_r;
+    logic        [ADDR_WIDTH-1:0] input_wadr_r;
+    logic        [ADDR_WIDTH-1:0] output_wbadr_r;
 
     assign instr_wadr     = instr_wadr_r;
     assign input_wadr     = input_wadr_r[3+:DATA_MEM_ADDR_WIDTH];
@@ -98,7 +97,6 @@ module controller #(
             instr_wadr_r   <= 0;
             input_wadr_r   <= 0;
             output_wbadr_r <= 0;
-
             mat_inv_en     <= 0;
             mvp_core_en    <= 0;
         end
@@ -114,7 +112,7 @@ module controller #(
                 end
 
                 if (wbs_debug && wbs_fsm_start) begin
-                    state_r <= `INNER_LOOP;
+                    state_r     <= `INNER_LOOP;
                     mvp_core_en <= 1;
                 end
             end
@@ -149,12 +147,12 @@ module controller #(
 
                 if ((input_wadr_r >= input_wadr_offset + input_max_wadr_c) && 
                     (output_wbadr_r >= output_radr_offset + output_max_adr_c)) begin
+                    state_r     <= `INNER_LOOP;
                     mvp_core_en <= 1;
-                    state_r <= `INNER_LOOP;
                 end
 
                 if (wbs_debug && wbs_fsm_start) begin
-                    state_r <= `INNER_LOOP;
+                    state_r     <= `INNER_LOOP;
                     mvp_core_en <= 1;
                 end
             end

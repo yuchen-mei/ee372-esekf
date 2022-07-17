@@ -1,117 +1,49 @@
-# get diode cell name
-# get_db base_cells -if {.num_base_pins == 1}
-
-
-# temporarily turn off antenna fixing and reduce timing optimization
 setNanoRouteMode -drouteFixAntenna 0
 setNanoRouteMode -routeWithTimingDriven 1
 setNanoRouteMode -quiet -routeWithSiDriven false
 routeDesign -globalDetail -viaOpt -wireOpt
 
-# fix drv violations
-
-# setOptMode -drcMargin 0.4
-# setOptMode -setupTargetSlack 1
-# setOptMode -fixCap true -fixTran true -fixFanoutLoad false
-# optDesign -postRoute -setup -hold
-
-
-# report all drc and antenna violations and reroute violated nets
+# get_db base_cells -if {.num_base_pins == 1}
 setAnalysisMode -analysisType onChipVariation -cppr both
-setNanoRouteMode -drouteFixAntenna true
-setNanoRouteMode -routeInsertAntennaDiode true
-setNanoRouteMode -routeInsertDiodeForClockNets true
-setNanoRouteMode -routeAntennaCellName "sky130_fd_sc_hd__diode_2"
-setNanoRouteMode -drouteEndIteration 1000
-# 1st fixing
-verify_drc
+setNanoRouteMode -quiet -drouteFixAntenna 1
+setNanoRouteMode -quiet -routeInsertAntennaDiode 1
+setNanoRouteMode -quiet -routeInsertDiodeForClockNets 1
+setNanoRouteMode -quiet -routeAntennaCellName "sky130_fd_sc_hd__diode_2"
+setNanoRouteMode -quiet -drouteEndIteration 100
+editDelete -regular_wire_with_drc
+ecoRoute
+
+setOptMode -fixCap true -fixTran true -fixFanoutLoad false
+optDesign -postRoute
+
+# 2nd fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 2nd fixing
-verify_drc
+# 3rd fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 3rd fixing
-verify_drc
+# 4th fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 4th fixing
-# verify_drc
+# 5th fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 5th fixing
-# verify_drc
+# 6th fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 6th fixing
-# verify_drc
+# 7th fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 7th fixing
-# verify_drc
+# 8th fix
 verifyProcessAntenna
 editDelete -regular_wire_with_drc
 ecoRoute
-# 8th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 9th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 10th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 11th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 12th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 13th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 14th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 15th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 16th fixing
-# verify_drc
-verifyProcessAntenna
-editDelete -regular_wire_with_drc
-ecoRoute
-# 17th fixing
-verifyProcessAntenna
-addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
-# 18th fixing
-verifyProcessAntenna
-addDiode user_proj_example.antenna.rpt sky130_fd_sc_hd__diode_2
-# delete route blockage to remove drc violation
-deleteRouteBlk -name "defLayerBlkName" -layer {met5}
-deleteRouteBlk -name "defLayerBlkName" -layer {met5}
-deleteRouteBlk -name "defLayerBlkName" -layer {met5}
-verify_drc
-verifyProcessAntenna
+
+# delete route blockages that cause drc violations
+deleteRouteBlk -layer {met5} -name "defLayerBlkName"

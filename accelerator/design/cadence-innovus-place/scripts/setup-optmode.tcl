@@ -31,13 +31,8 @@ setOptMode -holdTargetSlack  $::env(hold_target_slack)
 setOptMode -setupTargetSlack $::env(setup_target_slack)
 
 setOptMode -drcMargin        0.3
-setOptMode -fixCap true
-setOptMode -fixTran true
+setOptMode -fixCap           true
+setOptMode -fixTran          true
 setOptMode -bufferAssignNets true
-
-# setOptMode -fixDRC
-# setOptMode -fixFanoutLoad true
-# optDesign -preCTS -drv
-# optDesign -preCTS
 
 assignPtnPin
