@@ -10,6 +10,7 @@
 # provides optimization more opportunity to fix violations.
 
 setOptMode -fixHoldAllowOverlap TRUE
+
 setOptMode -holdTargetSlack  $::env(hold_target_slack)
 setOptMode -setupTargetSlack $::env(setup_target_slack)
 

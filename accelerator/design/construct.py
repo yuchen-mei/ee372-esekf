@@ -33,7 +33,7 @@ def construct():
     'testbench_name'      : 'user_proj_example_tb',
     'saif_instance'       : 'user_proj_example_tb/user_proj_example_inst',
     'dut_name'            : 'user_proj_example_inst',
-    'hold_target_slack'   : 1.0,
+    'hold_target_slack'   : 1.2,
     'setup_target_slack'  : 1.6
   }
 

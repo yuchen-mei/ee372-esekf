@@ -83,8 +83,8 @@ module controller #(
     assign input_wadr     = input_wadr_r[3+:DATA_MEM_ADDR_WIDTH];
     assign output_wb_radr = output_wbadr_r[3+:DATA_MEM_ADDR_WIDTH];
 
-    assign params_fifo_deq = ~wbs_debug & (state_r == `IDLE) & params_fifo_empty_n;
-    assign instr_full_n    = ~wbs_debug & (state_r == `INITIAL_FILL) & (instr_wadr_r <= instr_max_wadr_c);
+    assign params_fifo_deq = ~wbs_debug & (state_r == `IDLE            ) & params_fifo_empty_n;
+    assign instr_full_n    = ~wbs_debug & (state_r == `INITIAL_FILL    ) & (instr_wadr_r <= instr_max_wadr_c);
     assign input_full_n    = ~wbs_debug & (state_r == `RESET_INNER_LOOP) & (input_wadr_r <= input_wadr_offset + input_max_wadr_c);
     assign output_empty_n  = ~wbs_debug & (state_r == `RESET_INNER_LOOP) & (output_wbadr_r <= output_radr_offset + output_max_adr_c);
 
@@ -117,11 +117,11 @@ module controller #(
                 end
             end
             else if (state_r == `INITIAL_FILL) begin
-                instr_wadr_r <= (instr_wen && instr_wadr_r <= instr_max_wadr_c) ? 
+                instr_wadr_r    <= (instr_wen && instr_wadr_r <= instr_max_wadr_c) ? 
                     instr_wadr_r + 1 : instr_wadr_r;
 
                 if (instr_wadr_r == instr_max_wadr_c + 1) begin
-                    state_r <= `INNER_LOOP;
+                    state_r     <= `INNER_LOOP;
                     mvp_core_en <= 1;
                 end
             end
@@ -133,17 +133,17 @@ module controller #(
                     output_wbadr_r <= output_radr_offset;
                 end
                 else if (mem_write && (mem_addr == INVMAT_ADDR)) begin
-                    mvp_core_en <= 0;
-                    mat_inv_en  <= 1;
+                    mvp_core_en    <= 0;
+                    mat_inv_en     <= 1;
                 end
                 else if (mat_inv_en && mat_inv_out_vld) begin
-                    mvp_core_en <= 1;
-                    mat_inv_en  <= 0;
+                    mvp_core_en    <= 1;
+                    mat_inv_en     <= 0;
                 end
             end
             else if (state_r == `RESET_INNER_LOOP) begin
-                input_wadr_r   <= (input_wen && input_full_n) ? input_wadr_r + 8 : input_wadr_r;
-                output_wbadr_r <= (output_wb_ren && output_empty_n) ? output_wbadr_r + 8 : output_wbadr_r;
+                input_wadr_r    <= (input_wen && input_full_n) ? input_wadr_r + 8 : input_wadr_r;
+                output_wbadr_r  <= (output_wb_ren && output_empty_n) ? output_wbadr_r + 8 : output_wbadr_r;
 
                 if ((input_wadr_r >= input_wadr_offset + input_max_wadr_c) && 
                     (output_wbadr_r >= output_radr_offset + output_max_adr_c)) begin

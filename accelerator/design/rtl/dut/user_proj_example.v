@@ -47,7 +47,8 @@ module user_proj_example #(
     wire         io_clk;
     reg          io_rst_n;
     reg          wb_rst_n;
-    wire         rst_n_mux;
+    wire         sync_io_rst_n;
+    wire         sync_wb_rst_n;
     wire         user_proj_clk;
     wire         user_proj_rst_n;
 
@@ -105,9 +106,6 @@ module user_proj_example #(
     always @(posedge io_clk)   io_rst_n <= io_in[36];
     always @(posedge wb_clk_i) wb_rst_n <= ~wb_rst_i;
 
-    wire sync_io_rst_n;
-    wire sync_wb_rst_n;
-
     SyncBit io_rst_n_inst (
         .sCLK          ( io_clk             ),
         .sRST          ( io_rst_n           ),
@@ -127,12 +125,6 @@ module user_proj_example #(
     );
 
     assign user_proj_rst_n = sync_wbs_debug ? sync_wb_rst_n : sync_io_rst_n;
-
-    // assign rst_n_mux = wbs_debug ? wb_rst_n : io_rst_n;
-    // assign rst_n_mux = wbs_debug ? wb_rst_n : io_in[36];
-
-    // SyncResetA #(0) usr_rst_synca_inst (.CLK(user_proj_clk), .IN_RST(rst_n_mux), .OUT_RST(user_proj_rst_n));
-    // SyncResetA #(0) wb_rst_synca_inst  (.CLK(wb_clk_i     ), .IN_RST(~wb_rst_i), .OUT_RST(wb_rst_n       ));
 
 // ==============================================================================
 // Wishbone control

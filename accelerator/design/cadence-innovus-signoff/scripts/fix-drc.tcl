@@ -46,4 +46,4 @@ editDelete -regular_wire_with_drc
 ecoRoute
 
 # delete route blockages that cause drc violations
-deleteRouteBlk -layer {met5} -name "defLayerBlkName"
+deleteRouteBlk -name defLayerBlkName -layer met5
