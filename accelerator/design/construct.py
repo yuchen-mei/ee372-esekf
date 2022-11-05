@@ -114,6 +114,10 @@ def construct():
   pt_power_rtl.set_name( 'ptpx-rtl')
   pt_power_gl.set_name( 'ptpx-gl')
 
+
+  # NEW ! For efabless
+  pt_ptpx_genlibdb = Step(this_dir + '/synopsys-ptpx-genlibdb')
+
   # Default steps
 
   info            = Step( 'info',                          default=True )
@@ -165,6 +169,7 @@ def construct():
   g.add_step( pt_timing       )
   g.add_step( gen_saif_rtl    )
   g.add_step( gen_saif_gl     )
+  g.add_step( pt_ptpx_genlibdb)
   g.add_step( pt_power_rtl    )
   g.add_step( pt_power_gl     )
   g.add_step( magic_drc       )
@@ -200,8 +205,9 @@ def construct():
   calibre_lvs.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   calibre_lvs_nobbox.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.sp'])
   magic_drc.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
+  pt_ptpx_genlibdb.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.db'])
   
-  for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff]:
+  for step in [iflow, init, power, place, cts, postcts_hold, route, postroute, signoff, pt_ptpx_genlibdb]:
     step.extend_inputs(['sky130_sram_1kbyte_1rw1r_32x256_8_TT_1p8V_25C.lib', 'sky130_sram_1kbyte_1rw1r_32x256_8.lef'])
 
   init.extend_inputs(['floorplan.tcl', 'pin-assignments.tcl'])
@@ -235,11 +241,13 @@ def construct():
   g.connect_by_name( adk,             pt_power_rtl    )
   g.connect_by_name( adk,             pt_power_gl     )
   g.connect_by_name( adk,             gl_sim          )
+  g.connect_by_name( adk,             pt_ptpx_genlibdb    )
 
   g.connect_by_name( rtl,             rtl_sim         ) # design.v
   g.connect_by_name( testbench,       rtl_sim         ) # testbench.sv
   # g.connect_by_name( testbench,       gl_sim          ) # testbench.sv
   g.connect_by_name( rtl_sim,         gen_saif_rtl    ) # run.vcd
+ 
 
   g.connect_by_name( sram,            rtl_sim         )
   g.connect_by_name( sram,            gl_sim          )
@@ -257,6 +265,7 @@ def construct():
   g.connect_by_name( sram,            pt_timing       )
   g.connect_by_name( sram,            pt_power_rtl    )
   g.connect_by_name( sram,            pt_power_gl     )
+  g.connect_by_name( sram,            pt_ptpx_genlibdb       )
   g.connect_by_name( sram,            magic_def2spice )
   g.connect_by_name( sram,            magic_gds2spice )
   g.connect_by_name( sram,            netgen_lvs_def  )
@@ -349,6 +358,14 @@ def construct():
   g.connect( dc.o(     'design.sdc'    ),   pt_power_gl.i('design.pt.sdc'  ) )
   g.connect_by_name( gen_saif_gl,           pt_power_gl    ) # run.saif
   # g.connect_by_name( gl_sim,               pt_power_gl    ) # run.vcd
+
+
+  # New liberty generation
+  g.connect( signoff.o('design.spef.gz'),   pt_ptpx_genlibdb.i('design.spef.gz' ) )
+  g.connect( signoff.o('design.vcs.v'  ),   pt_ptpx_genlibdb.i('design.vcs.v'   ) )
+  g.connect( dc.o(     'design.sdc'    ),   pt_ptpx_genlibdb.i('design.pt.sdc'  ) )
+
+
 
   #-----------------------------------------------------------------------
   # Parameterize

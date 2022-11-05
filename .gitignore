@@ -1,4 +1,5 @@
 */build/*
+*/build[0-9]*/*
 */design/__pycache__/*
 mflowgen/
 venv/
